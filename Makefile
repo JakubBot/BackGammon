@@ -1,0 +1,22 @@
+CC = gcc
+CFLAGS = -I./headers
+LDFLAGS = -lncurses
+
+SRC_DIR = src
+HDR_DIR = headers
+
+SRCS = main.c $(SRC_DIR)/menu.c $(SRC_DIR)/renderGame.c $(SRC_DIR)/author.c $(SRC_DIR)/rollDice.c $(SRC_DIR)/vector.c
+OBJS = $(SRCS:.c=.o)
+
+TARGET = moj_program
+
+all: $(TARGET)
+
+$(TARGET): $(OBJS)
+	$(CC) -o $@ $^ $(CFLAGS) $(LDFLAGS)
+
+%.o: %.c
+	$(CC) -c -o $@ $< $(CFLAGS)
+
+clean:
+	rm -f $(TARGET) $(OBJS)

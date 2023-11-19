@@ -1,0 +1,3 @@
+/Users/jakubbot/Desktop/BackGammon2/cmake-build-debug/CMakeFiles/BackGammon2.dir
+/Users/jakubbot/Desktop/BackGammon2/cmake-build-debug/CMakeFiles/edit_cache.dir
+/Users/jakubbot/Desktop/BackGammon2/cmake-build-debug/CMakeFiles/rebuild_cache.dir

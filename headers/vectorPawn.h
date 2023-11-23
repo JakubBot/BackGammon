@@ -14,14 +14,14 @@ typedef struct {
     int allocated_size;
     int count;
     s_pawn *ptr;
-} vector_t;
+} vector_t_pawn;
 
-void init(vector_t *v);
+void init(vector_t_pawn *v);
 
-void reallocate(vector_t *v, int reallocate_size);
+void reallocate(vector_t_pawn *v, int reallocate_size);
 
-void push_back(vector_t *v, s_pawn val);
+void push_back(vector_t_pawn *v, s_pawn val);
 
-s_pawn pop_back(vector_t *v);
+s_pawn pop_back(vector_t_pawn *v);
 
 #endif //VECTOR_H

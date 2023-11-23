@@ -5,6 +5,6 @@
 #ifndef MENU_H
 #define MENU_H
 
-void* renderMenu(int btnIds[], int btnCount, int activeBtnIn, int menuPosX, int menuPosY);
+void* renderMenu(int btnIds[], int btnCount, int activeBtnIn, int menuPosX, int menuPosY, int* diceSize);
 
 #endif //MENU_H

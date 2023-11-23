@@ -12,8 +12,8 @@ add_executable(BackGammon2 main.c
         headers/author.h
         src/rollDice.c
         headers/rollDice.h
-        src/vector.c
-        headers/vector.h
+        src/pawnVector.c
+        headers/vectorPawn.h
         src/utils.cpp
         headers/utils.h
 )

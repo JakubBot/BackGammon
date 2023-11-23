@@ -4,5 +4,12 @@
 
 #ifndef ROLLDICE_H
 #define ROLLDICE_H
-int* rollDice(int size);
-#endif //ROLLDICE_H
+
+typedef struct
+{
+  int size;
+  int *dice;
+} s_dice;
+
+int *rollDice( int *diceSize);
+#endif // ROLLDICE_H

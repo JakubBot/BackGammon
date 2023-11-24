@@ -25,6 +25,10 @@ typedef struct
   s_boardColumn bar;
 } s_board;
 
+typedef struct  {
+  int* dice;
+  int diceSize;
+} s_diceInfo;
 typedef struct
 {
   int initialDiceValueW;
@@ -34,6 +38,6 @@ typedef struct
   s_pawn wPawns[PAWNS_COUNT];
   s_pawn bPawns[PAWNS_COUNT];
   s_pawn removePawns[2 * PAWNS_COUNT];
-  int rollDice[2];
+  s_diceInfo diceInfo;
 } s_game;
 #endif // GLOBALSTRUCTS_H

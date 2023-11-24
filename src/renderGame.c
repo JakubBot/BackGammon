@@ -198,22 +198,19 @@ void renderColumn(s_boardColumn boardColumn, s_game game, WINDOW *gameWin, int a
 
 void findColumnWithPawn(s_game game, int *currentActiveColumn)
 {
-    if (game.turn == 'w')
+    for (int i = 0; i < COLUMNS_COUNT; ++i)
     {
-        for (int i = 0; i < COLUMNS_COUNT; ++i)
-        {
-            // vector_t_pawn pawn = game.board.columns[i].pawnIds;
-            s_boardColumn boardColumn = game.board.columns[i];
-            vector_t_pawn currentColumn = boardColumn.pawnIds;
+        // vector_t_pawn pawn = game.board.columns[i].pawnIds;
+        s_boardColumn boardColumn = game.board.columns[i];
+        vector_t_pawn currentColumn = boardColumn.pawnIds;
 
-            if ((currentColumn.count > 0))
+        if ((currentColumn.count > 0))
+        {
+            char color = currentColumn.ptr[0].color;
+            if ((game.turn == 'w' && color == 'w') || game.turn == 'b' && color == 'b')
             {
-                char color = currentColumn.ptr[0].color;
-                if (color == 'w')
-                {
-                    *currentActiveColumn = i;
-                    break;
-                }
+                *currentActiveColumn = i;
+                break;
             }
         }
     }
@@ -329,14 +326,12 @@ void renderGame()
     wrefresh(gameWin);
 
     // this will render menu with roll dice option
-    //
-
     int menuIds[] = {4};
     int diceSize = 0;
     int *rollDice = (int *)renderMenu(menuIds, 1, 0, 0, 19, &diceSize, &game);
 
     curs_set(0);
-    renderPossibleDiceMoves(rollDice, diceSize);
+    // renderPossibleDiceMoves(rollDice, diceSize);
 
     // render to select a pawn from column
     int moveIds[] = {5};
@@ -344,7 +339,7 @@ void renderGame()
     renderMenu(moveIds, sizeof(moveIds) / sizeof(moveIds[0]), 0, 0, 19, NULL, &game);
     renderBoard(game, gameWin, 1);
 
-    free(rollDice);
+    // free(rollDice);
 
     wrefresh(gameWin);
 }

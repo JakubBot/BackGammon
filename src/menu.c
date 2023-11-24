@@ -91,11 +91,11 @@ void clrButtonPrints(int posY, int nLines)
     }
 }
 
-void *renderMenu(int btnIds[], int btnCount, int activeBtnIn, int menuPosX, int menuPosY, int *diceSize, s_game *game)
+void *renderMenu(int btnIds[], int btnCount, int activeBtnId, int menuPosX, int menuPosY, int *diceSize, s_game *game)
 {
     curs_set(0);
     s_btnOption *buttons = getBtnElements(btnIds, btnCount, game);
-    int selectedBtn = activeBtnIn;
+    int selectedBtn = activeBtnId;
     while (selectedBtn != -1)
     {
         int previusBtnLength = 0;
@@ -145,6 +145,8 @@ void *renderMenu(int btnIds[], int btnCount, int activeBtnIn, int menuPosX, int 
             break;
         }
     }
+    int *rollDicePtr;
+
     if (selectedBtn != -1)
     {
         s_btnOption btn = findBtn(buttons, selectedBtn, btnCount);
@@ -167,10 +169,21 @@ void *renderMenu(int btnIds[], int btnCount, int activeBtnIn, int menuPosX, int 
             break;
         case 'r':
             // roll dice
-            return rollDice(diceSize);
+            rollDicePtr = (int *)rollDice(diceSize);
+            game->diceInfo.dice = rollDicePtr;
+
+            game->diceInfo.diceSize = *diceSize;
+
+            clearSidebarInfo();
+            showTurnInfo(*game);
+
+            free(rollDicePtr);
+            // return rollDicePtr;
+            break;
+        case 'm':
+            curs_set(0);
             break;
         case 'e':
-        case 'm':
         default:
             break;
         }

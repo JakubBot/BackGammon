@@ -23,6 +23,37 @@ void showPlayerInfo(s_game game)
   }
 }
 
+void clearSidebarInfo()
+{
+
+  for (int i = 0; i < 20; ++i)
+  {
+    move(POSITION_Y + i, POSITION_X);
+    clrtoeol();
+  }
+  refresh();
+}
+
+void showTurnInfo(s_game game)
+{
+  mvprintw(POSITION_Y, POSITION_X, "Turn -> Player %c dice size %d", (game.turn == 'w') ? '1' : '2', game.diceInfo.diceSize);
+
+  mvprintw(POSITION_Y + 2, POSITION_X, "Roll dice result -> %d %d", game.diceInfo.dice[0], game.diceInfo.dice[1]);
+
+  for (int i = 0; i < game.diceInfo.diceSize; ++i)
+  {
+    int diceMove = game.diceInfo.dice[i];
+    // if -1 we already used it, so just skip this step
+    if (diceMove == -1)
+    {
+      i--;
+      continue;
+    }
+
+    mvprintw(POSITION_Y + 4 + i, POSITION_X, "Move %d", diceMove);
+  }
+}
+
 void updateInitialDiceValues(s_game *game)
 {
   showPlayerInfo(*game);
@@ -46,6 +77,7 @@ void updateInitialDiceValues(s_game *game)
 
   mvprintw(POSITION_Y + 6, POSITION_X, "Player %c starts the game", (startPlayer == 'w') ? '1' : '2');
 
+  mvprintw(POSITION_Y + 12, POSITION_X, "Turn -> Player %c", (startPlayer == 'w') ? '1' : '2');
+
   game->turn = startPlayer;
-  
 }

@@ -1,5 +1,8 @@
+#include "../headers/globalStructs.h"
+
 #ifndef RENDERGAME_H
 #define RENDERGAME_H
+
 
 void renderGame();
 

@@ -23,12 +23,16 @@ typedef struct
   s_pawn pawnOnBar;
   s_boardColumn columns[COLUMNS_COUNT];
   s_boardColumn bar;
+  int sourceColumn;
+  int targetColumn;
 } s_board;
 
 typedef struct  {
   int* dice;
   int diceSize;
 } s_diceInfo;
+
+
 typedef struct
 {
   int initialDiceValueW;

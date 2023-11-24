@@ -1,8 +1,8 @@
-//
-// Created by jakub bot on 18/11/2023.
-//
+#include "ncurses.h"
 
 #ifndef UTILS_H
 #define UTILS_H
 
-#endif //UTILS_H
+void clrButtonPrints(int posY, int nLines);
+
+#endif // UTILS_H

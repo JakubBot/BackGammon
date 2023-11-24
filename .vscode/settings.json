@@ -6,6 +6,7 @@
     "globalstructs.h": "c",
     "playerturn.h": "c",
     "ncurses.h": "c",
-    "rendergame.h": "c"
+    "rendergame.h": "c",
+    "utils.h": "c"
   }
 }

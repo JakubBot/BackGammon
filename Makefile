@@ -5,7 +5,7 @@ LDFLAGS = -lncurses
 SRC_DIR = src
 HDR_DIR = headers
 
-SRCS = main.c $(SRC_DIR)/menu.c $(SRC_DIR)/renderGame.c $(SRC_DIR)/author.c $(SRC_DIR)/rollDice.c $(SRC_DIR)/vectorPawn.c $(SRC_DIR)/playerTurn.c
+SRCS = main.c $(SRC_DIR)/menu.c $(SRC_DIR)/renderGame.c $(SRC_DIR)/author.c $(SRC_DIR)/rollDice.c $(SRC_DIR)/vectorPawn.c $(SRC_DIR)/playerTurn.c $(SRC_DIR)/move.c $(SRC_DIR)/utils.c
 OBJS = $(SRCS:.c=.o)
 
 TARGET = moj_program

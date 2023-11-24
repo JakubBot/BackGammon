@@ -5,6 +5,7 @@
 #include "../headers/vectorPawn.h"
 #include "../headers/playerTurn.h"
 #include "../headers/globalStructs.h"
+#include "../headers/utils.h"
 
 // #define COLUMNS_COUNT 24
 // #define BOARD_COLUMN_HEIGHT 5
@@ -108,8 +109,12 @@ void initializeGame(s_game *game)
         game->initialDiceValueW = -1;
         game->initialDiceValueB = -1;
 
+        game->board.sourceColumn = -1;
+        game->board.targetColumn = -1;
+
         int isReversed = (i + 1) > (COLUMNS_COUNT / 2) ? 1 : 0;
         int colX = isReversed ? COLUMNS_COUNT - i - 1 : (COLUMNS_COUNT / 2) + i;
+
         game->board.columns[i].colX = colX;
         game->board.columns[i].colY = isReversed ? 1 : 0;
         game->board.columns[i].isReversed = isReversed;
@@ -216,35 +221,38 @@ void findColumnWithPawn(s_game game, int *currentActiveColumn)
     }
 }
 
-void renderBoard(s_game game, WINDOW *gameWin, int selectColumn)
+void renderBoard(s_game *game, WINDOW *gameWin, int selectColumn, int targetColumn)
 {
     // selectColumn - 1 to active
     int currentActiveColumn = -1;
-
     do
     {
-        if (selectColumn && currentActiveColumn == -1)
+        if (targetColumn && currentActiveColumn == -1)
         {
-            findColumnWithPawn(game, &currentActiveColumn);
+            currentActiveColumn = game->board.sourceColumn + 1;
+        }
+        else if ((selectColumn) && currentActiveColumn == -1)
+        {
+            findColumnWithPawn(*game, &currentActiveColumn);
         }
         for (int i = 0; i < COLUMNS_COUNT; ++i)
         {
-            s_boardColumn boardColumn = game.board.columns[i];
+            s_boardColumn boardColumn = game->board.columns[i];
             int additionalOffsetLeft = 0;
             if (boardColumn.colX < 6 || boardColumn.colX > 17)
             {
                 additionalOffsetLeft = 4;
             }
-            if (i == currentActiveColumn)
+            if ((i == currentActiveColumn) || (i == game->board.sourceColumn))
             {
                 attron(COLOR_PAIR(2));
-                renderColumn(boardColumn, game, gameWin, additionalOffsetLeft);
+                renderColumn(boardColumn, *game, gameWin, additionalOffsetLeft);
 
                 attroff(COLOR_PAIR(2));
             }
             else
             {
-                renderColumn(boardColumn, game, gameWin, additionalOffsetLeft);
+                renderColumn(boardColumn, *game, gameWin, additionalOffsetLeft);
             }
         }
         // render bar that is between 6 and 7 column
@@ -256,7 +264,7 @@ void renderBoard(s_game game, WINDOW *gameWin, int selectColumn)
         }
         wrefresh(gameWin);
 
-        if (selectColumn == 1)
+        if ((selectColumn == 1) || (targetColumn == 1))
         {
             int ch = getch();
             curs_set(0);
@@ -288,9 +296,23 @@ void renderBoard(s_game game, WINDOW *gameWin, int selectColumn)
                     currentActiveColumn -= COLUMNS_COUNT / 2;
                 }
             }
+            else if (ch == 10)
+            {
+                // ch == 10 is enter
+                break;
+            }
         }
 
-    } while (selectColumn);
+    } while (selectColumn || targetColumn);
+
+    if (selectColumn)
+    {
+        game->board.sourceColumn = currentActiveColumn;
+    }
+    else if (targetColumn)
+    {
+        game->board.targetColumn = currentActiveColumn;
+    }
 }
 
 void renderPossibleDiceMoves(int *rollDice, int size)
@@ -317,7 +339,7 @@ void renderGame()
     wrefresh(gameWin);
     box(gameWin, 0, 0);
     wrefresh(gameWin);
-    renderBoard(game, gameWin, 0);
+    renderBoard(&game, gameWin, 0, 0);
 
     // decide who starts
     // int startRollsIds[] = {7};
@@ -326,18 +348,26 @@ void renderGame()
     wrefresh(gameWin);
 
     // this will render menu with roll dice option
-    int menuIds[] = {4};
+    int menuIds[] = {4, 8};
     int diceSize = 0;
-    int *rollDice = (int *)renderMenu(menuIds, 1, 0, 0, 19, &diceSize, &game);
+    clrButtonPrints(19, 3);
+    int *rollDice = (int *)renderMenu(menuIds, sizeof(menuIds) / sizeof(menuIds[0]), 0, 0, 19, &diceSize, &game);
 
     curs_set(0);
     // renderPossibleDiceMoves(rollDice, diceSize);
 
     // render to select a pawn from column
-    int moveIds[] = {5};
+    int sourceMoveIds[] = {5, 8};
+    clrButtonPrints(19, 3);
+    refresh();
+    renderMenu(sourceMoveIds, sizeof(sourceMoveIds) / sizeof(sourceMoveIds[0]), 0, 0, 19, NULL, &game);
+    renderBoard(&game, gameWin, 1, 0);
+    clrButtonPrints(19, 3);
 
-    renderMenu(moveIds, sizeof(moveIds) / sizeof(moveIds[0]), 0, 0, 19, NULL, &game);
-    renderBoard(game, gameWin, 1);
+    // render a target for a pawn
+    int targetMoveIds[] = {6, 8};
+    renderMenu(targetMoveIds, sizeof(targetMoveIds) / sizeof(targetMoveIds[0]), 0, 0, 19, NULL, &game);
+    renderBoard(&game, gameWin, 0, 1);
 
     // free(rollDice);
 

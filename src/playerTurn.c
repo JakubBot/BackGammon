@@ -36,21 +36,22 @@ void clearSidebarInfo()
 
 void showTurnInfo(s_game game)
 {
-  mvprintw(POSITION_Y, POSITION_X, "Turn -> Player %c dice size %d", (game.turn == 'w') ? '1' : '2', game.diceInfo.diceSize);
+  mvprintw(POSITION_Y, POSITION_X, "Turn -> Player %c, possible moves %d", (game.turn == 'w') ? '1' : '2', game.diceInfo.diceSize);
 
   mvprintw(POSITION_Y + 2, POSITION_X, "Roll dice result -> %d %d", game.diceInfo.dice[0], game.diceInfo.dice[1]);
 
+      mvprintw(POSITION_Y + 4 , POSITION_X, "Moves left:");
+
+  int displayPosition = 0;
   for (int i = 0; i < game.diceInfo.diceSize; ++i)
   {
     int diceMove = game.diceInfo.dice[i];
     // if -1 we already used it, so just skip this step
-    if (diceMove == -1)
+    if (diceMove != -1)
     {
-      i--;
-      continue;
+      mvprintw(POSITION_Y + 5 + displayPosition, POSITION_X, "-> %d", diceMove);
+      displayPosition++;
     }
-
-    mvprintw(POSITION_Y + 4 + i, POSITION_X, "Move %d", diceMove);
   }
 }
 

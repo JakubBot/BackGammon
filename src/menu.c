@@ -6,6 +6,7 @@
 #include "../headers/rollDice.h"
 #include "../headers/globalStructs.h"
 #include "../headers/playerTurn.h"
+#include "../headers/utils.h"
 
 typedef struct btnOption
 {
@@ -66,6 +67,7 @@ s_btnOption *getBtnElements(int btnIds[], int btnCount, s_game *game)
         (s_btnOption){"Select a pawn you want to move", 5, 'm'},
         (s_btnOption){"Select a column", 6, 'c'},
         (s_btnOption){formatOptionText(game), 7, 'd'},
+        (s_btnOption){"Exit & Save changes", 8, 'h'},
         // (s_btnOption){"Starting dice roll", 7, 'd'},
     };
     int btnContainerCount = sizeof(btnContainer) / sizeof(btnContainer[0]);
@@ -82,14 +84,14 @@ s_btnOption *getBtnElements(int btnIds[], int btnCount, s_game *game)
     return btns;
 }
 
-void clrButtonPrints(int posY, int nLines)
-{
-    for (int i = 0; i < nLines; ++i)
-    {
-        move(posY + i, 0);
-        clrtoeol();
-    }
-}
+// void clrButtonPrints(int posY, int nLines)
+// {
+//     for (int i = 0; i < nLines; ++i)
+//     {
+//         move(posY + i, 0);
+//         clrtoeol();
+//     }
+// }
 
 void *renderMenu(int btnIds[], int btnCount, int activeBtnId, int menuPosX, int menuPosY, int *diceSize, s_game *game)
 {
@@ -170,6 +172,7 @@ void *renderMenu(int btnIds[], int btnCount, int activeBtnId, int menuPosX, int 
         case 'r':
             // roll dice
             rollDicePtr = (int *)rollDice(diceSize);
+
             game->diceInfo.dice = rollDicePtr;
 
             game->diceInfo.diceSize = *diceSize;
@@ -180,8 +183,14 @@ void *renderMenu(int btnIds[], int btnCount, int activeBtnId, int menuPosX, int 
             free(rollDicePtr);
             // return rollDicePtr;
             break;
+
+        case 'h':
+            // exit & save changes
+            break;
+        case 'c':
         case 'm':
             curs_set(0);
+            // clrButtonPrints(menuPosY, 3);
             break;
         case 'e':
         default:

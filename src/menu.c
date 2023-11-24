@@ -4,10 +4,13 @@
 #include "../headers/renderGame.h"
 #include "../headers/author.h"
 #include "../headers/rollDice.h"
+#include "../headers/globalStructs.h"
+#include "../headers/playerTurn.h"
 
 typedef struct btnOption
 {
-    char text[10];
+    char *text;
+    // char text[50];
     int id;
     char action;
 } s_btnOption;
@@ -34,15 +37,36 @@ s_btnOption findBtn(s_btnOption *btns, int id, int btnCount)
     return btns[0];
 }
 
-s_btnOption *getBtnElements(int btnIds[], int btnCount)
+char *formatOptionText(s_game *game)
 {
+    if (game == NULL)
+        return "";
+    // Przykładowa logika zależna od zmiennej startingDice
+    if (game->turn == 'w')
+    {
+        char temp[50] = "Player 1 rolls";
+        return "Player 1 rolls";
+    }
+    else
+    {
+        char temp[50] = "Player 2 rolls";
+        return "Player 2 rolls";
+    }
+}
+
+s_btnOption *getBtnElements(int btnIds[], int btnCount, s_game *game)
+{
+    // char *diceRollPlayer = (game.turn == 'w') ? " " : "";
     s_btnOption btnContainer[] = {
         (s_btnOption){"Start", 0, 's'},
         (s_btnOption){"Load Game", 1, 'l'},
         (s_btnOption){"Author", 2, 'a'},
         (s_btnOption){"Exit", 3, 'e'},
         (s_btnOption){"Roll Dice", 4, 'r'},
-        (s_btnOption){"Move", 5, 'm'},
+        (s_btnOption){"Select a pawn you want to move", 5, 'm'},
+        (s_btnOption){"Select a column", 6, 'c'},
+        (s_btnOption){formatOptionText(game), 7, 'd'},
+        // (s_btnOption){"Starting dice roll", 7, 'd'},
     };
     int btnContainerCount = sizeof(btnContainer) / sizeof(btnContainer[0]);
 
@@ -58,10 +82,19 @@ s_btnOption *getBtnElements(int btnIds[], int btnCount)
     return btns;
 }
 
-void *renderMenu(int btnIds[], int btnCount, int activeBtnIn, int menuPosX, int menuPosY, int *diceSize)
+void clrButtonPrints(int posY, int nLines)
+{
+    for (int i = 0; i < nLines; ++i)
+    {
+        move(posY + i, 0);
+        clrtoeol();
+    }
+}
+
+void *renderMenu(int btnIds[], int btnCount, int activeBtnIn, int menuPosX, int menuPosY, int *diceSize, s_game *game)
 {
     curs_set(0);
-    s_btnOption *buttons = getBtnElements(btnIds, btnCount);
+    s_btnOption *buttons = getBtnElements(btnIds, btnCount, game);
     int selectedBtn = activeBtnIn;
     while (selectedBtn != -1)
     {
@@ -118,6 +151,11 @@ void *renderMenu(int btnIds[], int btnCount, int activeBtnIn, int menuPosX, int 
         curs_set(1);
         switch (btn.action)
         {
+        case 'd':
+            game->turn = (game->turn == 'w') ? 'b' : 'w';
+            clrButtonPrints(menuPosY, 3);
+            refresh();
+            break;
         case 's':
             // start
             renderGame();
@@ -125,13 +163,14 @@ void *renderMenu(int btnIds[], int btnCount, int activeBtnIn, int menuPosX, int 
         case 'a':
             // author
             authorInfo();
-            renderMenu(btnIds, btnCount, selectedBtn, 0, 0, diceSize);
+            renderMenu(btnIds, btnCount, selectedBtn, 0, 0, diceSize, game);
             break;
         case 'r':
             // roll dice
             return rollDice(diceSize);
             break;
         case 'e':
+        case 'm':
         default:
             break;
         }

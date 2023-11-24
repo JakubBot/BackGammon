@@ -11,5 +11,6 @@ typedef struct
   int *dice;
 } s_dice;
 
-int *rollDice( int *diceSize);
+int *rollDice(int *diceSize);
+int randomNum(int min, int max);
 #endif // ROLLDICE_H

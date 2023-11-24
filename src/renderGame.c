@@ -3,37 +3,40 @@
 #include "stdlib.h"
 #include "../headers/menu.h"
 #include "../headers/vectorPawn.h"
-#define COLUMNS_COUNT 24
-#define BOARD_COLUMN_HEIGHT 5
-#define PAWNS_COUNT 15
-#define MAX_PAWN_ON_COL 5
-#define COLUMNGAP 3
+#include "../headers/playerTurn.h"
+#include "../headers/globalStructs.h"
 
-typedef struct
-{
-    vector_t_pawn pawnIds;
-    //    int pawnIds[MAX_PAWN_ON_COL];
-    int colX;
-    int colY;
-    int isReversed;
-} s_boardColumn;
+// #define COLUMNS_COUNT 24
+// #define BOARD_COLUMN_HEIGHT 5
+// #define PAWNS_COUNT 15
+// #define MAX_PAWN_ON_COL 5
+// #define COLUMNGAP 3
 
-typedef struct
-{
-    s_pawn pawnOnBar;
-    s_boardColumn columns[COLUMNS_COUNT];
-    s_boardColumn bar;
-} s_board;
+// typedef struct
+// {
+//     vector_t_pawn pawnIds;
+//     //    int pawnIds[MAX_PAWN_ON_COL];
+//     int colX;
+//     int colY;
+//     int isReversed;
+// } s_boardColumn;
 
-typedef struct
-{
-    char turn;
-    s_board board;
-    s_pawn wPawns[PAWNS_COUNT];
-    s_pawn bPawns[PAWNS_COUNT];
-    s_pawn removePawns[2 * PAWNS_COUNT];
-    int rollDice[2];
-} s_game;
+// typedef struct
+// {
+//     s_pawn pawnOnBar;
+//     s_boardColumn columns[COLUMNS_COUNT];
+//     s_boardColumn bar;
+// } s_board;
+
+// typedef struct
+// {
+//     char turn;
+//     s_board board;
+//     s_pawn wPawns[PAWNS_COUNT];
+//     s_pawn bPawns[PAWNS_COUNT];
+//     s_pawn removePawns[2 * PAWNS_COUNT];
+//     int rollDice[2];
+// } s_game;
 
 int getPawnInitialX(char color, int index)
 {
@@ -101,12 +104,15 @@ void initializeGame(s_game *game)
 {
     for (int i = 0; i < COLUMNS_COUNT; ++i)
     {
+        game->turn = 'w';
+        game->initialDiceValueW = -1;
+        game->initialDiceValueB = -1;
+
         int isReversed = (i + 1) > (COLUMNS_COUNT / 2) ? 1 : 0;
         int colX = isReversed ? COLUMNS_COUNT - i - 1 : (COLUMNS_COUNT / 2) + i;
         game->board.columns[i].colX = colX;
         game->board.columns[i].colY = isReversed ? 1 : 0;
         game->board.columns[i].isReversed = isReversed;
-
         vector_t_pawn *pawn = &game->board.columns[i].pawnIds;
 
         init(pawn);
@@ -120,14 +126,9 @@ void initializeGame(s_game *game)
     {
         game->wPawns[i].color = 'w';
         game->wPawns[i].id = i;
-        //        game->wPawns[i].x = 0;
-        //        game->wPawns[i].x = getPawnInitialX('w',i);
-        //        game->wPawns[i].y = 0;
 
         game->bPawns[i].color = 'b';
         game->bPawns[i].id = i;
-        //        game->bPawns[i].x = 0;
-        //        game->bPawns[i].y = 0;
     }
 }
 
@@ -145,7 +146,7 @@ void renderColumn(s_boardColumn boardColumn, s_game game, WINDOW *gameWin, int a
     vector_t_pawn currentColumn = boardColumn.pawnIds;
     int columnCount = currentColumn.count;
     char color = currentColumn.ptr[0].color;
-    char *pawnLabel = color == 'b' ? "\u2593\u2593" : "\u2592\u2592";
+    char *pawnLabel = color == 'b' ? "\u2592\u2592" : "\u2593\u2593";
     // char *pawnLabel = color == 'b' ?  "ww" : "bb";
 
     int count = BOARD_COLUMN_HEIGHT - columnCount;
@@ -182,47 +183,124 @@ void renderColumn(s_boardColumn boardColumn, s_game game, WINDOW *gameWin, int a
             if (columnCount > 0)
             {
                 mvprintw(yOffset, xOffset, pawnLabel);
-                //                mvprintw( row + offset_y,offset_x + (x * 4), label);
                 columnCount--;
             }
             else
             {
                 mvprintw(yOffset, xOffset, label);
             }
-
-            //            mvprintw( row + offset_y,offset_x + (x * 4), label);
         }
         mvprintw(offset_y - 2, offset_x + (x * 4), "%d", labelRowId);
     }
 }
-void renderBoard(s_game game, WINDOW *gameWin)
+
+// render columns
+
+void findColumnWithPawn(s_game game, int *currentActiveColumn)
 {
-    // render columns
-    for (int i = 0; i < COLUMNS_COUNT; ++i)
+    if (game.turn == 'w')
     {
-        s_boardColumn boardColumn = game.board.columns[i];
-        int additionalOffsetLeft = 0;
-        if (boardColumn.colX < 6 || boardColumn.colX > 17)
+        for (int i = 0; i < COLUMNS_COUNT; ++i)
         {
-            additionalOffsetLeft = 4;
+            // vector_t_pawn pawn = game.board.columns[i].pawnIds;
+            s_boardColumn boardColumn = game.board.columns[i];
+            vector_t_pawn currentColumn = boardColumn.pawnIds;
+
+            if ((currentColumn.count > 0))
+            {
+                char color = currentColumn.ptr[0].color;
+                if (color == 'w')
+                {
+                    *currentActiveColumn = i;
+                    break;
+                }
+            }
         }
-        renderColumn(boardColumn, game, gameWin, additionalOffsetLeft);
     }
-    // render bar that is between 6 and 7 column
-    int barElements = (MAX_PAWN_ON_COL * 2) + COLUMNGAP;
-    int offset_y = 3;
-    for (int i = 1; i < barElements; ++i)
+}
+
+void renderBoard(s_game game, WINDOW *gameWin, int selectColumn)
+{
+    // selectColumn - 1 to active
+    int currentActiveColumn = -1;
+
+    do
     {
-        mvprintw(i + offset_y, 1 + (6 * 4), "||");
-    }
-    wrefresh(gameWin);
+        if (selectColumn && currentActiveColumn == -1)
+        {
+            findColumnWithPawn(game, &currentActiveColumn);
+        }
+        for (int i = 0; i < COLUMNS_COUNT; ++i)
+        {
+            s_boardColumn boardColumn = game.board.columns[i];
+            int additionalOffsetLeft = 0;
+            if (boardColumn.colX < 6 || boardColumn.colX > 17)
+            {
+                additionalOffsetLeft = 4;
+            }
+            if (i == currentActiveColumn)
+            {
+                attron(COLOR_PAIR(2));
+                renderColumn(boardColumn, game, gameWin, additionalOffsetLeft);
+
+                attroff(COLOR_PAIR(2));
+            }
+            else
+            {
+                renderColumn(boardColumn, game, gameWin, additionalOffsetLeft);
+            }
+        }
+        // render bar that is between 6 and 7 column
+        int barElements = (MAX_PAWN_ON_COL * 2) + COLUMNGAP;
+        int offset_y = 3;
+        for (int i = 1; i < barElements; ++i)
+        {
+            mvprintw(i + offset_y, 1 + (6 * 4), "||");
+        }
+        wrefresh(gameWin);
+
+        if (selectColumn == 1)
+        {
+            int ch = getch();
+            curs_set(0);
+            if (ch == KEY_LEFT)
+            {
+                if (currentActiveColumn > 0)
+                {
+                    currentActiveColumn--;
+                }
+            }
+            else if (ch == KEY_RIGHT)
+            {
+                if (currentActiveColumn < COLUMNS_COUNT - 1)
+                {
+                    currentActiveColumn++;
+                }
+            }
+            else if (ch == KEY_DOWN)
+            {
+                if (currentActiveColumn < COLUMNS_COUNT / 2)
+                {
+                    currentActiveColumn += COLUMNS_COUNT / 2;
+                }
+            }
+            else if (ch == KEY_UP)
+            {
+                if (currentActiveColumn > ((COLUMNS_COUNT / 2) - 1))
+                {
+                    currentActiveColumn -= COLUMNS_COUNT / 2;
+                }
+            }
+        }
+
+    } while (selectColumn);
 }
 
 void renderPossibleDiceMoves(int *rollDice, int size)
 {
     for (int i = 0; i < size; ++i)
     {
-        mvprintw(10 , 29 + (i * 2),  "%d", rollDice[i]);
+        mvprintw(10, 29 + (i * 2), "%d", rollDice[i]);
     }
 }
 
@@ -234,19 +312,39 @@ void renderGame()
     mvprintw(0, 0, "Backgammon (press q to exit)");
     s_game game = {};
     initializeGame(&game);
+
+    // showPlayerInfo(game);
+
     int ySize = 14, xSize = 52, yStart = 3, xStart = 0;
     WINDOW *gameWin = newwin(ySize, xSize, yStart, xStart);
     wrefresh(gameWin);
     box(gameWin, 0, 0);
     wrefresh(gameWin);
-    renderBoard(game, gameWin);
+    renderBoard(game, gameWin, 0);
+
+    // decide who starts
+    // int startRollsIds[] = {7};
+    // renderMenu(startRollsIds, sizeof(startRollsIds) / sizeof(startRollsIds[0]), 0, 0, 19, NULL, &game);
+    updateInitialDiceValues(&game);
+    wrefresh(gameWin);
 
     // this will render menu with roll dice option
+    //
+
     int menuIds[] = {4};
     int diceSize = 0;
-    int *rollDice = (int *)renderMenu(menuIds, sizeof(menuIds) / sizeof(menuIds[0]), 0, 0, 19, &diceSize);
+    int *rollDice = (int *)renderMenu(menuIds, 1, 0, 0, 19, &diceSize, &game);
+
+    curs_set(0);
     renderPossibleDiceMoves(rollDice, diceSize);
 
+    // render to select a pawn from column
+    int moveIds[] = {5};
+
+    renderMenu(moveIds, sizeof(moveIds) / sizeof(moveIds[0]), 0, 0, 19, NULL, &game);
+    renderBoard(game, gameWin, 1);
+
     free(rollDice);
+
     wrefresh(gameWin);
 }

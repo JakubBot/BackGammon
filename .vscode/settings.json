@@ -1,5 +1,11 @@
 {
   "files.associations": {
-    "vectorpawn.h": "c"
+    "vectorpawn.h": "c",
+    "stdlib.h": "c",
+    "rolldice.h": "c",
+    "globalstructs.h": "c",
+    "playerturn.h": "c",
+    "ncurses.h": "c",
+    "rendergame.h": "c"
   }
 }

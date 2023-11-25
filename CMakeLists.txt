@@ -12,10 +12,15 @@ add_executable(BackGammon2 main.c
         headers/author.h
         src/rollDice.c
         headers/rollDice.h
-        src/pawnVector.c
         headers/vectorPawn.h
-        src/utils.cpp
+        src/vectorPawn.c
+        src/utils.c
         headers/utils.h
+        src/playerTurn.c
+        headers/playerTurn.h
+        src/move.c
+        headers/move.h
 )
+
 find_package(Curses REQUIRED)
 target_link_libraries(BackGammon2 ${CURSES_LIBRARIES})

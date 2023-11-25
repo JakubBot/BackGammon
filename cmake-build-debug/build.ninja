@@ -79,8 +79,26 @@ build CMakeFiles/BackGammon2.dir/src/rollDice.c.o: C_COMPILER__BackGammon2_unsca
   OBJECT_DIR = CMakeFiles/BackGammon2.dir
   OBJECT_FILE_DIR = CMakeFiles/BackGammon2.dir/src
 
-build CMakeFiles/BackGammon2.dir/src/vector.c.o: C_COMPILER__BackGammon2_unscanned_Debug /Users/jakubbot/Desktop/BackGammon2/src/vector.c || cmake_object_order_depends_target_BackGammon2
-  DEP_FILE = CMakeFiles/BackGammon2.dir/src/vector.c.o.d
+build CMakeFiles/BackGammon2.dir/src/vectorPawn.c.o: C_COMPILER__BackGammon2_unscanned_Debug /Users/jakubbot/Desktop/BackGammon2/src/vectorPawn.c || cmake_object_order_depends_target_BackGammon2
+  DEP_FILE = CMakeFiles/BackGammon2.dir/src/vectorPawn.c.o.d
+  FLAGS = -g -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX14.0.sdk -fcolor-diagnostics
+  OBJECT_DIR = CMakeFiles/BackGammon2.dir
+  OBJECT_FILE_DIR = CMakeFiles/BackGammon2.dir/src
+
+build CMakeFiles/BackGammon2.dir/src/utils.c.o: C_COMPILER__BackGammon2_unscanned_Debug /Users/jakubbot/Desktop/BackGammon2/src/utils.c || cmake_object_order_depends_target_BackGammon2
+  DEP_FILE = CMakeFiles/BackGammon2.dir/src/utils.c.o.d
+  FLAGS = -g -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX14.0.sdk -fcolor-diagnostics
+  OBJECT_DIR = CMakeFiles/BackGammon2.dir
+  OBJECT_FILE_DIR = CMakeFiles/BackGammon2.dir/src
+
+build CMakeFiles/BackGammon2.dir/src/playerTurn.c.o: C_COMPILER__BackGammon2_unscanned_Debug /Users/jakubbot/Desktop/BackGammon2/src/playerTurn.c || cmake_object_order_depends_target_BackGammon2
+  DEP_FILE = CMakeFiles/BackGammon2.dir/src/playerTurn.c.o.d
+  FLAGS = -g -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX14.0.sdk -fcolor-diagnostics
+  OBJECT_DIR = CMakeFiles/BackGammon2.dir
+  OBJECT_FILE_DIR = CMakeFiles/BackGammon2.dir/src
+
+build CMakeFiles/BackGammon2.dir/src/move.c.o: C_COMPILER__BackGammon2_unscanned_Debug /Users/jakubbot/Desktop/BackGammon2/src/move.c || cmake_object_order_depends_target_BackGammon2
+  DEP_FILE = CMakeFiles/BackGammon2.dir/src/move.c.o.d
   FLAGS = -g -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX14.0.sdk -fcolor-diagnostics
   OBJECT_DIR = CMakeFiles/BackGammon2.dir
   OBJECT_FILE_DIR = CMakeFiles/BackGammon2.dir/src
@@ -93,7 +111,7 @@ build CMakeFiles/BackGammon2.dir/src/vector.c.o: C_COMPILER__BackGammon2_unscann
 #############################################
 # Link the executable BackGammon2
 
-build BackGammon2: C_EXECUTABLE_LINKER__BackGammon2_Debug CMakeFiles/BackGammon2.dir/main.c.o CMakeFiles/BackGammon2.dir/src/menu.c.o CMakeFiles/BackGammon2.dir/src/renderGame.c.o CMakeFiles/BackGammon2.dir/src/author.c.o CMakeFiles/BackGammon2.dir/src/rollDice.c.o CMakeFiles/BackGammon2.dir/src/vector.c.o | /Library/Developer/CommandLineTools/SDKs/MacOSX14.0.sdk/usr/lib/libcurses.tbd /Library/Developer/CommandLineTools/SDKs/MacOSX14.0.sdk/usr/lib/libform.tbd
+build BackGammon2: C_EXECUTABLE_LINKER__BackGammon2_Debug CMakeFiles/BackGammon2.dir/main.c.o CMakeFiles/BackGammon2.dir/src/menu.c.o CMakeFiles/BackGammon2.dir/src/renderGame.c.o CMakeFiles/BackGammon2.dir/src/author.c.o CMakeFiles/BackGammon2.dir/src/rollDice.c.o CMakeFiles/BackGammon2.dir/src/vectorPawn.c.o CMakeFiles/BackGammon2.dir/src/utils.c.o CMakeFiles/BackGammon2.dir/src/playerTurn.c.o CMakeFiles/BackGammon2.dir/src/move.c.o | /Library/Developer/CommandLineTools/SDKs/MacOSX14.0.sdk/usr/lib/libcurses.tbd /Library/Developer/CommandLineTools/SDKs/MacOSX14.0.sdk/usr/lib/libform.tbd
   FLAGS = -g -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX14.0.sdk
   LINK_LIBRARIES = /Library/Developer/CommandLineTools/SDKs/MacOSX14.0.sdk/usr/lib/libcurses.tbd  /Library/Developer/CommandLineTools/SDKs/MacOSX14.0.sdk/usr/lib/libform.tbd
   OBJECT_DIR = CMakeFiles/BackGammon2.dir

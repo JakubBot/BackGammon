@@ -7,37 +7,8 @@
 #include "../headers/globalStructs.h"
 #include "../headers/utils.h"
 
-// #define COLUMNS_COUNT 24
-// #define BOARD_COLUMN_HEIGHT 5
-// #define PAWNS_COUNT 15
-// #define MAX_PAWN_ON_COL 5
-// #define COLUMNGAP 3
 
-// typedef struct
-// {
-//     vector_t_pawn pawnIds;
-//     //    int pawnIds[MAX_PAWN_ON_COL];
-//     int colX;
-//     int colY;
-//     int isReversed;
-// } s_boardColumn;
 
-// typedef struct
-// {
-//     s_pawn pawnOnBar;
-//     s_boardColumn columns[COLUMNS_COUNT];
-//     s_boardColumn bar;
-// } s_board;
-
-// typedef struct
-// {
-//     char turn;
-//     s_board board;
-//     s_pawn wPawns[PAWNS_COUNT];
-//     s_pawn bPawns[PAWNS_COUNT];
-//     s_pawn removePawns[2 * PAWNS_COUNT];
-//     int rollDice[2];
-// } s_game;
 
 int getPawnInitialX(char color, int index)
 {
@@ -103,15 +74,15 @@ void getInitialColumnsIds(vector_t_pawn *boardColumn, int column)
 
 void initializeGame(s_game *game)
 {
+    game->turn = 'w';
+    game->initialDiceValueW = -1;
+    game->initialDiceValueB = -1;
+
+    game->board.sourceColumn = -1;
+    game->board.targetColumn = -1;
+
     for (int i = 0; i < COLUMNS_COUNT; ++i)
     {
-        game->turn = 'w';
-        game->initialDiceValueW = -1;
-        game->initialDiceValueB = -1;
-
-        game->board.sourceColumn = -1;
-        game->board.targetColumn = -1;
-
         int isReversed = (i + 1) > (COLUMNS_COUNT / 2) ? 1 : 0;
         int colX = isReversed ? COLUMNS_COUNT - i - 1 : (COLUMNS_COUNT / 2) + i;
 
@@ -199,31 +170,95 @@ void renderColumn(s_boardColumn boardColumn, s_game game, WINDOW *gameWin, int a
     }
 }
 
-// render columns
-
-void findColumnWithPawn(s_game game, int *currentActiveColumn)
-{
-    for (int i = 0; i < COLUMNS_COUNT; ++i)
-    {
-        // vector_t_pawn pawn = game.board.columns[i].pawnIds;
+s_boardColumn findColumnBasedOnColX(s_game game, int currentActiveColumn) {
+    for (int i = 0; i < COLUMNS_COUNT; ++i) {
         s_boardColumn boardColumn = game.board.columns[i];
-        vector_t_pawn currentColumn = boardColumn.pawnIds;
 
-        if ((currentColumn.count > 0))
-        {
-            char color = currentColumn.ptr[0].color;
-            if ((game.turn == 'w' && color == 'w') || game.turn == 'b' && color == 'b')
-            {
-                *currentActiveColumn = i;
-                break;
-            }
+        if (boardColumn.colX == currentActiveColumn) {
+            return boardColumn;
         }
     }
+    return game.board.columns[0];
+}
+int findNextPossibleMove(s_game game, int currentActiveColumn, char action) {
+    int currIndex = currentActiveColumn;
+    while (true) {
+        if (currIndex >= COLUMNS_COUNT) {
+            currIndex = 0;
+        }   else if (currIndex < 0) {
+            currIndex = COLUMNS_COUNT - 1;
+        }
+
+        s_boardColumn bColumn = findColumnBasedOnColX(game,currIndex);
+        vector_t_pawn cColumn = bColumn.pawnIds;
+
+        if ((cColumn.count > 0) && (bColumn.colX != game.board.sourceColumn))
+        {
+            char color = cColumn.ptr[0].color;
+            if ((game.turn == 'w' && color == 'w') || game.turn == 'b' && color == 'b')
+            {
+                return bColumn.colX;
+            }
+        }
+        if (action == 'r') {
+            ++currIndex;
+        } else if (action == 'l') {
+            --currIndex;
+        }
+    }
+}
+
+//int searchColumn(s_game game, int currentActiveColumn,char action) {
+//    if (action == 'r') {
+//        int i = findNextPossibleMove(game, currentActiveColumn + 1, action) ;
+//        return i;
+//    } else if(action == 'l') {
+//        int i = findNextPossibleMove(game, currentActiveColumn - 1,action) ;
+//        return i;
+//    }
+//
+//  return -1;
+//}
+
+void findColumnWithPawn(s_game game, int *currentActiveColumn, char action)
+{
+    switch(action) {
+        case 'r':
+            *currentActiveColumn = findNextPossibleMove(game, *currentActiveColumn + 1, action);
+            break;
+            case 'l':
+            *currentActiveColumn = findNextPossibleMove(game, *currentActiveColumn - 1, action);
+            break;
+
+        default:
+            // just find any right column starting with STARTING_COLUMN_POINT(12) index (based on colX)
+            *currentActiveColumn = findNextPossibleMove(game, STARTING_COLUMN_POINT, 'r');
+
+            break;
+    }
+//    for (int i = 0; i < COLUMNS_COUNT; ++i)
+//    {
+//        // vector_t_pawn pawn = game.board.columns[i].pawnIds;
+//        s_boardColumn boardColumn = game.board.columns[i];
+//        vector_t_pawn currentColumn = boardColumn.pawnIds;
+//
+//        if ((currentColumn.count > 0))
+//        {
+//            char color = currentColumn.ptr[0].color;
+//            if ((game.turn == 'w' && color == 'w') || game.turn == 'b' && color == 'b')
+//            {
+//                *currentActiveColumn = boardColumn.colX;
+////                *currentActiveColumn = i;
+//                break;
+//            }
+//        }
+//    }
 }
 
 void renderBoard(s_game *game, WINDOW *gameWin, int selectColumn, int targetColumn)
 {
     // selectColumn - 1 to active
+    // currentActiveColumn represents column(colX) that is active
     int currentActiveColumn = -1;
     do
     {
@@ -231,9 +266,9 @@ void renderBoard(s_game *game, WINDOW *gameWin, int selectColumn, int targetColu
         {
             currentActiveColumn = game->board.sourceColumn + 1;
         }
-        else if ((selectColumn) && currentActiveColumn == -1)
+        else if (selectColumn && currentActiveColumn == -1)
         {
-            findColumnWithPawn(*game, &currentActiveColumn);
+            findColumnWithPawn(*game, &currentActiveColumn, ' ');
         }
         for (int i = 0; i < COLUMNS_COUNT; ++i)
         {
@@ -243,12 +278,13 @@ void renderBoard(s_game *game, WINDOW *gameWin, int selectColumn, int targetColu
             {
                 additionalOffsetLeft = 4;
             }
-            if ((i == currentActiveColumn) || (i == game->board.sourceColumn))
+            if ((boardColumn.colX == currentActiveColumn) || (boardColumn.colX == game->board.sourceColumn))
             {
-                attron(COLOR_PAIR(2));
+                int colorPair = boardColumn.colX == currentActiveColumn ? 2 : 3;
+                attron(COLOR_PAIR(colorPair));
                 renderColumn(boardColumn, *game, gameWin, additionalOffsetLeft);
 
-                attroff(COLOR_PAIR(2));
+                attroff(COLOR_PAIR(colorPair));
             }
             else
             {
@@ -270,32 +306,26 @@ void renderBoard(s_game *game, WINDOW *gameWin, int selectColumn, int targetColu
             curs_set(0);
             if (ch == KEY_LEFT)
             {
-                if (currentActiveColumn > 0)
-                {
-                    currentActiveColumn--;
-                }
+                findColumnWithPawn(*game, &currentActiveColumn, 'l');
             }
             else if (ch == KEY_RIGHT)
             {
-                if (currentActiveColumn < COLUMNS_COUNT - 1)
-                {
-                    currentActiveColumn++;
-                }
+                findColumnWithPawn(*game, &currentActiveColumn, 'r');
             }
-            else if (ch == KEY_DOWN)
-            {
-                if (currentActiveColumn < COLUMNS_COUNT / 2)
-                {
-                    currentActiveColumn += COLUMNS_COUNT / 2;
-                }
-            }
-            else if (ch == KEY_UP)
-            {
-                if (currentActiveColumn > ((COLUMNS_COUNT / 2) - 1))
-                {
-                    currentActiveColumn -= COLUMNS_COUNT / 2;
-                }
-            }
+//            else if (ch == KEY_DOWN)
+//            {
+//                if (currentActiveColumn < COLUMNS_COUNT / 2)
+//                {
+//                    currentActiveColumn += COLUMNS_COUNT / 2;
+//                }
+//            }
+//            else if (ch == KEY_UP)
+//            {
+//                if (currentActiveColumn > ((COLUMNS_COUNT / 2) - 1))
+//                {
+//                    currentActiveColumn -= COLUMNS_COUNT / 2;
+//                }
+//            }
             else if (ch == 10)
             {
                 // ch == 10 is enter

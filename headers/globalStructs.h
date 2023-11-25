@@ -9,6 +9,8 @@
 #define MAX_PAWN_ON_COL 5
 #define COLUMNGAP 3
 
+#define STARTING_COLUMN_POINT 12
+
 typedef struct
 {
   vector_t_pawn pawnIds;

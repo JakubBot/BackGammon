@@ -1,4 +1,5 @@
 #include "ncurses.h"
+#include "../headers/globalStructs.h"
 
 void clrButtonPrints(int posY, int nLines)
 {
@@ -8,4 +9,40 @@ void clrButtonPrints(int posY, int nLines)
         clrtoeol();
     }
     refresh();
+}
+
+void changeTurn(s_game *game)
+{
+    if (game->turn == 'w')
+    {
+        game->turn = 'b';
+    }
+    else
+    {
+        game->turn = 'w';
+    }
+}
+
+
+
+s_boardColumn findColumnBasedOnColX(s_game game, int currentActiveColumn) {
+    for (int i = 0; i < COLUMNS_COUNT; ++i) {
+        s_boardColumn boardColumn = game.board.columns[i];
+
+        if (boardColumn.colX == currentActiveColumn) {
+            return boardColumn;
+        }
+    }
+    return game.board.columns[0];
+}
+
+vector_t_pawn* findColumnPawnIds(s_game *game, int currentActiveColumn) {
+    for (int i = 0; i < COLUMNS_COUNT; ++i) {
+        s_boardColumn boardColumn = game->board.columns[i];
+
+        if (boardColumn.colX == currentActiveColumn) {
+            return &game->board.columns[i].pawnIds;
+        }
+    }
+    return &game->board.columns[0].pawnIds;
 }

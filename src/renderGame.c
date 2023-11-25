@@ -6,6 +6,7 @@
 #include "../headers/playerTurn.h"
 #include "../headers/globalStructs.h"
 #include "../headers/utils.h"
+#include "../headers/move.h"
 
 
 
@@ -170,16 +171,16 @@ void renderColumn(s_boardColumn boardColumn, s_game game, WINDOW *gameWin, int a
     }
 }
 
-s_boardColumn findColumnBasedOnColX(s_game game, int currentActiveColumn) {
-    for (int i = 0; i < COLUMNS_COUNT; ++i) {
-        s_boardColumn boardColumn = game.board.columns[i];
-
-        if (boardColumn.colX == currentActiveColumn) {
-            return boardColumn;
-        }
-    }
-    return game.board.columns[0];
-}
+//s_boardColumn findColumnBasedOnColX(s_game game, int currentActiveColumn) {
+//    for (int i = 0; i < COLUMNS_COUNT; ++i) {
+//        s_boardColumn boardColumn = game.board.columns[i];
+//
+//        if (boardColumn.colX == currentActiveColumn) {
+//            return boardColumn;
+//        }
+//    }
+//    return game.board.columns[0];
+//}
 int findNextPossibleMove(s_game game, int currentActiveColumn, char action) {
     int currIndex = currentActiveColumn;
     while (true) {
@@ -208,17 +209,6 @@ int findNextPossibleMove(s_game game, int currentActiveColumn, char action) {
     }
 }
 
-//int searchColumn(s_game game, int currentActiveColumn,char action) {
-//    if (action == 'r') {
-//        int i = findNextPossibleMove(game, currentActiveColumn + 1, action) ;
-//        return i;
-//    } else if(action == 'l') {
-//        int i = findNextPossibleMove(game, currentActiveColumn - 1,action) ;
-//        return i;
-//    }
-//
-//  return -1;
-//}
 
 void findColumnWithPawn(s_game game, int *currentActiveColumn, char action)
 {
@@ -233,7 +223,6 @@ void findColumnWithPawn(s_game game, int *currentActiveColumn, char action)
         default:
             // just find any right column starting with STARTING_COLUMN_POINT(12) index (based on colX)
             *currentActiveColumn = findNextPossibleMove(game, STARTING_COLUMN_POINT, 'r');
-
             break;
     }
 //    for (int i = 0; i < COLUMNS_COUNT; ++i)
@@ -254,6 +243,100 @@ void findColumnWithPawn(s_game game, int *currentActiveColumn, char action)
 //        }
 //    }
 }
+int getNextMoveCalculation(int firstVal, int secondVal, int whiteTurn, char action,int changeDirection) {
+//        if ((action == 'r' && whiteTurn) || (action == 'l' && !whiteTurn)) {
+    if (whiteTurn) {
+        if (action == 'l' || changeDirection) {
+            return firstVal + secondVal;
+        } else {
+            return firstVal - secondVal;
+        }
+    } else {
+        if (action == 'l' || changeDirection) {
+            return firstVal - secondVal;
+        } else {
+            return firstVal + secondVal;
+        }
+    }
+
+
+}
+
+int getDistanceBetweenColumns(int colX, int firstVal, int secondVal, int thirdVal) {
+    if ((colX == (firstVal + secondVal + thirdVal)) || (colX == (firstVal - secondVal - thirdVal))) {
+        return 1;
+    }
+    return 0;
+}
+
+int findNextLegalMove(s_game game, int *currentActiveColumn, char action) {
+    int sourceColX = game.board.sourceColumn;
+
+    int* dice = game.diceInfo.dice;
+
+    short whiteTurn = game.turn == 'w' ? 1 : 0 ;
+
+    int stepValue = dice[0];
+    if (game.diceInfo.isDoublet) {
+        int step = abs((*currentActiveColumn - sourceColX)) / stepValue;
+        if (action == 'r' && step > 1) {
+            *currentActiveColumn = getNextMoveCalculation(*currentActiveColumn,stepValue,whiteTurn,action,0) ;
+        } else if (action == 'l' && step < game.diceInfo.diceSize) {
+            if (((*currentActiveColumn - stepValue) < 0) || ((*currentActiveColumn + stepValue) > COLUMNS_COUNT)) {
+                return 0;
+            }
+            *currentActiveColumn = getNextMoveCalculation(*currentActiveColumn,stepValue,whiteTurn,action,0) ;;
+        }
+        return 0;
+    }
+
+    int dice1 = dice[0];
+    int dice2 = dice[1];
+    int maxDice,minDice;
+    if (dice1 >= dice2) {
+        maxDice = dice1;
+        minDice = dice2;
+    } else {
+        maxDice = dice2;
+        minDice = dice1;
+    }
+    int indexMove = 0,isInitialPosition = 0;
+    if (*currentActiveColumn == sourceColX) {
+        indexMove = minDice;
+        isInitialPosition = 1;
+    } else if (getDistanceBetweenColumns(*currentActiveColumn,sourceColX,minDice,0)) {
+        if(action == 'r') {
+            return 0;
+        } else {
+            indexMove = maxDice;
+            isInitialPosition = 1;
+        }
+    } else if (getDistanceBetweenColumns(*currentActiveColumn,sourceColX,maxDice,0)) {
+        if(action == 'r') {
+            indexMove = minDice;
+        } else {
+            indexMove = maxDice + minDice;
+        }
+
+    } else if (getDistanceBetweenColumns(*currentActiveColumn,sourceColX,maxDice,minDice)) {
+        if(action == 'r') {
+            indexMove = maxDice;
+        } else {
+            return 0;
+        }
+    }  else {
+        indexMove = minDice;
+    }
+    if (action == 'r' && isInitialPosition) return 0;
+
+    int move = getNextMoveCalculation(sourceColX, indexMove, whiteTurn,action, 1);
+    if (move < 0 || move > (COLUMNS_COUNT - 1)) return 0;
+
+    *currentActiveColumn = move;
+
+    return 0;
+
+}
 
 void renderBoard(s_game *game, WINDOW *gameWin, int selectColumn, int targetColumn)
 {
@@ -264,7 +347,7 @@ void renderBoard(s_game *game, WINDOW *gameWin, int selectColumn, int targetColu
     {
         if (targetColumn && currentActiveColumn == -1)
         {
-            currentActiveColumn = game->board.sourceColumn + 1;
+            currentActiveColumn = game->board.sourceColumn;
         }
         else if (selectColumn && currentActiveColumn == -1)
         {
@@ -300,7 +383,7 @@ void renderBoard(s_game *game, WINDOW *gameWin, int selectColumn, int targetColu
         }
         wrefresh(gameWin);
 
-        if ((selectColumn == 1) || (targetColumn == 1))
+        if (selectColumn == 1)
         {
             int ch = getch();
             curs_set(0);
@@ -312,23 +395,25 @@ void renderBoard(s_game *game, WINDOW *gameWin, int selectColumn, int targetColu
             {
                 findColumnWithPawn(*game, &currentActiveColumn, 'r');
             }
-//            else if (ch == KEY_DOWN)
-//            {
-//                if (currentActiveColumn < COLUMNS_COUNT / 2)
-//                {
-//                    currentActiveColumn += COLUMNS_COUNT / 2;
-//                }
-//            }
-//            else if (ch == KEY_UP)
-//            {
-//                if (currentActiveColumn > ((COLUMNS_COUNT / 2) - 1))
-//                {
-//                    currentActiveColumn -= COLUMNS_COUNT / 2;
-//                }
-//            }
             else if (ch == 10)
             {
                 // ch == 10 is enter
+                break;
+            }
+        } else if (targetColumn == 1)
+        {
+            int ch = getch();
+            curs_set(0);
+            if (ch == KEY_LEFT)
+            {
+               findNextLegalMove(*game, &currentActiveColumn, 'l');
+            }
+            else if (ch == KEY_RIGHT)
+            {
+                findNextLegalMove(*game, &currentActiveColumn, 'r');
+            }
+            else if (ch == 10)
+            {
                 break;
             }
         }
@@ -345,46 +430,15 @@ void renderBoard(s_game *game, WINDOW *gameWin, int selectColumn, int targetColu
     }
 }
 
-void renderPossibleDiceMoves(int *rollDice, int size)
-{
-    for (int i = 0; i < size; ++i)
-    {
-        mvprintw(10, 29 + (i * 2), "%d", rollDice[i]);
-    }
-}
 
-void renderGame()
-{
-    erase();
-    refresh();
-
-    mvprintw(0, 0, "Backgammon (press q to exit)");
-    s_game game = {};
-    initializeGame(&game);
-
-    // showPlayerInfo(game);
-
-    int ySize = 14, xSize = 52, yStart = 3, xStart = 0;
-    WINDOW *gameWin = newwin(ySize, xSize, yStart, xStart);
-    wrefresh(gameWin);
-    box(gameWin, 0, 0);
-    wrefresh(gameWin);
-    renderBoard(&game, gameWin, 0, 0);
-
-    // decide who starts
-    // int startRollsIds[] = {7};
-    // renderMenu(startRollsIds, sizeof(startRollsIds) / sizeof(startRollsIds[0]), 0, 0, 19, NULL, &game);
-    updateInitialDiceValues(&game);
-    wrefresh(gameWin);
-
+void wypiszGre(s_game game, WINDOW* gameWin) {
     // this will render menu with roll dice option
     int menuIds[] = {4, 8};
     int diceSize = 0;
     clrButtonPrints(19, 3);
-    int *rollDice = (int *)renderMenu(menuIds, sizeof(menuIds) / sizeof(menuIds[0]), 0, 0, 19, &diceSize, &game);
+    renderMenu(menuIds, sizeof(menuIds) / sizeof(menuIds[0]), 0, 0, 19, &diceSize, &game);
 
     curs_set(0);
-    // renderPossibleDiceMoves(rollDice, diceSize);
 
     // render to select a pawn from column
     int sourceMoveIds[] = {5, 8};
@@ -399,7 +453,40 @@ void renderGame()
     renderMenu(targetMoveIds, sizeof(targetMoveIds) / sizeof(targetMoveIds[0]), 0, 0, 19, NULL, &game);
     renderBoard(&game, gameWin, 0, 1);
 
-    // free(rollDice);
+    movePawn(&game);
 
+    changeTurn(&game);
+    clearSidebarInfo();
+    renderBoard(&game, gameWin, 0, 0);
+    refresh();
     wrefresh(gameWin);
+    wypiszGre(game, gameWin);
 }
+
+
+void renderGame()
+{
+    erase();
+    refresh();
+
+    mvprintw(0, 0, "Backgammon (press q to exit)");
+    s_game game = {};
+    initializeGame(&game);
+
+    int ySize = 14, xSize = 52, yStart = 3, xStart = 0;
+    WINDOW *gameWin = newwin(ySize, xSize, yStart, xStart);
+    wrefresh(gameWin);
+    box(gameWin, 0, 0);
+    wrefresh(gameWin);
+    renderBoard(&game, gameWin, 0, 0);
+
+    // decide who starts
+    // int startRollsIds[] = {7};
+    // renderMenu(startRollsIds, sizeof(startRollsIds) / sizeof(startRollsIds[0]), 0, 0, 19, NULL, &game);
+    updateInitialDiceValues(&game);
+    wrefresh(gameWin);
+
+    wypiszGre(game, gameWin);
+
+}
+

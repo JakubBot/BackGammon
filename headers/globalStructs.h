@@ -32,6 +32,7 @@ typedef struct
 typedef struct  {
   int* dice;
   int diceSize;
+  int isDoublet;
 } s_diceInfo;
 
 

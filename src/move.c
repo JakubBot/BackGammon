@@ -10,10 +10,9 @@ void capturePawn(s_game *game, int colX)
 
     s_pawn pawn = pop_back(sourcePawnIds);
 
-
     push_back(barPawnIds, pawn);
 
-    mvprintw(18,80, "capture pawn");
+    mvprintw(18, 80, "capture pawn");
 }
 
 void movePawn(s_game *game)
@@ -30,12 +29,16 @@ void movePawn(s_game *game)
         capturePawn(game, targetColId);
     }
 
-    s_pawn pawn = pop_back(sourcePawnIds);
+
+    vector_t_pawn *barPawnIds = &game->board.bar.pawnIds;
+
+    s_pawn pawn = game->board.isBarActive ? pop_back(barPawnIds) : pop_back(sourcePawnIds);
+
     push_back(targetPawnIds, pawn);
 
     game->board.sourceColumn = -1;
     game->board.targetColumn = -1;
-
+    game->board.isBarActive = 0;
     //    game->diceInfo = -1;
 
     refresh();

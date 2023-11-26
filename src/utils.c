@@ -49,3 +49,37 @@ vector_t_pawn* findColumnPawnIds(s_game *game, int currentActiveColumn) {
     }
     return &game->board.columns[0].pawnIds;
 }
+
+char checkTurn(s_game game) {
+    return game.turn;
+}
+
+int allPawnsInHome(s_game game) {
+    if (game.board.isBarActive) {
+        return 0;
+    }
+
+    char turn = checkTurn(game);
+
+    int eWhiteHome = 6;
+    int sBlackHome = 18;
+    if (turn == 'w') {
+        for (int i = eWhiteHome; i < PAWNS_COUNT; ++i) {
+            s_boardColumn currentCol = findColumnBasedOnColX(game, i);
+            vector_t_pawn pawn = currentCol.pawnIds;
+            if (pawn.count > 0 && pawn.ptr[0].color != turn) {
+                return 0;
+            }
+        }
+    } else {
+        for (int i = 0; i < sBlackHome; ++i) {
+            s_boardColumn currentCol = findColumnBasedOnColX(game, i);
+            vector_t_pawn pawn = currentCol.pawnIds;
+            if (pawn.count > 0 && pawn.ptr[0].color != turn) {
+                return 0;
+            }
+        }
+    }
+
+    return 1;
+}

@@ -12,5 +12,5 @@ void changeTurn(s_game *game);
 
 s_boardColumn findColumnBasedOnColX(s_game game, int currentActiveColumn);
 vector_t_pawn* findColumnPawnIds(s_game *game, int currentActiveColumn);
-
+int allPawnsInHome(s_game game);
 #endif // UTILS_H

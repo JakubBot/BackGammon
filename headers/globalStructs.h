@@ -13,6 +13,7 @@
 
 #define BLACK_PAWN  "\u2592\u2592"
 #define WHITE_PAWN "\u2593\u2593"
+#define SQUARE "\u25A0"
 
 typedef struct
 {
@@ -27,10 +28,9 @@ typedef struct
   vector_t_pawn pawnIds;
 } s_bar;
 
-
 typedef struct
 {
-  s_pawn pawnOnBar;
+  int isBarActive;
   s_boardColumn columns[COLUMNS_COUNT];
   s_bar bar;
   int sourceColumn;

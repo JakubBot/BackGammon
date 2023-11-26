@@ -19,3 +19,10 @@
 4	203	1701019025852660236	CMakeFiles/BackGammon2.dir/src/move.c.o	9554bc85658d8769
 3	207	1701019025858545932	CMakeFiles/BackGammon2.dir/src/renderGame.c.o	aa7cfde5c6a4a806
 208	242	1701019025892401219	BackGammon2	65fb0a7927bc56c0
+1	238	1701033301782884213	CMakeFiles/BackGammon2.dir/main.c.o	aef729425353e339
+3	238	1701033301782872004	CMakeFiles/BackGammon2.dir/src/move.c.o	9554bc85658d8769
+3	239	1701033301782920004	CMakeFiles/BackGammon2.dir/src/utils.c.o	525e2d238dff6485
+3	239	1701033301782868046	CMakeFiles/BackGammon2.dir/src/playerTurn.c.o	f6b5c979335c9a
+4	240	1701033301784358036	CMakeFiles/BackGammon2.dir/src/menu.c.o	f5339fba591f34af
+2	242	1701033301788925340	CMakeFiles/BackGammon2.dir/src/renderGame.c.o	aa7cfde5c6a4a806
+243	274	1701033301819367391	BackGammon2	65fb0a7927bc56c0

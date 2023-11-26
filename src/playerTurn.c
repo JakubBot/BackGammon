@@ -4,7 +4,7 @@
 #include "../headers/rollDice.h"
 #include "../headers/menu.h"
 
-#define POSITION_X 55
+#define POSITION_X 56
 // #define POSITION_Y 9
 #define POSITION_Y 3
 

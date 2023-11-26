@@ -80,6 +80,9 @@ void initializeGame(s_game *game)
     game->board.targetColumn = -1;
 
     vector_t_pawn *barPawn = &game->board.bar.pawnIds;
+
+    game->board.isBarActive = 0;
+
     init(barPawn);
 
     for (int i = 0; i < COLUMNS_COUNT; ++i)
@@ -271,7 +274,7 @@ int validPawnToColumnMove(s_game *game, int nextColX)
     return 1;
 }
 
-int findNextLegalMove(s_game *game, int *currentActiveColumn, char action, int *targetColStep)
+int findNextLegalMove(s_game *game, int *currentActiveColumn, char action, int *targetColStep, int notFoundCount)
 {
     int sourceColX = game->board.sourceColumn;
 
@@ -317,14 +320,12 @@ int findNextLegalMove(s_game *game, int *currentActiveColumn, char action, int *
         {
             if (*targetColStep > 0)
             {
-                //                (*targetColStep)--;
                 increaseStep = -1;
             }
         }
         else
         {
             indexMove = val;
-            //            (*targetColStep)++;
             increaseStep = 1;
         }
     }
@@ -346,7 +347,6 @@ int findNextLegalMove(s_game *game, int *currentActiveColumn, char action, int *
             if (action == 'l')
             {
                 indexMove = minDice;
-                //                (*targetColStep)++;
                 increaseStep = 1;
             }
         }
@@ -354,13 +354,11 @@ int findNextLegalMove(s_game *game, int *currentActiveColumn, char action, int *
         {
             if (action == 'r')
             {
-                //                (*targetColStep)--;
                 increaseStep = -1;
             }
             else
             {
                 indexMove = maxDice;
-                //                (*targetColStep)++;
                 increaseStep = 1;
             }
         }
@@ -369,13 +367,11 @@ int findNextLegalMove(s_game *game, int *currentActiveColumn, char action, int *
             if (action == 'r')
             {
                 indexMove = minDice;
-                //                (*targetColStep)--;
                 increaseStep = -1;
             }
             else
             {
                 indexMove = maxDice + minDice;
-                //                (*targetColStep)++;
                 increaseStep = 1;
             }
         }
@@ -384,7 +380,6 @@ int findNextLegalMove(s_game *game, int *currentActiveColumn, char action, int *
             if (action == 'r')
             {
                 indexMove = maxDice;
-                //                (*targetColStep)--;
                 increaseStep = -1;
             }
             else
@@ -400,8 +395,11 @@ int findNextLegalMove(s_game *game, int *currentActiveColumn, char action, int *
 
     int move = getNextMoveCalculation(sourceColX, indexMove, whiteTurn, action, 1);
 
-    if (move < 0 || move > (COLUMNS_COUNT - 1))
+    int pawnGoToHome = allPawnsInHome(*game) && ((move == -1) || (move == COLUMNS_COUNT));
+
+    if ((move < 0 || move > (COLUMNS_COUNT - 1)) && !pawnGoToHome) {
         return 0;
+    }
 
     int isValidColumn = validPawnToColumnMove(game, move);
 
@@ -416,23 +414,40 @@ int findNextLegalMove(s_game *game, int *currentActiveColumn, char action, int *
 
     if (!isValidColumn)
     {
-        if (*targetColStep >= 4)
+        if (*targetColStep >= 4 || notFoundCount == 1)
         {
             *targetColStep = 0;
             refresh();
             return 0;
         }
 
-        //         *targetColStep = (*targetColStep) + 1;
-        //        *currentActiveColumn = move;
-        //        int nextCol = (*currentActiveColumn) + 1;
-        return findNextLegalMove(game, currentActiveColumn, action, targetColStep);
-        //        *targetColStep = (*targetColStep) - 1;
+        return findNextLegalMove(game, currentActiveColumn, action, targetColStep ,notFoundCount + 1);
     }
 
     *currentActiveColumn = move;
 
     return 0;
+}
+
+void addAdditionalEntrance(s_game game) {
+    // additional square for start and end for each color
+    if (game.board.sourceColumn == 24 && game.board.isBarActive) {
+        attron(COLOR_PAIR(2));
+        mvprintw(4,53, SQUARE);
+        attroff(COLOR_PAIR(2));
+    } else {
+        mvprintw(4,53, " ");
+    }
+
+    if (game.board.sourceColumn == -1 && game.board.isBarActive) {
+        attron(COLOR_PAIR(2));
+        mvprintw(15,53, SQUARE);
+        attroff(COLOR_PAIR(2));
+    }else {
+        mvprintw(15,53, " ");
+    }
+
+    refresh();
 }
 
 void renderBoard(s_game *game, WINDOW *gameWin, int selectColumn, int targetColumn)
@@ -451,6 +466,9 @@ void renderBoard(s_game *game, WINDOW *gameWin, int selectColumn, int targetColu
         {
             findColumnWithPawn(*game, &currentActiveColumn, ' ');
         }
+
+        addAdditionalEntrance(*game);
+
         for (int i = 0; i < COLUMNS_COUNT; ++i)
         {
             s_boardColumn boardColumn = game->board.columns[i];
@@ -487,12 +505,24 @@ void renderBoard(s_game *game, WINDOW *gameWin, int selectColumn, int targetColu
 
         for (int i = 0; i < barPawnCount; ++i)
         {
-            char clr = pawn->ptr[i].color;
+
+            char clr = pawn->ptr[0].color;
 
             char *pawnLabel = clr == 'b' ? BLACK_PAWN : WHITE_PAWN;
 
-            mvprintw(i + offset_y + start, 1 + (6 * 4), pawnLabel);
+            if (i == 0 && game->board.isBarActive)
+            {
+                attron(COLOR_PAIR(2));
+                mvprintw(i + offset_y + start, 1 + (6 * 4), pawnLabel);
+                attroff(COLOR_PAIR(2));
+            }
+            else
+            {
+                mvprintw(i + offset_y + start, 1 + (6 * 4), pawnLabel);
+            }
         }
+
+
         wrefresh(gameWin);
 
         if (selectColumn == 1)
@@ -509,7 +539,6 @@ void renderBoard(s_game *game, WINDOW *gameWin, int selectColumn, int targetColu
             }
             else if (ch == 10)
             {
-                // ch == 10 is enter
                 break;
             }
         }
@@ -519,11 +548,11 @@ void renderBoard(s_game *game, WINDOW *gameWin, int selectColumn, int targetColu
             curs_set(0);
             if (ch == KEY_LEFT)
             {
-                findNextLegalMove(game, &currentActiveColumn, 'l', &targetColStep);
+                findNextLegalMove(game, &currentActiveColumn, 'l', &targetColStep,0);
             }
             else if (ch == KEY_RIGHT)
             {
-                findNextLegalMove(game, &currentActiveColumn, 'r', &targetColStep);
+                findNextLegalMove(game, &currentActiveColumn, 'r', &targetColStep,0);
             }
             else if (ch == 10)
             {
@@ -589,17 +618,36 @@ void renderBoard(s_game *game, WINDOW *gameWin, int selectColumn, int targetColu
     }
 }
 
+int shouldUseBarPawn(s_game game) {
+    if (game.board.bar.pawnIds.count > 0 && game.board.bar.pawnIds.ptr[0].color == game.turn) {
+        return 1;
+    }
+    return 0;
+}
+
 void moveRepeater(s_game *game, WINDOW *gameWin)
 {
-
     while (game->diceInfo.availableDiceMoves > 0)
     {
-        int sourceMoveIds[] = {5, 8};
-        clrButtonPrints(19, 3);
-        refresh();
-        renderMenu(sourceMoveIds, sizeof(sourceMoveIds) / sizeof(sourceMoveIds[0]), 0, 0, 19, NULL, game);
-        renderBoard(game, gameWin, 1, 0);
-        clrButtonPrints(19, 3);
+        if (shouldUseBarPawn(*game))
+        {
+            game->board.isBarActive = 1;
+            if (game->turn == 'w') {
+                game->board.sourceColumn = -1;
+            } else {
+                game->board.sourceColumn = 24;
+            }
+        }
+        else
+        {
+            game->board.isBarActive = 0;
+            int sourceMoveIds[] = {5, 8};
+            clrButtonPrints(19, 3);
+            refresh();
+            renderMenu(sourceMoveIds, sizeof(sourceMoveIds) / sizeof(sourceMoveIds[0]), 0, 0, 19, NULL, game);
+            renderBoard(game, gameWin, 1, 0);
+            clrButtonPrints(19, 3);
+        }
 
         // render a target for a pawn
         int targetMoveIds[] = {6, 8};

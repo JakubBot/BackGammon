@@ -11,10 +11,12 @@
 
 #define STARTING_COLUMN_POINT 12
 
+#define BLACK_PAWN  "\u2592\u2592"
+#define WHITE_PAWN "\u2593\u2593"
+
 typedef struct
 {
   vector_t_pawn pawnIds;
-  //    int pawnIds[MAX_PAWN_ON_COL];
   int colX;
   int colY;
   int isReversed;
@@ -22,9 +24,15 @@ typedef struct
 
 typedef struct
 {
+  vector_t_pawn pawnIds;
+} s_bar;
+
+
+typedef struct
+{
   s_pawn pawnOnBar;
   s_boardColumn columns[COLUMNS_COUNT];
-  s_boardColumn bar;
+  s_bar bar;
   int sourceColumn;
   int targetColumn;
 } s_board;
@@ -33,6 +41,8 @@ typedef struct  {
   int* dice;
   int diceSize;
   int isDoublet;
+  int availableDiceMoves;
+  int initialDiceValues[2];
 } s_diceInfo;
 
 

@@ -84,7 +84,6 @@ s_btnOption *getBtnElements(int btnIds[], int btnCount, s_game *game)
     return btns;
 }
 
-
 void *renderMenu(int btnIds[], int btnCount, int activeBtnId, int menuPosX, int menuPosY, int *diceSize, s_game *game)
 {
     curs_set(0);
@@ -160,18 +159,25 @@ void *renderMenu(int btnIds[], int btnCount, int activeBtnId, int menuPosX, int 
             authorInfo();
             renderMenu(btnIds, btnCount, selectedBtn, 0, 0, diceSize, game);
             break;
-        case 'r':
+        case 'r':{
             // roll dice
-            game->diceInfo.dice = (int *)rollDice(diceSize);
+            int *diceRes = (int *)rollDice(diceSize);
+            game->diceInfo.dice = diceRes;
+
+            for (int i = 0; i < 2; ++i)
+            {
+                game->diceInfo.initialDiceValues[i] = diceRes[i];
+            }
 
             game->diceInfo.diceSize = *diceSize;
-            game->diceInfo.isDoublet = 1;
+            game->diceInfo.availableDiceMoves = *diceSize;
+            game->diceInfo.isDoublet = game->diceInfo.dice[0] == game->diceInfo.dice[1] ? 1 : 0;
 
             clearSidebarInfo();
             showTurnInfo(*game);
 
             break;
-
+        }
         case 'h':
             // exit & save changes
             break;

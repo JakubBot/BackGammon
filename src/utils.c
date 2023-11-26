@@ -21,6 +21,9 @@ void changeTurn(s_game *game)
     {
         game->turn = 'w';
     }
+    game->diceInfo.isDoublet = 0;
+    game->diceInfo.diceSize = 0;
+    game->diceInfo.availableDiceMoves = 0;
 }
 
 

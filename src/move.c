@@ -3,21 +3,40 @@
 #include "../headers/vectorPawn.h"
 #include "../headers/utils.h"
 
-void movePawn(s_game *game) {
-
-    int sourceCol = game->board.sourceColumn;
-    int targetCol = game->board.targetColumn;
-
-    vector_t_pawn* sourcePawnIds = findColumnPawnIds(game,sourceCol);
-    vector_t_pawn* targetPawnIds = findColumnPawnIds(game,targetCol);
+void capturePawn(s_game *game, int colX)
+{
+    vector_t_pawn *sourcePawnIds = findColumnPawnIds(game, colX);
+    vector_t_pawn *barPawnIds = &game->board.bar.pawnIds;
 
     s_pawn pawn = pop_back(sourcePawnIds);
-//    s_pawn pawn = pop_back(&game->board.columns[sourceCol].pawnIds);
-    push_back(targetPawnIds,pawn);
-//    push_back(&game->board.columns[targetCol].pawnIds, pawn);
+
+
+    push_back(barPawnIds, pawn);
+
+    mvprintw(18,80, "capture pawn");
+}
+
+void movePawn(s_game *game)
+{
+
+    int sourceColId = game->board.sourceColumn;
+    int targetColId = game->board.targetColumn;
+
+    vector_t_pawn *sourcePawnIds = findColumnPawnIds(game, sourceColId);
+    vector_t_pawn *targetPawnIds = findColumnPawnIds(game, targetColId);
+
+    if ((targetPawnIds->count == 1) && (targetPawnIds->ptr[0].color != game->turn))
+    {
+        capturePawn(game, targetColId);
+    }
+
+    s_pawn pawn = pop_back(sourcePawnIds);
+    push_back(targetPawnIds, pawn);
 
     game->board.sourceColumn = -1;
     game->board.targetColumn = -1;
+
+    //    game->diceInfo = -1;
 
     refresh();
 }

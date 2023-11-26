@@ -5,6 +5,7 @@
 #include "../headers/menu.h"
 
 #define POSITION_X 55
+// #define POSITION_Y 9
 #define POSITION_Y 3
 
 void showPlayerInfo(s_game game)
@@ -38,7 +39,7 @@ void showTurnInfo(s_game game)
 {
   mvprintw(POSITION_Y, POSITION_X, "Turn -> Player %c", (game.turn == 'w') ? '1' : '2');
 
-  mvprintw(POSITION_Y + 2, POSITION_X, "Roll dice result -> %d %d", game.diceInfo.dice[0], game.diceInfo.dice[1]);
+ mvprintw(POSITION_Y + 2, POSITION_X, "Roll dice result -> %d %d", game.diceInfo.initialDiceValues[0], game.diceInfo.initialDiceValues[1]);
 
   mvprintw(POSITION_Y + 4, POSITION_X, "Moves left:");
 

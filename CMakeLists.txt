@@ -20,6 +20,7 @@ add_executable(BackGammon2 main.c
         headers/playerTurn.h
         src/move.c
         headers/move.h
+        src/bidirectionalList.c
 )
 
 find_package(Curses REQUIRED)

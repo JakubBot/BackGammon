@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include "../headers/rollDice.h"
+#include "../headers/utils.h"
 
 int randomNum(int min, int max)
 {
@@ -11,6 +12,7 @@ int randomNum(int min, int max)
 int *rollDice(int *diceSize)
 {
     int tempArr[2] = {0, 0};
+//    int tempArr[2] = {2,2};
 
     for (int i = 0; i < 2; i++)
     {
@@ -33,18 +35,16 @@ int *rollDice(int *diceSize)
         }
         return dice;
     }
-
-    for (int i = 0; i < *diceSize; i++)
-    {
-        if (*diceSize == 4)
+    if (*diceSize == 4) {
+        for (int i = 0; i < *diceSize; i++)
         {
             dice[i] = tempArr[0];
         }
-        else
-        {
-            dice[i] = tempArr[i];
-        }
+    } else {
+        dice[0] = min(tempArr[0], tempArr[1]);
+        dice[1] = max(tempArr[0], tempArr[1]);
     }
+
 
     return dice;
 }

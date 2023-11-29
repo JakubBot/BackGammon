@@ -169,9 +169,10 @@ void *renderMenu(int btnIds[], int btnCount, int activeBtnId, int menuPosX, int 
                 game->diceInfo.initialDiceValues[i] = diceRes[i];
             }
 
+            int isDoublet = game->diceInfo.dice[0] == game->diceInfo.dice[1] ? 1 : 0;
             game->diceInfo.diceSize = *diceSize;
-            game->diceInfo.availableDiceMoves = *diceSize;
-            game->diceInfo.isDoublet = game->diceInfo.dice[0] == game->diceInfo.dice[1] ? 1 : 0;
+            game->diceInfo.availableDiceMoves = *diceSize + (isDoublet ? 0 : 1);
+            game->diceInfo.isDoublet = isDoublet ;
 
             clearSidebarInfo();
             showTurnInfo(*game);

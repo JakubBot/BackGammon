@@ -12,7 +12,6 @@ int randomNum(int min, int max)
 int *rollDice(int *diceSize)
 {
     int tempArr[2] = {0, 0};
-//    int tempArr[2] = {2,2};
 
     for (int i = 0; i < 2; i++)
     {
@@ -25,8 +24,7 @@ int *rollDice(int *diceSize)
         *diceSize = 2;
 
     int *dice = (int *)malloc(*diceSize * sizeof(int));
-    srand(time(NULL));
-    // int *dice = (int *)malloc(size * sizeof(int));
+
     if (dice == NULL)
     {
         for (int i = 0; i < *diceSize; i++)

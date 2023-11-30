@@ -25,11 +25,8 @@ void capturePawn(s_game *game, int colX)
 
 void movePawn(s_game *game)
 {
-
     int sourceColId = game->board.sourceColumn;
     int targetColId = game->board.targetColumn;
-
-
 
 //    if ((targetPawnIds->count == 1) && (targetPawnIds->ptr[0].color != game->turn))
 //    {

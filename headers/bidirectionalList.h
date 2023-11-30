@@ -19,4 +19,6 @@ int countDepthRecursive(struct Node* node);
 void removeFirstNodeWithValue(struct Node** head, int value);
 void removeLastNode(struct Node** head);
 void moveToTop(struct Node** current);
+void freeList(struct Node** b_list);
+
 #endif // BIDIRECTIONALLIST_H

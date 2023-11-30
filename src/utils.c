@@ -54,7 +54,15 @@ char checkTurn(s_game game) {
     return game.turn;
 }
 
-int allPawnsInHome(s_game game) {
+char getTurn(s_game game) {
+    return game.turn;
+}
+
+int isWhiteTurn(s_game game) {
+    return game.turn == 'w' ? 1 : 0;
+}
+
+int allPawnsHome(s_game game) {
     if (game.board.isBarActive) {
         return 0;
     }
@@ -92,10 +100,13 @@ int min(int a, int b) {
     return (a < b) ? a : b;
 }
 
-int isBarActive(vector_t_pawn barPawnIds, s_game game) {
-    for (int i =0; i < barPawnIds.count; i++) {
-        if (barPawnIds.ptr[i].color == game.turn) {
-            return 1;
-        }
-    }
+//int isBarActive(vector_t_pawn barPawnIds, s_game game) {
+//    for (int i =0; i < barPawnIds.count; i++) {
+//        if (barPawnIds.ptr[i].color == game.turn) {
+//            return 1;
+//        }
+//    }
+//}
+int getPawnBarCount(s_game game) {
+    return game.board.bar.pawnIds.count;
 }

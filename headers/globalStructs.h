@@ -8,12 +8,15 @@
 #define PAWNS_COUNT 15
 #define MAX_PAWN_ON_COL 5
 #define COLUMNGAP 3
+#define COLUMN_WIDTH 4
 
 #define STARTING_COLUMN_POINT 12
 
 #define BLACK_PAWN  "\u2592\u2592"
 #define WHITE_PAWN "\u2593\u2593"
 #define SQUARE "\u25A0"
+
+#define BAR_COLUMN_HEIGHT ((MAX_PAWN_ON_COL * 2) + COLUMNGAP)
 
 typedef struct
 {

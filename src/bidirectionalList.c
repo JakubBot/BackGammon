@@ -116,3 +116,10 @@ void removeLastNode(struct Node** head) {
     free(current);
 }
 
+void freeList(struct Node** b_list) {
+    while (*b_list != NULL) {
+        struct Node* temp = *b_list;
+        *b_list = (*b_list)->next;
+        free(temp);
+    }
+}

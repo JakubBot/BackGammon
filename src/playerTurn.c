@@ -60,26 +60,27 @@ void updateInitialDiceValues(s_game *game)
 {
   showPlayerInfo(*game);
 
-  int startRollsIds[] = {7};
-  renderMenu(startRollsIds, sizeof(startRollsIds) / sizeof(startRollsIds[0]), 0, 0, 19, NULL, game);
+  int rollId[] = {7};
+  int rollSize = sizeof(rollId) / sizeof(rollId[0]);
+  renderMenu(rollId, rollSize, 0, 0, 19, NULL, game);
 
-  int player1Num = randomNum(1, 6);
-  game->initialDiceValueW = player1Num;
-
-  showPlayerInfo(*game);
-
-  renderMenu(startRollsIds, sizeof(startRollsIds) / sizeof(startRollsIds[0]), 0, 0, 19, NULL, game);
-
-  int player2Num = randomNum(1, 6);
-  game->initialDiceValueB = player2Num;
+  int p1 = randomNum(1, 6);
+  game->initialDiceValueW = p1;
 
   showPlayerInfo(*game);
 
-  char startPlayer = player1Num >= player2Num ? 'w' : 'b';
+  renderMenu(rollId, rollSize, 0, 0, 19, NULL, game);
 
-  mvprintw(POSITION_Y + 6, POSITION_X, "Player %c starts the game", (startPlayer == 'w') ? '1' : '2');
+  int p2 = randomNum(1, 6);
+  game->initialDiceValueB = p2;
 
-  mvprintw(POSITION_Y + 12, POSITION_X, "Turn -> Player %c", (startPlayer == 'w') ? '1' : '2');
+  showPlayerInfo(*game);
 
-  game->turn = startPlayer;
+  char startCol = p1 >= p2 ? 'w' : 'b';
+
+  mvprintw(POSITION_Y + 6, POSITION_X, "Player %c starts the game", (startCol == 'w') ? '1' : '2');
+
+  mvprintw(POSITION_Y + 12, POSITION_X, "Turn -> Player %c", (startCol == 'w') ? '1' : '2');
+
+  game->turn = startCol;
 }

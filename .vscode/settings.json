@@ -8,6 +8,7 @@
     "ncurses.h": "c",
     "rendergame.h": "c",
     "utils.h": "c",
-    "move.h": "c"
+    "move.h": "c",
+    "bidirectionallist.h": "c"
   }
 }

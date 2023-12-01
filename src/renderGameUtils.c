@@ -8,6 +8,23 @@
 #include "../headers/utils.h"
 #include "../headers/bidirectionalList.h"
 
+void clearGameState(s_game* game) {
+    // ,struct Node** b_list
+
+    // clear board
+
+    // clear bidirectional list
+    //  freeList(b_list);
+
+    // remove allocated memory for vector pawn ids
+    cleanup(&game->board.bar.pawnIds);
+
+    for (int i = 0; i < COLUMNS_COUNT; ++i) {
+        cleanup(&game->board.columns[i].pawnIds);
+    }
+
+
+}
 
 int validPawnToColumnMove(s_game *game, int nextColX)
 {

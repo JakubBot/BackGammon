@@ -423,7 +423,6 @@ void moveRepeater(s_game *game, WINDOW *gameWin)
 
         renderBoard(game, gameWin, 0, 0, NULL);
     }
-
     freeList(&b_list);
 }
 
@@ -465,10 +464,9 @@ void initializeGame(s_game *game)
 void saveState(s_game game)
 {
     FILE *file = game.file;
-//     FILE *file = fopen("currentGame.txt", "w");
+    //     FILE *file = fopen("currentGame.txt", "w");
     fprintf(file, "siemazxc2");
-//    fclose(file);
-
+    //    fclose(file);
 
     // fprintf(file, "%d %d %c", game.initialDiceValueW, game.initialDiceValueB, game.turn);
 
@@ -506,6 +504,7 @@ void saveState(s_game game)
 
 void gameLoop(s_game game, WINDOW *gameWin)
 {
+
     // this will render menu with roll dice option
     int menuIds[] = {4, 8};
     int diceSize = 0;
@@ -555,4 +554,10 @@ void renderGame()
     {
         fclose(game.file);
     }
+}
+
+void initGame()
+{
+    int menuIds[] = {0, 1, 2, 3};
+    renderMenu(menuIds, sizeof(menuIds) / sizeof(menuIds[0]), 0, 0, 0, NULL, NULL);
 }

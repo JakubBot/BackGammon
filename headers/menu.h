@@ -3,6 +3,7 @@
 //
 
 #include "../headers/globalStructs.h"
+#include "../headers/bidirectionalList.h"
 
 #ifndef MENU_H
 #define MENU_H

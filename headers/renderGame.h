@@ -5,5 +5,6 @@
 
 
 void renderGame();
+void initGame();
 
 #endif //RENDERGAME_H

@@ -8,7 +8,8 @@
 #include "../headers/playerTurn.h"
 #include "../headers/utils.h"
 #include "../headers/menuUtils.h"
-
+#include "../headers/renderGameUtils.h"
+#include "../headers/bidirectionalList.h"
 
 void menuAction(s_game *game, int *diceSize, int btnIds[], int btnCount, int selectedBtn, int menuPosY,s_btnOption *buttons);
 void displayMenuBtn( int btnCount, int menuPosX, int menuPosY,int selectedBtn, s_btnOption* buttons);
@@ -17,28 +18,37 @@ void *renderMenu(int btnIds[], int btnCount, int activeBtnId, int menuPosX, int 
 {
     curs_set(0);
     s_btnOption *buttons = getBtnElements(btnIds, btnCount, game);
-    int selectedBtn = activeBtnId;
+    int selectedBtn = btnIds[0];
+    //    int selectedBtn = activeBtnId;
+    int currentIndex = 0;
+
     while (selectedBtn != -1)
     {
+        for (int i = 0; i < btnCount; ++i) {
+            if (btnIds[i] == selectedBtn) {
+                currentIndex = i;
+            }
+        }
         displayMenuBtn(btnCount, menuPosX, menuPosY, selectedBtn, buttons);
 
         int ch = getch();
         if (ch == KEY_LEFT)
         {
-            if (selectedBtn > 0)
+            if (currentIndex > 0)
             {
-//                s_btnOption btn = findBtn(buttons, selectedBtn + 1, btnCount);
-//                selectedBtn = btn.id;
-                selectedBtn--;
+                s_btnOption btn = findBtn(buttons, btnIds[currentIndex-1], btnCount);
+                selectedBtn = btn.id;
+//                selectedBtn--;
             }
         }
         else if (ch == KEY_RIGHT)
         {
-            if (selectedBtn < btnCount - 1)
+            if (currentIndex < btnCount)
+//            if (selectedBtn < btnCount - 1)
             {
-//                s_btnOption btn = findBtn(buttons, selectedBtn - 1, btnCount);
-//                selectedBtn = btn.id;
-                selectedBtn++;
+                s_btnOption btn = findBtn(buttons, btnIds[currentIndex+1], btnCount);
+                selectedBtn = btn.id;
+//                selectedBtn++;
             }
         }
         else if (ch == 10)
@@ -65,7 +75,8 @@ void displayMenuBtn( int btnCount, int menuPosX, int menuPosY,int selectedBtn, s
         WINDOW *menuwin = newwin(3, txtLen + 2, menuPosY, (previusBtnLength + (i * 1) + menuPosX));
         previusBtnLength += txtLen + 2;
         wborder(menuwin, '|', '|', '-', '-', '+', '+', '+', '+');
-        if (selectedBtn == i)
+        if (selectedBtn == buttons[i].id)
+//        if (selectedBtn == i)
         {
             wattron(menuwin, COLOR_PAIR(1));
             mvwprintw(menuwin, 1, 1, "%s", buttons[i].text);
@@ -105,7 +116,6 @@ void menuAction(s_game *game, int *diceSize, int btnIds[], int btnCount, int sel
         s_btnOption btn = findBtn(buttons, selectedBtn, btnCount);
         curs_set(1);
 
-        mvprintw(0,70, "%d", selectedBtn);
         refresh();
 
         switch (btn.action)
@@ -130,7 +140,15 @@ void menuAction(s_game *game, int *diceSize, int btnIds[], int btnCount, int sel
                 menuRollDiceAction(game, diceSize);
                 break;
             case 'h':
-//                fclose(game->file);
+                fclose(game->file);
+                clear();
+                refresh();
+                clearGameState(game);
+                initGame();
+//                clear();
+//                renderMenu(btnIds, btnCount, selectedBtn, 0, 0, diceSize, game);
+//                refresh();
+//                exit(1);
                 // exit & save changes
                 break;
             case 'l':

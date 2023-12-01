@@ -19,6 +19,13 @@ void init(vector_t_pawn *v) {
     v->ptr = (s_pawn *)malloc(v->allocated_size * sizeof(s_pawn));
 }
 
+void cleanup(vector_t_pawn *v) {
+    free(v->ptr);
+    v->ptr = NULL;
+    v->count = 0;
+    v->allocated_size = 0;
+}
+
 void reallocate(vector_t_pawn *v, int reallocate_size) {
     v->allocated_size = reallocate_size;
     s_pawn *newPtr = (s_pawn *)malloc(v->allocated_size * sizeof(s_pawn));

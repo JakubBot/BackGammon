@@ -5,6 +5,7 @@
 #include <ncurses.h>
 #include "headers/menu.h"
 #include "headers/utils.h"
+#include "headers/renderGame.h"
 
 //#define COLOR_COLUMN 20
 //#define POSSIBLE_COLUMN_MOVE 21
@@ -26,9 +27,9 @@ int main()
     init_pair(2, COLOR_COLUMN, COLOR_BLACK);
     init_pair(3, POSSIBLE_COLUMN_MOVE, COLOR_BLACK);
     refresh();
-
-    int menuIds[] = {0, 1, 2, 3};
-    renderMenu(menuIds, sizeof(menuIds) / sizeof(menuIds[0]), 0, 0, 0,NULL,NULL);
+    initGame();
+//    int menuIds[] = {0, 1, 2, 3};
+//    renderMenu(menuIds, sizeof(menuIds) / sizeof(menuIds[0]), 0, 0, 0,NULL,NULL);
 
     getch();
     endwin();

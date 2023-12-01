@@ -17,6 +17,7 @@ typedef struct {
 } vector_t_pawn;
 
 void init(vector_t_pawn *v);
+void cleanup(vector_t_pawn *v);
 
 void reallocate(vector_t_pawn *v, int reallocate_size);
 

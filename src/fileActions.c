@@ -13,7 +13,7 @@ void saveCurrentState(s_game game)
     fprintf(file, " %d", pawn->count);
     for (int j = 0; j < pawn->count; ++j)
     {
-      fprintf(file, " %d", pawn->ptr[j].id);
+      fprintf(file, " %d %c", pawn->ptr[j].id, pawn->ptr[j].color);
     }
   }
 
@@ -37,10 +37,12 @@ void saveCurrentState(s_game game)
   fprintf(file, "\n");
 }
 
-void saveGameState()
+void updateGameFile(int copyToCurrentFile)
 {
-  FILE *sourceFile = fopen(CURRENT_GAME, "r");    // Otwórz plik do odczytu tekstowego
-  FILE *destinationFile = fopen(SAVED_GAME, "w"); // Otwórz plik do zapisu tekstowego
+  char *source = copyToCurrentFile ? SAVED_GAME : CURRENT_GAME;
+  char *target = copyToCurrentFile ? CURRENT_GAME : SAVED_GAME;
+  FILE *sourceFile = fopen(source, "r");    
+  FILE *destinationFile = fopen(target, "w"); 
 
   if (sourceFile == NULL || destinationFile == NULL)
   {
@@ -68,7 +70,7 @@ void readGameState(FILE *file, s_game *game)
     fscanf(file, " %d", &pawn->count);
     for (int j = 0; j < pawn->count; ++j)
     {
-      fscanf(file, " %d", &pawn->ptr[j].id);
+      fscanf(file, " %d %c", &pawn->ptr[j].id, &pawn->ptr[j].color);
     }
   }
 
@@ -92,7 +94,7 @@ void readGameState(FILE *file, s_game *game)
 
 void loadFile(s_game *game)
 {
-  FILE* file = fopen(SAVED_GAME, "r");
+  FILE *file = fopen(SAVED_GAME, "r");
   fseek(file, -2, SEEK_END); // Przesunięcie kursora na przedostatnią pozycję
   while (fgetc(file) != '\n')
   {

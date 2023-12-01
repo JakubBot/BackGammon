@@ -416,7 +416,8 @@ void moveRepeater(s_game *game, WINDOW *gameWin)
         setSourceColumn(game, gameWin);
 
         // target col
-        int targetIds[] = {6, 8};
+        int targetIds[] = {6};
+        // int targetIds[] = {6, 8};
         renderMenu(targetIds, sizeof(targetIds) / sizeof(targetIds[0]), 0, 0, 19, NULL, game);
         renderBoard(game, gameWin, 0, 1, b_list);
 
@@ -492,12 +493,14 @@ void renderGame(int loadFromFile)
     erase();
     refresh();
 
-    mvprintw(0, 0, "Backgammon (press q to exit)");
+    mvprintw(0, 0, "Backgammon");
     s_game game = {};
     initializeGame(&game);
+
     if (loadFromFile == 1)
     {
         loadFile(&game);
+        updateGameFile(1);
     }
     int ySize = 14, xSize = 52, yStart = 3, xStart = 0;
     WINDOW *gameWin = newwin(ySize, xSize, yStart, xStart);
@@ -507,7 +510,10 @@ void renderGame(int loadFromFile)
     renderBoard(&game, gameWin, 0, 0, NULL);
 
     refresh();
-    updateInitialDiceValues(&game);
+    if (loadFromFile == 0)
+    {
+        updateInitialDiceValues(&game);
+    }
 
     wrefresh(gameWin);
 

@@ -28,7 +28,7 @@ void clearGameState(s_game *game)
     }
 
     fclose(game->file);
-    saveGameState();
+    updateGameFile(0);
 }
 
 int validPawnToColumnMove(s_game *game, int nextColX)

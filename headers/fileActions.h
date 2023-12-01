@@ -3,6 +3,6 @@
 #ifndef FILEACTIONS_H
 #define FILEACTIONS_H
 void saveCurrentState(s_game game);
-void saveGameState();
+void updateGameFile(int copyToCurrentFile);
 void loadFile(s_game* game);
 #endif // FILEACTIONS_H

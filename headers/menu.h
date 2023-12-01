@@ -1,7 +1,3 @@
-//
-// Created by jakub bot on 18/11/2023.
-//
-
 #include "../headers/globalStructs.h"
 #include "../headers/bidirectionalList.h"
 

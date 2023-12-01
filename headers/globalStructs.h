@@ -17,6 +17,9 @@
 #define WHITE_PAWN "\u2593\u2593"
 #define SQUARE "\u25A0"
 
+#define CURRENT_GAME  "currentGame.txt"
+#define SAVED_GAME  "savedGame.txt"
+
 #define BAR_COLUMN_HEIGHT ((MAX_PAWN_ON_COL * 2) + COLUMNGAP)
 
 typedef struct

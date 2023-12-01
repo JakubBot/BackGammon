@@ -4,7 +4,7 @@
 #define RENDERGAME_H
 
 
-void renderGame();
+void renderGame(int loadFromFile);
 void initGame();
 
 #endif //RENDERGAME_H

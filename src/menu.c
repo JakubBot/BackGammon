@@ -10,22 +10,25 @@
 #include "../headers/menuUtils.h"
 #include "../headers/renderGameUtils.h"
 #include "../headers/bidirectionalList.h"
+#include "../headers/fileActions.h"
 
-void menuAction(s_game *game, int *diceSize, int btnIds[], int btnCount, int selectedBtn, int menuPosY,s_btnOption *buttons);
-void displayMenuBtn( int btnCount, int menuPosX, int menuPosY,int selectedBtn, s_btnOption* buttons);
+void menuAction(s_game *game, int *diceSize, int btnIds[], int btnCount, int selectedBtn, int menuPosY, s_btnOption *buttons);
+void displayMenuBtn(int btnCount, int menuPosX, int menuPosY, int selectedBtn, s_btnOption *buttons);
 
 void *renderMenu(int btnIds[], int btnCount, int activeBtnId, int menuPosX, int menuPosY, int *diceSize, s_game *game)
 {
     curs_set(0);
     s_btnOption *buttons = getBtnElements(btnIds, btnCount, game);
-    int selectedBtn = btnIds[0];
+    int selectedBtn = activeBtnId ? activeBtnId : btnIds[0];
     //    int selectedBtn = activeBtnId;
     int currentIndex = 0;
 
     while (selectedBtn != -1)
     {
-        for (int i = 0; i < btnCount; ++i) {
-            if (btnIds[i] == selectedBtn) {
+        for (int i = 0; i < btnCount; ++i)
+        {
+            if (btnIds[i] == selectedBtn)
+            {
                 currentIndex = i;
             }
         }
@@ -36,19 +39,19 @@ void *renderMenu(int btnIds[], int btnCount, int activeBtnId, int menuPosX, int 
         {
             if (currentIndex > 0)
             {
-                s_btnOption btn = findBtn(buttons, btnIds[currentIndex-1], btnCount);
+                s_btnOption btn = findBtn(buttons, btnIds[currentIndex - 1], btnCount);
                 selectedBtn = btn.id;
-//                selectedBtn--;
+                //                selectedBtn--;
             }
         }
         else if (ch == KEY_RIGHT)
         {
             if (currentIndex < btnCount)
-//            if (selectedBtn < btnCount - 1)
+            //            if (selectedBtn < btnCount - 1)
             {
-                s_btnOption btn = findBtn(buttons, btnIds[currentIndex+1], btnCount);
+                s_btnOption btn = findBtn(buttons, btnIds[currentIndex + 1], btnCount);
                 selectedBtn = btn.id;
-//                selectedBtn++;
+                //                selectedBtn++;
             }
         }
         else if (ch == 10)
@@ -67,7 +70,8 @@ void *renderMenu(int btnIds[], int btnCount, int activeBtnId, int menuPosX, int 
     return NULL;
 }
 
-void displayMenuBtn( int btnCount, int menuPosX, int menuPosY,int selectedBtn, s_btnOption* buttons) {
+void displayMenuBtn(int btnCount, int menuPosX, int menuPosY, int selectedBtn, s_btnOption *buttons)
+{
     int previusBtnLength = 0;
     for (int i = 0; i < btnCount; i++)
     {
@@ -76,7 +80,7 @@ void displayMenuBtn( int btnCount, int menuPosX, int menuPosY,int selectedBtn, s
         previusBtnLength += txtLen + 2;
         wborder(menuwin, '|', '|', '-', '-', '+', '+', '+', '+');
         if (selectedBtn == buttons[i].id)
-//        if (selectedBtn == i)
+        //        if (selectedBtn == i)
         {
             wattron(menuwin, COLOR_PAIR(1));
             mvwprintw(menuwin, 1, 1, "%s", buttons[i].text);
@@ -92,7 +96,8 @@ void displayMenuBtn( int btnCount, int menuPosX, int menuPosY,int selectedBtn, s
     }
 }
 
-void menuRollDiceAction(s_game *game, int *diceSize) {
+void menuRollDiceAction(s_game *game, int *diceSize)
+{
     int *diceRes = (int *)rollDice(diceSize);
     game->diceInfo.dice = diceRes;
 
@@ -104,13 +109,14 @@ void menuRollDiceAction(s_game *game, int *diceSize) {
     int isDoublet = game->diceInfo.dice[0] == game->diceInfo.dice[1] ? 1 : 0;
     game->diceInfo.diceSize = *diceSize;
     game->diceInfo.availableDiceMoves = *diceSize + (isDoublet ? 0 : 1);
-    game->diceInfo.isDoublet = isDoublet ;
+    game->diceInfo.isDoublet = isDoublet;
 
     clearSidebarInfo();
     showTurnInfo(*game);
 }
 
-void menuAction(s_game *game, int *diceSize, int btnIds[], int btnCount, int selectedBtn, int menuPosY,s_btnOption *buttons) {
+void menuAction(s_game *game, int *diceSize, int btnIds[], int btnCount, int selectedBtn, int menuPosY, s_btnOption *buttons)
+{
     if (selectedBtn != -1)
     {
         s_btnOption btn = findBtn(buttons, selectedBtn, btnCount);
@@ -120,48 +126,47 @@ void menuAction(s_game *game, int *diceSize, int btnIds[], int btnCount, int sel
 
         switch (btn.action)
         {
-            case 'd':
-                game->turn = (game->turn == 'w') ? 'b' : 'w';
-                clrButtonPrints(menuPosY, 3);
-                refresh();
-                break;
-            case 's':
-                // start
-                renderGame();
-                break;
-            case 'a':
-                // author
-                authorInfo();
-                renderMenu(btnIds, btnCount, selectedBtn, 0, 0, diceSize, game);
-                break;
-            case 'r':
-                // roll dice
+        case 'd':
+            game->turn = (game->turn == 'w') ? 'b' : 'w';
+            clrButtonPrints(menuPosY, 3);
+            refresh();
+            break;
+        case 's':
+            // start
+            renderGame(0);
+            break;
+        case 'a':
+            // author
+            authorInfo();
 
-                menuRollDiceAction(game, diceSize);
-                break;
-            case 'h':
-                fclose(game->file);
-                clear();
-                refresh();
-                clearGameState(game);
-                initGame();
-//                clear();
-//                renderMenu(btnIds, btnCount, selectedBtn, 0, 0, diceSize, game);
-//                refresh();
-//                exit(1);
-                // exit & save changes
-                break;
-            case 'l':
-//                fclose(game->file);
-                break;
-            case 'c':
-            case 'm':
-                curs_set(0);
-                // clrButtonPrints(menuPosY, 3);
-                break;
-            case 'e':
-            default:
-                break;
+            // set author btn active
+            s_btnOption btn = findBtn(buttons, 2, btnCount);
+            renderMenu(btnIds, btnCount, btn.id, 0, 0, diceSize, game);
+            break;
+        case 'r':
+            // roll dice
+
+            menuRollDiceAction(game, diceSize);
+            break;
+        case 'h':
+            clear();
+            refresh();
+            clearGameState(game);
+            initGame();
+            // exit & save changes
+            break;
+        case 'l':
+            renderGame(1);
+            //                fclose(game->file);
+            break;
+        case 'c':
+        case 'm':
+            curs_set(0);
+            // clrButtonPrints(menuPosY, 3);
+            break;
+        case 'e':
+        default:
+            break;
         }
     }
 }

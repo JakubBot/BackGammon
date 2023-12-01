@@ -9,6 +9,7 @@
 #include "../headers/move.h"
 #include "../headers/bidirectionalList.h"
 #include "../headers/renderGameUtils.h"
+#include "../headers/fileActions.h"
 
 void renderBoard(s_game *game, WINDOW *gameWin, int selectColumn, int targetColumn, struct Node *b_list);
 
@@ -428,7 +429,7 @@ void moveRepeater(s_game *game, WINDOW *gameWin)
 
 void initializeGame(s_game *game)
 {
-    FILE *file = fopen("currentGame.txt", "w");
+    FILE *file = fopen(CURRENT_GAME, "w");
     if (file == NULL)
     {
         mvprintw(0, 0, "Error while opening file");
@@ -461,47 +462,6 @@ void initializeGame(s_game *game)
     //    }
 }
 
-void saveState(s_game game)
-{
-    FILE *file = game.file;
-    //     FILE *file = fopen("currentGame.txt", "w");
-    fprintf(file, "siemazxc2");
-    //    fclose(file);
-
-    // fprintf(file, "%d %d %c", game.initialDiceValueW, game.initialDiceValueB, game.turn);
-
-    // for (int i = 0; i < COLUMNS_COUNT; ++i)
-    // {
-    //     vector_t_pawn *pawn = &game.board.columns[i].pawnIds;
-    //     fprintf(file, " %d", pawn->count);
-    //     for (int j = 0; j < pawn->count; ++j)
-    //     {
-    //         fprintf(file, " %d", pawn->ptr[j].id);
-    //     }
-    // }
-
-    // vector_t_pawn *barPawn = &game.board.bar.pawnIds;
-    // fprintf(file, " %d", barPawn->count);
-    // for (int i = 0; i < barPawn->count; ++i)
-    // {
-    //     fprintf(file, " %d", barPawn->ptr[i].id);
-    // }
-
-    // fprintf(file, " %d %d %d", game.board.isBarActive, game.board.sourceColumn, game.board.targetColumn);
-    // fprintf(file, " %d", game.diceInfo.diceSize);
-    // for (int i = 0; i < game.diceInfo.diceSize; ++i)
-    // {
-    //     fprintf(file, " %d", game.diceInfo.dice[i]);
-    // }
-
-    // fprintf(file, " %d %d %d %d", game.diceInfo.isDoublet, game.diceInfo.availableDiceMoves,
-    //         game.diceInfo.initialDiceValues[0], game.diceInfo.initialDiceValues[1]);
-
-    // fprintf(file, "\n"); // Dodanie nowej linii na końcu
-
-    // fclose(file);
-}
-
 void gameLoop(s_game game, WINDOW *gameWin)
 {
 
@@ -521,12 +481,12 @@ void gameLoop(s_game game, WINDOW *gameWin)
     wrefresh(gameWin);
     clearSidebarInfo();
 
-    saveState(game);
+    saveCurrentState(game);
 
     gameLoop(game, gameWin);
 }
 
-void renderGame()
+void renderGame(int loadFromFile)
 {
 
     erase();
@@ -535,7 +495,10 @@ void renderGame()
     mvprintw(0, 0, "Backgammon (press q to exit)");
     s_game game = {};
     initializeGame(&game);
-
+    if (loadFromFile == 1)
+    {
+        loadFile(&game);
+    }
     int ySize = 14, xSize = 52, yStart = 3, xStart = 0;
     WINDOW *gameWin = newwin(ySize, xSize, yStart, xStart);
     wrefresh(gameWin);

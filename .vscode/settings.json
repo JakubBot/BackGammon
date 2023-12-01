@@ -10,6 +10,7 @@
     "utils.h": "c",
     "move.h": "c",
     "bidirectionallist.h": "c",
-    "menu.h": "c"
+    "menu.h": "c",
+    "rendergameutils.h": "c"
   }
 }

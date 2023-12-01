@@ -2,13 +2,16 @@
 // Created by jakub bot on 30/11/2023.
 //
 
-//#include "../headers/renderGameUtils.h"
+// #include "../headers/renderGameUtils.h"
 
 #include "../headers/globalStructs.h"
 #include "../headers/utils.h"
 #include "../headers/bidirectionalList.h"
+#include "../headers/fileActions.h"
 
-void clearGameState(s_game* game) {
+
+void clearGameState(s_game *game)
+{
     // ,struct Node** b_list
 
     // clear board
@@ -19,11 +22,13 @@ void clearGameState(s_game* game) {
     // remove allocated memory for vector pawn ids
     cleanup(&game->board.bar.pawnIds);
 
-    for (int i = 0; i < COLUMNS_COUNT; ++i) {
+    for (int i = 0; i < COLUMNS_COUNT; ++i)
+    {
         cleanup(&game->board.columns[i].pawnIds);
     }
 
-
+    fclose(game->file);
+    saveGameState();
 }
 
 int validPawnToColumnMove(s_game *game, int nextColX)
@@ -82,22 +87,21 @@ int findNextPossibleMove(s_game game, int currentActiveColumn, char action)
     }
 }
 
-
 void findColumnWithPawn(s_game game, int *currentActiveColumn, char action)
 {
     switch (action)
     {
-        case 'r':
-            *currentActiveColumn = findNextPossibleMove(game, *currentActiveColumn + 1, action);
-            break;
-        case 'l':
-            *currentActiveColumn = findNextPossibleMove(game, *currentActiveColumn - 1, action);
-            break;
+    case 'r':
+        *currentActiveColumn = findNextPossibleMove(game, *currentActiveColumn + 1, action);
+        break;
+    case 'l':
+        *currentActiveColumn = findNextPossibleMove(game, *currentActiveColumn - 1, action);
+        break;
 
-        default:
-            // just find any right column starting with STARTING_COLUMN_POINT(12) index (based on colX)
-            *currentActiveColumn = findNextPossibleMove(game, STARTING_COLUMN_POINT, 'r');
-            break;
+    default:
+        // just find any right column starting with STARTING_COLUMN_POINT(12) index (based on colX)
+        *currentActiveColumn = findNextPossibleMove(game, STARTING_COLUMN_POINT, 'r');
+        break;
     }
 }
 
@@ -188,7 +192,6 @@ int getMoveDicePosition(struct Node *b_list, s_game game)
     }
     return position;
 }
-
 
 void updateDiceDublet(s_game *game, struct Node *b_list)
 {

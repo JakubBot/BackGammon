@@ -1,6 +1,7 @@
 
 #include "ncurses.h"
 #include "stdlib.h"
+#include "stdio.h"
 #include "../headers/menu.h"
 #include "../headers/playerTurn.h"
 #include "../headers/globalStructs.h"
@@ -29,33 +30,6 @@ void initializeColumns(s_game *game)
 
         refresh();
     }
-}
-
-void initializeGame(s_game *game)
-{
-    game->turn = 'w';
-    game->initialDiceValueW = -1;
-    game->initialDiceValueB = -1;
-
-    game->board.sourceColumn = -1;
-    game->board.targetColumn = -1;
-
-    vector_t_pawn *barPawn = &game->board.bar.pawnIds;
-
-    game->board.isBarActive = 0;
-
-    init(barPawn);
-
-    initializeColumns(game);
-
-    //    for (int i = 0; i < PAWNS_COUNT; ++i)
-    //    {
-    //        game->wPawns[i].color = 'w';
-    //        game->wPawns[i].id = i;
-    //
-    //        game->bPawns[i].color = 'b';
-    //        game->bPawns[i].id = i;
-    //    }
 }
 
 void printUpperCol(int offset_y, int offset_x, int x, int labelRowId, char *pawnLabel, int columnCount, char *label)
@@ -453,6 +427,83 @@ void moveRepeater(s_game *game, WINDOW *gameWin)
     freeList(&b_list);
 }
 
+void initializeGame(s_game *game)
+{
+    FILE *file = fopen("currentGame.txt", "w");
+    if (file == NULL)
+    {
+        mvprintw(0, 0, "Error while opening file");
+    }
+
+    game->file = file;
+
+    game->turn = 'w';
+    game->initialDiceValueW = -1;
+    game->initialDiceValueB = -1;
+
+    game->board.sourceColumn = -1;
+    game->board.targetColumn = -1;
+
+    vector_t_pawn *barPawn = &game->board.bar.pawnIds;
+
+    game->board.isBarActive = 0;
+
+    init(barPawn);
+
+    initializeColumns(game);
+
+    //    for (int i = 0; i < PAWNS_COUNT; ++i)
+    //    {
+    //        game->wPawns[i].color = 'w';
+    //        game->wPawns[i].id = i;
+    //
+    //        game->bPawns[i].color = 'b';
+    //        game->bPawns[i].id = i;
+    //    }
+}
+
+void saveState(s_game game)
+{
+    FILE *file = game.file;
+//     FILE *file = fopen("currentGame.txt", "w");
+    fprintf(file, "siemazxc2");
+//    fclose(file);
+
+
+    // fprintf(file, "%d %d %c", game.initialDiceValueW, game.initialDiceValueB, game.turn);
+
+    // for (int i = 0; i < COLUMNS_COUNT; ++i)
+    // {
+    //     vector_t_pawn *pawn = &game.board.columns[i].pawnIds;
+    //     fprintf(file, " %d", pawn->count);
+    //     for (int j = 0; j < pawn->count; ++j)
+    //     {
+    //         fprintf(file, " %d", pawn->ptr[j].id);
+    //     }
+    // }
+
+    // vector_t_pawn *barPawn = &game.board.bar.pawnIds;
+    // fprintf(file, " %d", barPawn->count);
+    // for (int i = 0; i < barPawn->count; ++i)
+    // {
+    //     fprintf(file, " %d", barPawn->ptr[i].id);
+    // }
+
+    // fprintf(file, " %d %d %d", game.board.isBarActive, game.board.sourceColumn, game.board.targetColumn);
+    // fprintf(file, " %d", game.diceInfo.diceSize);
+    // for (int i = 0; i < game.diceInfo.diceSize; ++i)
+    // {
+    //     fprintf(file, " %d", game.diceInfo.dice[i]);
+    // }
+
+    // fprintf(file, " %d %d %d %d", game.diceInfo.isDoublet, game.diceInfo.availableDiceMoves,
+    //         game.diceInfo.initialDiceValues[0], game.diceInfo.initialDiceValues[1]);
+
+    // fprintf(file, "\n"); // Dodanie nowej linii na końcu
+
+    // fclose(file);
+}
+
 void gameLoop(s_game game, WINDOW *gameWin)
 {
     // this will render menu with roll dice option
@@ -471,11 +522,14 @@ void gameLoop(s_game game, WINDOW *gameWin)
     wrefresh(gameWin);
     clearSidebarInfo();
 
+    saveState(game);
+
     gameLoop(game, gameWin);
 }
 
 void renderGame()
 {
+
     erase();
     refresh();
 
@@ -496,4 +550,9 @@ void renderGame()
     wrefresh(gameWin);
 
     gameLoop(game, gameWin);
+
+    if (game.file != NULL)
+    {
+        fclose(game.file);
+    }
 }

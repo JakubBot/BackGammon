@@ -27,6 +27,8 @@ void *renderMenu(int btnIds[], int btnCount, int activeBtnId, int menuPosX, int 
         {
             if (selectedBtn > 0)
             {
+//                s_btnOption btn = findBtn(buttons, selectedBtn + 1, btnCount);
+//                selectedBtn = btn.id;
                 selectedBtn--;
             }
         }
@@ -34,6 +36,8 @@ void *renderMenu(int btnIds[], int btnCount, int activeBtnId, int menuPosX, int 
         {
             if (selectedBtn < btnCount - 1)
             {
+//                s_btnOption btn = findBtn(buttons, selectedBtn - 1, btnCount);
+//                selectedBtn = btn.id;
                 selectedBtn++;
             }
         }
@@ -100,6 +104,10 @@ void menuAction(s_game *game, int *diceSize, int btnIds[], int btnCount, int sel
     {
         s_btnOption btn = findBtn(buttons, selectedBtn, btnCount);
         curs_set(1);
+
+        mvprintw(0,70, "%d", selectedBtn);
+        refresh();
+
         switch (btn.action)
         {
             case 'd':
@@ -116,14 +124,17 @@ void menuAction(s_game *game, int *diceSize, int btnIds[], int btnCount, int sel
                 authorInfo();
                 renderMenu(btnIds, btnCount, selectedBtn, 0, 0, diceSize, game);
                 break;
-            case 'r':{
+            case 'r':
                 // roll dice
 
                 menuRollDiceAction(game, diceSize);
                 break;
-            }
             case 'h':
+//                fclose(game->file);
                 // exit & save changes
+                break;
+            case 'l':
+//                fclose(game->file);
                 break;
             case 'c':
             case 'm':

@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include "../headers/vectorPawn.h"
 
 #ifndef GLOBALSTRUCTS_H
@@ -59,5 +60,6 @@ typedef struct
   s_pawn bPawns[PAWNS_COUNT];
   s_pawn removePawns[2 * PAWNS_COUNT];
   s_diceInfo diceInfo;
+  FILE* file;
 } s_game;
 #endif // GLOBALSTRUCTS_H

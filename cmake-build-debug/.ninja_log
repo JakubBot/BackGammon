@@ -13,3 +13,14 @@
 2	307	1701259034225299889	CMakeFiles/BackGammon2.dir/src/rollDice.c.o	e12bbcab88f70778
 1	207	1700348791675513625	CMakeFiles/BackGammon2.dir/src/vector.c.o	3572fe890295d7a1
 1	306	1701259034225215099	CMakeFiles/BackGammon2.dir/src/menu.c.o	f5339fba591f34af
+4	279	1701388538769076411	CMakeFiles/BackGammon2.dir/src/rollDice.c.o	e12bbcab88f70778
+3	280	1701388538769077661	CMakeFiles/BackGammon2.dir/main.c.o	aef729425353e339
+4	280	1701388538769046579	CMakeFiles/BackGammon2.dir/src/menu.c.o	f5339fba591f34af
+4	280	1701388538771041878	CMakeFiles/BackGammon2.dir/src/renderGame.c.o	aa7cfde5c6a4a806
+5	281	1701388538769068662	CMakeFiles/BackGammon2.dir/src/utils.c.o	525e2d238dff6485
+6	281	1701388538769072286	CMakeFiles/BackGammon2.dir/src/playerTurn.c.o	f6b5c979335c9a
+279	306	1701388538800565630	CMakeFiles/BackGammon2.dir/src/move.c.o	9554bc85658d8769
+280	309	1701388538803341257	CMakeFiles/BackGammon2.dir/src/renderGameUtils.c.o	2e32c14702a84782
+280	309	1701388538803343591	CMakeFiles/BackGammon2.dir/src/bidirectionalList.c.o	6a2e30bcf7e55741
+280	309	1701388538804185207	CMakeFiles/BackGammon2.dir/src/menuUtils.c.o	60bd5cdc58923484
+309	422	1701388538914790743	BackGammon2	4a8315971df4e974

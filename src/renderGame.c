@@ -166,7 +166,7 @@ int findNextLegalMove(s_game *game, char action, struct Node **b_list, int *curr
     if (!isValidCol)
     {
         int res = findNextLegalMove(game, action, b_list, currentActiveColumn);
-        movePrev(b_list);
+        // movePrev(b_list);
         return res;
     }
 

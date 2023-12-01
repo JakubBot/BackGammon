@@ -396,7 +396,8 @@ void setSourceColumn(s_game *game, WINDOW *gameWin)
     else
     {
         game->board.isBarActive = 0;
-        int srcIds[] = {5, 8};
+        int srcIds[] = {5};
+        // int srcIds[] = {5, 8};
         clrButtonPrints(19, 3);
         refresh();
         renderMenu(srcIds, sizeof(srcIds) / sizeof(srcIds[0]), 0, 0, 19, NULL, game);

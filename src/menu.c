@@ -165,6 +165,8 @@ void menuAction(s_game *game, int *diceSize, int btnIds[], int btnCount, int sel
             // clrButtonPrints(menuPosY, 3);
             break;
         case 'e':
+            exit(1);
+            break;
         default:
             break;
         }

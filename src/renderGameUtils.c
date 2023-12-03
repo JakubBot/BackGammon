@@ -9,9 +9,10 @@
 #include "../headers/bidirectionalList.h"
 #include "../headers/fileActions.h"
 
-
 void clearGameState(s_game *game)
 {
+    fclose(game->file);
+    updateGameFile(0,*game);
     // ,struct Node** b_list
 
     // clear board
@@ -20,15 +21,14 @@ void clearGameState(s_game *game)
     //  freeList(b_list);
 
     // remove allocated memory for vector pawn ids
+
     cleanup(&game->board.bar.pawnIds);
+    cleanup(&game->courtPawns);
 
     for (int i = 0; i < COLUMNS_COUNT; ++i)
     {
         cleanup(&game->board.columns[i].pawnIds);
     }
-
-    fclose(game->file);
-    updateGameFile(0);
 }
 
 int validPawnToColumnMove(s_game *game, int nextColX)

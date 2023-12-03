@@ -25,24 +25,43 @@ void saveCurrentState(s_game game)
   }
 
   fprintf(file, " %d %d %d", game.board.isBarActive, game.board.sourceColumn, game.board.targetColumn);
-  fprintf(file, " %d", game.diceInfo.diceSize);
-  for (int i = 0; i < game.diceInfo.diceSize; ++i)
-  {
-    fprintf(file, " %d", game.diceInfo.dice[i]);
-  }
 
-  fprintf(file, " %d %d %d %d", game.diceInfo.isDoublet, game.diceInfo.availableDiceMoves,
-          game.diceInfo.initialDiceValues[0], game.diceInfo.initialDiceValues[1]);
+  vector_t_pawn *courtPawns = &game.courtPawns;
+  fprintf(file, " %d", courtPawns->count);
+  for (int i = 0; i < courtPawns->count; ++i)
+  {
+    fprintf(file, " %d %c", courtPawns->ptr[i].id, courtPawns->ptr[i].color);
+  }
+  // fprintf(file, " %d", game.diceInfo.diceSize);
+  // for (int i = 0; i < game.diceInfo.diceSize; ++i)
+  // {
+  //   fprintf(file, " %d", game.diceInfo.dice[i]);
+  // }
+
+  // fprintf(file, " %d %d %d %d", game.diceInfo.isDoublet, game.diceInfo.availableDiceMoves,
+  //         game.diceInfo.initialDiceValues[0], game.diceInfo.initialDiceValues[1]);
 
   fprintf(file, "\n");
 }
 
-void updateGameFile(int copyToCurrentFile)
+void updateGameFile(int copyToCurrentFile, s_game game)
 {
   char *source = copyToCurrentFile ? SAVED_GAME : CURRENT_GAME;
   char *target = copyToCurrentFile ? CURRENT_GAME : SAVED_GAME;
-  FILE *sourceFile = fopen(source, "r");    
-  FILE *destinationFile = fopen(target, "w"); 
+  FILE *sourceFile = NULL;
+  FILE *destinationFile = NULL;
+  // load from saved file to current
+  // 
+  if (copyToCurrentFile == 0 && game.gameLoadedFromFile)
+  {
+    sourceFile = fopen(source, "r");
+    destinationFile = fopen(target, "a");
+  }
+  else
+  {
+    sourceFile = fopen(source, "r");
+    destinationFile = fopen(target, "w");
+  }
 
   if (sourceFile == NULL || destinationFile == NULL)
   {
@@ -78,18 +97,26 @@ void readGameState(FILE *file, s_game *game)
   fscanf(file, " %d", &barPawn->count);
   for (int i = 0; i < barPawn->count; ++i)
   {
-    fscanf(file, " %d", &barPawn->ptr[i].id);
+    fscanf(file, " %d %c", &barPawn->ptr[i].id, &barPawn->ptr[i].color);
   }
 
   fscanf(file, " %d %d %d", &game->board.isBarActive, &game->board.sourceColumn, &game->board.targetColumn);
-  fscanf(file, " %d", &game->diceInfo.diceSize);
-  for (int i = 0; i < game->diceInfo.diceSize; ++i)
+
+  vector_t_pawn *courtPawns = &game->courtPawns;
+  fscanf(file, " %d", &courtPawns->count);
+  for (int i = 0; i < courtPawns->count; ++i)
   {
-    fscanf(file, " %d", &game->diceInfo.dice[i]);
+    fscanf(file, " %d %c", &courtPawns->ptr[i].id, &courtPawns->ptr[i].color);
   }
 
-  fscanf(file, " %d %d %d %d", &game->diceInfo.isDoublet, &game->diceInfo.availableDiceMoves,
-         &game->diceInfo.initialDiceValues[0], &game->diceInfo.initialDiceValues[1]);
+  // fscanf(file, " %d", &game->diceInfo.diceSize);
+  // for (int i = 0; i < game->diceInfo.diceSize; ++i)
+  // {
+  //   fscanf(file, " %d", &game->diceInfo.dice[i]);
+  // }
+
+  // fscanf(file, " %d %d %d %d", &game->diceInfo.isDoublet, &game->diceInfo.availableDiceMoves,
+  //        &game->diceInfo.initialDiceValues[0], &game->diceInfo.initialDiceValues[1]);
 }
 
 void loadFile(s_game *game)

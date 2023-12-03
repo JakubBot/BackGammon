@@ -42,6 +42,7 @@ typedef struct
   s_bar bar;
   int sourceColumn;
   int targetColumn;
+  int pawnMoveToCourt;
 } s_board;
 
 typedef struct  {
@@ -61,8 +62,9 @@ typedef struct
   s_board board;
   s_pawn wPawns[PAWNS_COUNT];
   s_pawn bPawns[PAWNS_COUNT];
-  s_pawn removePawns[2 * PAWNS_COUNT];
+  vector_t_pawn courtPawns;
   s_diceInfo diceInfo;
   FILE* file;
+  int gameLoadedFromFile;
 } s_game;
 #endif // GLOBALSTRUCTS_H

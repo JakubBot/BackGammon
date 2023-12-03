@@ -25,6 +25,7 @@ add_executable(BackGammon2 main.c
         src/menuUtils.c
         src/renderGameUtils.c
         headers/renderGameUtils.h
+        src/fileActions.c
 )
 
 find_package(Curses REQUIRED)

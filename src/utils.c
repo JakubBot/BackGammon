@@ -72,7 +72,7 @@ int allPawnsHome(s_game game) {
     int eWhiteHome = 6;
     int sBlackHome = 18;
     if (turn == 'w') {
-        for (int i = eWhiteHome; i < PAWNS_COUNT; ++i) {
+        for (int i = eWhiteHome; i < COLUMNS_COUNT; ++i) {
             s_boardColumn currentCol = findColumnBasedOnColX(game, i);
             vector_t_pawn pawn = currentCol.pawnIds;
             if (pawn.count > 0 && pawn.ptr[0].color != turn) {

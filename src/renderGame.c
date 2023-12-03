@@ -133,8 +133,7 @@ int makeMove(s_game *game, struct Node **b_list, char action)
 int isValidNextMove(s_game *game, struct Node **b_list, char action, int move)
 {
 
-    int pawnGoToHome = allPawnsHome(*game) && ((move == -1) || (move == COLUMNS_COUNT));
-    if ((move < 0 || move > (COLUMNS_COUNT - 1)) && !pawnGoToHome && (action == 'l'))
+    if ((move < 0 || move > (COLUMNS_COUNT - 1)))
     {
         movePrev(b_list);
         return 0;
@@ -155,6 +154,19 @@ int findNextLegalMove(s_game *game, char action, struct Node **b_list, int *curr
     int step = (*b_list)->data;
 
     int move = getNextMoveCalculation(sourceColX, step, whiteTurn, action);
+    int pawnGoToHome = allPawnsHome(*game) && ((move == -1) || (move == COLUMNS_COUNT));
+    if (pawnGoToHome)
+    {
+        game->board.pawnMoveToCourt = 1;
+
+        *currentActiveColumn = move;
+
+        return 0;
+    }
+    else
+    {
+        game->board.pawnMoveToCourt = 0;
+    }
 
     int validNext = isValidNextMove(game, b_list, action, move);
     if (!validNext)
@@ -179,7 +191,7 @@ int findNextLegalMove(s_game *game, char action, struct Node **b_list, int *curr
 void barActiveDots(s_game game)
 {
     // additional square for start and end for each color
-    if (game.board.sourceColumn == 24 && game.board.isBarActive)
+    if (game.board.sourceColumn == 24 && (game.board.isBarActive || game.board.pawnMoveToCourt))
     {
         attron(COLOR_PAIR(2));
         mvprintw(4, 53, SQUARE);
@@ -190,7 +202,7 @@ void barActiveDots(s_game game)
         mvprintw(4, 53, " ");
     }
 
-    if (game.board.sourceColumn == -1 && game.board.isBarActive)
+    if (game.board.sourceColumn == -1 && (game.board.isBarActive || game.board.pawnMoveToCourt))
     {
         attron(COLOR_PAIR(2));
         mvprintw(15, 53, SQUARE);
@@ -431,7 +443,16 @@ void moveRepeater(s_game *game, WINDOW *gameWin)
 
 void initializeGame(s_game *game)
 {
-    FILE *file = fopen(CURRENT_GAME, "w");
+    FILE *file = file = fopen(CURRENT_GAME, "w");
+    // fopen(CURRENT_GAME, "w");
+    // if (game->gameLoadedFromFile == 1)
+    // {
+    //     file = fopen(CURRENT_GAME, "a");
+    // }
+    // else
+    // {
+    //     file = fopen(CURRENT_GAME, "w");
+    // }
     if (file == NULL)
     {
         mvprintw(0, 0, "Error while opening file");
@@ -452,6 +473,9 @@ void initializeGame(s_game *game)
 
     init(barPawn);
 
+    vector_t_pawn *courtPawns = &game->courtPawns;
+    init(courtPawns);
+
     initializeColumns(game);
 
     //    for (int i = 0; i < PAWNS_COUNT; ++i)
@@ -467,25 +491,29 @@ void initializeGame(s_game *game)
 void gameLoop(s_game game, WINDOW *gameWin)
 {
 
-    // this will render menu with roll dice option
-    int menuIds[] = {4, 8};
-    int diceSize = 0;
-    clrButtonPrints(19, 3);
-    renderMenu(menuIds, sizeof(menuIds) / sizeof(menuIds[0]), 0, 0, 19, &diceSize, &game);
+    while (1)
+    {
 
-    curs_set(0);
+        // this will render menu with roll dice option
+        int menuIds[] = {4, 8};
+        int diceSize = 0;
+        clrButtonPrints(19, 3);
+        renderMenu(menuIds, sizeof(menuIds) / sizeof(menuIds[0]), 0, 0, 19, &diceSize, &game);
 
-    moveRepeater(&game, gameWin);
+        curs_set(0);
 
-    changeTurn(&game);
+        moveRepeater(&game, gameWin);
 
-    refresh();
-    wrefresh(gameWin);
-    clearSidebarInfo();
+        changeTurn(&game);
 
-    saveCurrentState(game);
+        refresh();
+        wrefresh(gameWin);
+        clearSidebarInfo();
 
-    gameLoop(game, gameWin);
+        saveCurrentState(game);
+    }
+
+    // gameLoop(game, gameWin);
 }
 
 void renderGame(int loadFromFile)
@@ -498,11 +526,14 @@ void renderGame(int loadFromFile)
     s_game game = {};
     initializeGame(&game);
 
+    game.gameLoadedFromFile = loadFromFile == 1 ? 1 : 0;
+
     if (loadFromFile == 1)
     {
+        updateGameFile(1, game);
         loadFile(&game);
-        updateGameFile(1);
     }
+
     int ySize = 14, xSize = 52, yStart = 3, xStart = 0;
     WINDOW *gameWin = newwin(ySize, xSize, yStart, xStart);
     wrefresh(gameWin);

@@ -4,7 +4,7 @@
 #include "ncurses.h"
 
 struct Node* createNode(int value) {
-    struct Node* newNode = (struct Node*)malloc(sizeof(struct Node));
+    struct Node* newNode = (struct Node*)malloc(3 * sizeof(struct Node));
     if (newNode == NULL) {
         printf("Błąd alokacji pamięci.\n");
         exit(1);

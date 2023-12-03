@@ -63,27 +63,27 @@ int isWhiteTurn(s_game game) {
 }
 
 int allPawnsHome(s_game game) {
-    if (game.board.isBarActive) {
+    if (game.board.isBarActive == 1) {
         return 0;
     }
 
     char turn = checkTurn(game);
 
-    int eWhiteHome = 6;
-    int sBlackHome = 18;
+    int sBlackHome  = 6;
+    int eWhiteHome = 18;
     if (turn == 'w') {
-        for (int i = eWhiteHome; i < COLUMNS_COUNT; ++i) {
+        for (int i = 0; i < eWhiteHome; ++i) {
             s_boardColumn currentCol = findColumnBasedOnColX(game, i);
             vector_t_pawn pawn = currentCol.pawnIds;
-            if (pawn.count > 0 && pawn.ptr[0].color != turn) {
+            if (pawn.count > 0 && pawn.ptr[0].color == turn) {
                 return 0;
             }
         }
     } else {
-        for (int i = 0; i < sBlackHome; ++i) {
+        for (int i = sBlackHome; i < COLUMNS_COUNT ; ++i) {
             s_boardColumn currentCol = findColumnBasedOnColX(game, i);
             vector_t_pawn pawn = currentCol.pawnIds;
-            if (pawn.count > 0 && pawn.ptr[0].color != turn) {
+            if (pawn.count > 0 && pawn.ptr[0].color == turn) {
                 return 0;
             }
         }

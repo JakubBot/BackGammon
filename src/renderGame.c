@@ -133,7 +133,7 @@ int makeMove(s_game *game, struct Node **b_list, char action)
 int isValidNextMove(s_game *game, struct Node **b_list, char action, int move)
 {
 
-    if ((move < 0 || move > (COLUMNS_COUNT - 1)))
+    if ((move < 0) || (move > (COLUMNS_COUNT - 1)))
     {
         movePrev(b_list);
         return 0;
@@ -154,7 +154,7 @@ int findNextLegalMove(s_game *game, char action, struct Node **b_list, int *curr
     int step = (*b_list)->data;
 
     int move = getNextMoveCalculation(sourceColX, step, whiteTurn, action);
-    int pawnGoToHome = allPawnsHome(*game) && ((move == -1) || (move == COLUMNS_COUNT));
+    int pawnGoToHome = allPawnsHome(*game) && ((move == -1) || (move == COLUMNS_COUNT)) ? 1 : 0;
     if (pawnGoToHome)
     {
         game->board.pawnMoveToCourt = 1;
@@ -191,7 +191,7 @@ int findNextLegalMove(s_game *game, char action, struct Node **b_list, int *curr
 void barActiveDots(s_game game)
 {
     // additional square for start and end for each color
-    if (game.board.sourceColumn == 24 && (game.board.isBarActive || game.board.pawnMoveToCourt))
+    if ((game.board.sourceColumn == 24 && game.board.isBarActive) || (game.board.pawnMoveToCourt == 1 && getTurn(game) == 'w'))
     {
         attron(COLOR_PAIR(2));
         mvprintw(4, 53, SQUARE);
@@ -202,7 +202,7 @@ void barActiveDots(s_game game)
         mvprintw(4, 53, " ");
     }
 
-    if (game.board.sourceColumn == -1 && (game.board.isBarActive || game.board.pawnMoveToCourt))
+    if ((game.board.sourceColumn == -1 && game.board.isBarActive) || (game.board.pawnMoveToCourt == 1 && getTurn(game) == 'b'))
     {
         attron(COLOR_PAIR(2));
         mvprintw(15, 53, SQUARE);
@@ -224,7 +224,7 @@ void setSelectedColumn(s_game *game, WINDOW *gameWin, struct Node *b_list, int c
     }
     else if (targetColumn)
     {
-        if (currentActiveColumn == -1 || currentActiveColumn == 24)
+        if ((currentActiveColumn == -1 || currentActiveColumn == 24) && game->board.pawnMoveToCourt != 1)
         {
             // block if pawn is on bar with source -1 or 24, he has to move it
             return renderBoard(game, gameWin, selectColumn, targetColumn, b_list);

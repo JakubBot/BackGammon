@@ -443,16 +443,17 @@ void moveRepeater(s_game *game, WINDOW *gameWin)
 
 void initializeGame(s_game *game)
 {
-    FILE *file = file = fopen(CURRENT_GAME, "w");
+    FILE *file = NULL;
+    // FILE *file = fopen(CURRENT_GAME, "a");
     // fopen(CURRENT_GAME, "w");
-    // if (game->gameLoadedFromFile == 1)
-    // {
-    //     file = fopen(CURRENT_GAME, "a");
-    // }
-    // else
-    // {
-    //     file = fopen(CURRENT_GAME, "w");
-    // }
+    if (game->gameLoadedFromFile == 1)
+    {
+        file = fopen(CURRENT_GAME, "a");
+    }
+    else
+    {
+        file = fopen(CURRENT_GAME, "w");
+    }
     if (file == NULL)
     {
         mvprintw(0, 0, "Error while opening file");
@@ -524,9 +525,9 @@ void renderGame(int loadFromFile)
 
     mvprintw(0, 0, "Backgammon");
     s_game game = {};
-    initializeGame(&game);
-
     game.gameLoadedFromFile = loadFromFile == 1 ? 1 : 0;
+
+    initializeGame(&game);
 
     if (loadFromFile == 1)
     {

@@ -51,11 +51,11 @@ void updateGameFile(int copyToCurrentFile, s_game game)
   FILE *sourceFile = NULL;
   FILE *destinationFile = NULL;
   // load from saved file to current
-  // 
+  //
   if (copyToCurrentFile == 0 && game.gameLoadedFromFile)
   {
     sourceFile = fopen(source, "r");
-    destinationFile = fopen(target, "a");
+    destinationFile = fopen(target, "w");
   }
   else
   {
@@ -87,6 +87,12 @@ void readGameState(FILE *file, s_game *game)
   {
     vector_t_pawn *pawn = &game->board.columns[i].pawnIds;
     fscanf(file, " %d", &pawn->count);
+
+    if (pawn->count > pawn->allocated_size)
+    {
+      reallocate(pawn, pawn->count * 2);
+    }
+
     for (int j = 0; j < pawn->count; ++j)
     {
       fscanf(file, " %d %c", &pawn->ptr[j].id, &pawn->ptr[j].color);
@@ -95,6 +101,11 @@ void readGameState(FILE *file, s_game *game)
 
   vector_t_pawn *barPawn = &game->board.bar.pawnIds;
   fscanf(file, " %d", &barPawn->count);
+
+  if (barPawn->count > barPawn->allocated_size)
+  {
+    reallocate(barPawn, barPawn->count * 2);
+  }
   for (int i = 0; i < barPawn->count; ++i)
   {
     fscanf(file, " %d %c", &barPawn->ptr[i].id, &barPawn->ptr[i].color);
@@ -104,6 +115,12 @@ void readGameState(FILE *file, s_game *game)
 
   vector_t_pawn *courtPawns = &game->courtPawns;
   fscanf(file, " %d", &courtPawns->count);
+
+  if (courtPawns->count > courtPawns->allocated_size)
+  {
+    reallocate(courtPawns, courtPawns->count * 2);
+  }
+
   for (int i = 0; i < courtPawns->count; ++i)
   {
     fscanf(file, " %d %c", &courtPawns->ptr[i].id, &courtPawns->ptr[i].color);

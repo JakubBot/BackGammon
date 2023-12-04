@@ -43,6 +43,5 @@ int *rollDice(int *diceSize)
         dice[1] = max(tempArr[0], tempArr[1]);
     }
 
-
     return dice;
 }

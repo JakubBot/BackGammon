@@ -3,9 +3,11 @@
 #include "../headers/bidirectionalList.h"
 #include "ncurses.h"
 
-struct Node* createNode(int value) {
-    struct Node* newNode = (struct Node*)malloc(3 * sizeof(struct Node));
-    if (newNode == NULL) {
+struct Node *createNode(int value)
+{
+    struct Node *newNode = (struct Node *)malloc(sizeof(struct Node));
+    if (newNode == NULL)
+    {
         printf("Błąd alokacji pamięci.\n");
         exit(1);
     }
@@ -15,13 +17,18 @@ struct Node* createNode(int value) {
     return newNode;
 }
 
-void append(struct Node** head, int value) {
-    struct Node* newNode = createNode(value);
-    if (*head == NULL) {
+void append(struct Node **head, int value)
+{
+    struct Node *newNode = createNode(value);
+    if (*head == NULL)
+    {
         *head = newNode;
-    } else {
-        struct Node* current = *head;
-        while (current->next != NULL) {
+    }
+    else
+    {
+        struct Node *current = *head;
+        while (current->next != NULL)
+        {
             current = current->next;
         }
         current->next = newNode;
@@ -29,59 +36,88 @@ void append(struct Node** head, int value) {
     }
 }
 
-struct Node* next(struct Node* current) {
-    return current->next;
+struct Node *next(struct Node *current)
+{
+
+    if (current != NULL && current->next != NULL)
+    {
+        return current->next;
+    }
+    return NULL;
+
+    // return current->next;
 }
 
-int moveNext(struct Node** current) {
-    if (*current != NULL && next(*current) != NULL) {
+struct Node *prev(struct Node *current)
+{
+
+    if (current != NULL && current->prev != NULL)
+    {
+        return current->prev;
+    }
+
+    return NULL;
+    // return current->prev;
+}
+
+int moveNext(struct Node **current)
+{
+    if (*current != NULL && next(*current) != NULL)
+    {
         *current = (*current)->next;
         return 1;
     }
     return 0;
 }
 
-struct Node* prev(struct Node* current) {
-    return current->prev;
-}
-
-
-int movePrev(struct Node** current) {
-    if (*current != NULL && prev(*current) != NULL) {
+int movePrev(struct Node **current)
+{
+    if (*current != NULL && prev(*current) != NULL)
+    {
         *current = (*current)->prev;
         return 1;
     }
     return 0;
 }
 
-void moveToTop(struct Node** current) {
-    while (*current != NULL && (*current)->prev != NULL) {
+void moveToTop(struct Node **current)
+{
+    while (*current != NULL && (*current)->prev != NULL)
+    {
         *current = (*current)->prev;
     }
 }
 
-
-int countDepthRecursive(struct Node* current) {
+int countDepthRecursive(struct Node *current)
+{
     int steps = 0;
-    while (current->prev != NULL) {
+    while (current->prev != NULL)
+    {
         steps++;
         current = current->prev;
     }
     return steps;
 }
 
-void removeFirstNodeWithValue(struct Node** head, int value) {
-    struct Node* current = *head;
+void removeFirstNodeWithValue(struct Node **head, int value)
+{
+    struct Node *current = *head;
 
-    while (current != NULL) {
-        if (current->data == value) {
-            if (current->prev != NULL) {
+    while (current != NULL)
+    {
+        if (current->data == value)
+        {
+            if (current->prev != NULL)
+            {
                 current->prev->next = current->next;
-            } else {
+            }
+            else
+            {
                 *head = current->next;
             }
 
-            if (current->next != NULL) {
+            if (current->next != NULL)
+            {
                 current->next->prev = current->prev;
             }
 
@@ -93,32 +129,39 @@ void removeFirstNodeWithValue(struct Node** head, int value) {
     }
 }
 
-
-void removeLastNode(struct Node** head) {
-    if (*head == NULL) {
+void removeLastNode(struct Node **head)
+{
+    if (*head == NULL)
+    {
         return;
     }
 
-    struct Node* current = *head;
-    struct Node* previous = NULL;
+    struct Node *current = *head;
+    struct Node *previous = NULL;
 
-    while (current->next != NULL) {
+    while (current->next != NULL)
+    {
         previous = current;
         current = current->next;
     }
 
-    if (previous != NULL) {
+    if (previous != NULL)
+    {
         previous->next = NULL;
-    } else {
+    }
+    else
+    {
         *head = NULL;
     }
 
     free(current);
 }
 
-void freeList(struct Node** b_list) {
-    while (*b_list != NULL) {
-        struct Node* temp = *b_list;
+void freeList(struct Node **b_list)
+{
+    while (*b_list != NULL)
+    {
+        struct Node *temp = *b_list;
         *b_list = (*b_list)->next;
         free(temp);
     }

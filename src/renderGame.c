@@ -117,7 +117,7 @@ void renderColumn(s_boardColumn boardColumn, int barOffset)
     char *p_label = currCol.ptr[0].color == 'b' ? BLACK_PAWN : WHITE_PAWN;
     int labelRowId = x + 1;
 
-     int count = BOARD_COLUMN_HEIGHT - colCount;
+    int count = BOARD_COLUMN_HEIGHT - colCount;
     if (rev)
     {
         printBottomCol(offset_y, offset_x, x, labelRowId, p_label, colCount, label, count, colVerticalOffset);
@@ -162,23 +162,34 @@ int isValidNextMove(s_game *game, struct Node **b_list, char action, int move)
 
     if ((move < 0) || (move > (COLUMNS_COUNT - 1)))
     {
-        movePrev(b_list);
+        // movePrev(b_list);
         return 0;
     }
 
     return 1;
 }
 
-int findNextLegalMove(s_game *game, char action, struct Node **b_list, int *currentActiveColumn)
+int findNextLegalMove(s_game *game, char action, struct Node **b_list, int *currentActiveColumn, int *skippedColumns)
 {
     int sourceColX = game->board.sourceColumn;
     int whiteTurn = isWhiteTurn(*game);
 
-    int validMv = makeMove(game, b_list, action);
-    if (!validMv)
-        return 0;
+    struct Node *nextElement;
 
-    int step = (*b_list)->data;
+    if (action == 'l')
+    {
+        nextElement = next(*b_list);
+        if (nextElement == NULL)
+            return 0;
+    }
+    else if (action == 'r')
+    {
+        nextElement = prev(*b_list);
+        if (nextElement == NULL)
+            return 0;
+    }
+
+    int step = nextElement->data;
 
     int move = getNextMoveCalculation(sourceColX, step, whiteTurn, action);
     int pawnGoToHome = allPawnsHome(*game) && ((move == -1) || (move == COLUMNS_COUNT)) ? 1 : 0;
@@ -187,6 +198,8 @@ int findNextLegalMove(s_game *game, char action, struct Node **b_list, int *curr
         game->board.pawnMoveToCourt = 1;
 
         *currentActiveColumn = move;
+
+        int validMv = makeMove(game, b_list, action);
 
         return 0;
     }
@@ -199,17 +212,21 @@ int findNextLegalMove(s_game *game, char action, struct Node **b_list, int *curr
     if (!validNext)
         return 0;
 
-    // dodac zdejmowanie pionkow
-
     int isValidCol = validPawnToColumnMove(game, move);
 
     if (!isValidCol)
     {
-        int res = findNextLegalMove(game, action, b_list, currentActiveColumn);
-        // movePrev(b_list);
+        int validMv = makeMove(game, b_list, action);
+        *skippedColumns = *skippedColumns + 1;
+        int res = findNextLegalMove(game, action, b_list, currentActiveColumn, skippedColumns);
         return res;
     }
+    else
+    {
+        *skippedColumns = 0;
+    }
 
+    int validMv = makeMove(game, b_list, action);
     *currentActiveColumn = move;
 
     return 0;
@@ -278,7 +295,7 @@ void setSelectedColumn(s_game *game, WINDOW *gameWin, struct Node *b_list, int c
     }
 }
 
-int handleBoardMove(s_game *game, struct Node **b_list, int selectColumn, int targetColumn, int *currentActiveColumn)
+int handleBoardMove(s_game *game, struct Node **b_list, int selectColumn, int targetColumn, int *currentActiveColumn, int *skippedColumns)
 {
     if (selectColumn == 1)
     {
@@ -303,11 +320,11 @@ int handleBoardMove(s_game *game, struct Node **b_list, int selectColumn, int ta
         curs_set(0);
         if (ch == KEY_LEFT)
         {
-            findNextLegalMove(game, 'l', b_list, currentActiveColumn);
+            findNextLegalMove(game, 'l', b_list, currentActiveColumn, skippedColumns);
         }
         else if (ch == KEY_RIGHT)
         {
-            findNextLegalMove(game, 'r', b_list, currentActiveColumn);
+            findNextLegalMove(game, 'r', b_list, currentActiveColumn, skippedColumns);
         }
         else if (ch == 10)
         {
@@ -416,6 +433,7 @@ void renderBoard(s_game *game, WINDOW *gameWin, int selectColumn, int targetColu
     // currentActiveColumn represents column(colX) that is active
     int currentActiveColumn = -1;
 
+    int skippedColumns = 0;
     do
     {
         setDefaultActiveColumn(*game, &currentActiveColumn, targetColumn, selectColumn);
@@ -431,11 +449,16 @@ void renderBoard(s_game *game, WINDOW *gameWin, int selectColumn, int targetColu
 
         wrefresh(gameWin);
 
-        int action = handleBoardMove(game, &b_list, selectColumn, targetColumn, &currentActiveColumn);
+        int action = handleBoardMove(game, &b_list, selectColumn, targetColumn, &currentActiveColumn, &skippedColumns);
         if (action == 0)
             break;
 
     } while (selectColumn || targetColumn);
+
+    for (int i = 0; i < skippedColumns; ++i)
+    {
+        movePrev(&b_list);
+    }
 
     setSelectedColumn(game, gameWin, b_list, currentActiveColumn, selectColumn, targetColumn);
 }

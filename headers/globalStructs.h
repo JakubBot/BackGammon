@@ -13,12 +13,12 @@
 
 #define STARTING_COLUMN_POINT 12
 
-#define BLACK_PAWN  "\u2592\u2592"
+#define BLACK_PAWN "\u2592\u2592"
 #define WHITE_PAWN "\u2593\u2593"
 #define SQUARE "\u25A0"
 
-#define CURRENT_GAME  "currentGame.txt"
-#define SAVED_GAME  "savedGame.txt"
+#define CURRENT_GAME "currentGame.txt"
+#define SAVED_GAME "savedGame.txt"
 
 #define BAR_COLUMN_HEIGHT ((MAX_PAWN_ON_COL * 2) + COLUMNGAP)
 
@@ -42,17 +42,18 @@ typedef struct
   s_bar bar;
   int sourceColumn;
   int targetColumn;
+  int forcedTargetColumn;
   int pawnMoveToCourt;
 } s_board;
 
-typedef struct  {
-  int* dice;
+typedef struct
+{
+  int *dice;
   int diceSize;
   int isDoublet;
   int availableDiceMoves;
   int initialDiceValues[2];
 } s_diceInfo;
-
 
 typedef struct
 {
@@ -64,7 +65,7 @@ typedef struct
   s_pawn bPawns[PAWNS_COUNT];
   vector_t_pawn courtPawns;
   s_diceInfo diceInfo;
-  FILE* file;
+  FILE *file;
   int gameLoadedFromFile;
 } s_game;
 #endif // GLOBALSTRUCTS_H

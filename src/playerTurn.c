@@ -3,8 +3,9 @@
 #include "../headers/globalStructs.h"
 #include "../headers/rollDice.h"
 #include "../headers/menu.h"
+#include "../headers/utils.h"
 
-#define POSITION_X 56
+#define POSITION_X (BOARD_WIDTH + 4)
 // #define POSITION_Y 9
 #define POSITION_Y 3
 
@@ -35,11 +36,36 @@ void clearSidebarInfo()
   refresh();
 }
 
+void showColorsDefinition()
+{
+  int offsetX = 4;
+  int offsetY = -4;
+  int startDefinitionY = POSITION_Y + BOARD_HEIGHT + offsetY;
+  int startDefinitionX = POSITION_X;
+
+  mvprintw(startDefinitionY, startDefinitionX, "Colors definition:");
+  attron(COLOR_PAIR(COLOR_COLUMN_ID));
+  mvprintw(startDefinitionY + 1, startDefinitionX, SQUARE);
+  attroff(COLOR_PAIR(COLOR_COLUMN_ID));
+  mvprintw(startDefinitionY + 1, startDefinitionX + 1, " - current column");
+
+  attron(COLOR_PAIR(POSSIBLE_COLUMN_MOVE_ID));
+  mvprintw(startDefinitionY + 2, startDefinitionX, SQUARE);
+  attroff(COLOR_PAIR(POSSIBLE_COLUMN_MOVE_ID));
+  mvprintw(startDefinitionY + 2, startDefinitionX + 1, " - source column");
+
+  attron(COLOR_PAIR(FORCED_COLUMN_MOVE_ID));
+  mvprintw(startDefinitionY + 3, startDefinitionX, SQUARE);
+  attroff(COLOR_PAIR(FORCED_COLUMN_MOVE_ID));
+  mvprintw(startDefinitionY + 3, startDefinitionX + 1, " - forced target column");
+
+}
+
 void showTurnInfo(s_game game)
 {
   mvprintw(POSITION_Y, POSITION_X, "Turn -> Player %c", (game.turn == 'w') ? '1' : '2');
 
- mvprintw(POSITION_Y + 2, POSITION_X, "Roll dice result -> %d %d", game.diceInfo.initialDiceValues[0], game.diceInfo.initialDiceValues[1]);
+  mvprintw(POSITION_Y + 2, POSITION_X, "Roll dice result -> %d %d", game.diceInfo.initialDiceValues[0], game.diceInfo.initialDiceValues[1]);
 
   mvprintw(POSITION_Y + 4, POSITION_X, "Moves left:");
 
@@ -54,6 +80,7 @@ void showTurnInfo(s_game game)
       displayPosition++;
     }
   }
+  showColorsDefinition();
 }
 
 void updateInitialDiceValues(s_game *game)

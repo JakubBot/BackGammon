@@ -62,6 +62,8 @@ void movePawn(s_game *game)
     game->board.targetColumn = -1;
     game->board.isBarActive = 0;
     game->board.pawnMoveToCourt = 0;
+    game->board.forcedTargetColumn = -10;
+
     //    game->diceInfo = -1;
 
     refresh();

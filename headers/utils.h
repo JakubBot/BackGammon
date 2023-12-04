@@ -5,6 +5,14 @@
 
 #define COLOR_COLUMN 20
 #define POSSIBLE_COLUMN_MOVE 21
+#define FORCED_COLUMN_MOVE 22
+
+#define COLOR_COLUMN_ID 2
+#define POSSIBLE_COLUMN_MOVE_ID 3
+#define FORCED_COLUMN_MOVE_ID 4
+
+#define BOARD_WIDTH 52
+#define BOARD_HEIGHT 14
 
 void clrButtonPrints(int posY, int nLines);
 

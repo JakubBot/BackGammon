@@ -52,9 +52,27 @@ void movePawn(s_game *game)
         s_pawn pawn = pop_back(sourcePawnIds);
         push_back(courtPawns, pawn);
     }
+    else if (isBarActive)
+    {
+        int pawnIndex = findPawnIndex(*barPawnIds, game->turn);
+        // for (int i = 0; i < game->board.bar.pawnIds.count; ++i)
+        // {
+        //     if (game->board.bar.pawnIds.ptr[i].color == game->turn)
+        //     {
+        //         pawnIndex = i;
+        //     }
+        // }
+        
+        if (pawnIndex != -10)
+        {
+            s_pawn pawn = erasePawn(barPawnIds, pawnIndex);
+            push_back(targetPawnIds, pawn);
+        }
+    }
     else
     {
-        s_pawn pawn = isBarActive ? pop_back(barPawnIds) : pop_back(sourcePawnIds);
+        //  isBarActive ? pop_back(barPawnIds) :
+        s_pawn pawn = pop_back(sourcePawnIds);
         push_back(targetPawnIds, pawn);
     }
 
@@ -63,7 +81,6 @@ void movePawn(s_game *game)
     game->board.isBarActive = 0;
     game->board.pawnMoveToCourt = 0;
     game->board.forcedTargetColumn = -10;
-
     //    game->diceInfo = -1;
 
     refresh();

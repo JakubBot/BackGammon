@@ -162,7 +162,6 @@ int isValidNextMove(s_game *game, struct Node **b_list, char action, int move)
 
     if ((move < 0) || (move > (COLUMNS_COUNT - 1)))
     {
-        // movePrev(b_list);
         return 0;
     }
 
@@ -402,7 +401,9 @@ void printBarPawn(s_game game)
 
         char *pawnLabel = clr == 'b' ? BLACK_PAWN : WHITE_PAWN;
 
-        if (i == 0 && game.board.isBarActive)
+        int pawnIndex = findPawnIndex(game.board.bar.pawnIds, game.turn);
+
+        if (i == pawnIndex && game.board.isBarActive)
         {
             attron(COLOR_PAIR(2));
             mvprintw(i + COLUMNGAP + start, 1 + (6 * 4), pawnLabel);

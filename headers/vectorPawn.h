@@ -24,5 +24,6 @@ void reallocate(vector_t_pawn *v, int reallocate_size);
 void push_back(vector_t_pawn *v, s_pawn val);
 
 s_pawn pop_back(vector_t_pawn *v);
+s_pawn erasePawn(vector_t_pawn *v, int index);
 
 #endif //VECTOR_H

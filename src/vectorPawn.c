@@ -49,3 +49,30 @@ s_pawn pop_back(vector_t_pawn *v) {
         reallocate(v, v->allocated_size / 2);
     return retv;
 }
+
+
+s_pawn erasePawn(vector_t_pawn *v, int index) {
+    s_pawn removedPawn;
+
+    if (index < 0 || index >= v->count) {
+        // Invalid index, return a default-initialized s_pawn or handle error as needed
+        return removedPawn;
+    }
+
+    removedPawn = v->ptr[index];
+
+    // Shift elements to fill the gap
+    for (int i = index; i < v->count - 1; i++) {
+        v->ptr[i] = v->ptr[i + 1];
+    }
+
+    // Decrease the count
+    v->count--;
+
+    // Check if reallocation is needed
+    if (4 * v->count <= v->allocated_size) {
+        reallocate(v, v->allocated_size / 2);
+    }
+
+    return removedPawn;
+}

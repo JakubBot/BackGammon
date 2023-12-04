@@ -12,7 +12,7 @@
 void clearGameState(s_game *game)
 {
     fclose(game->file);
-    updateGameFile(0,*game);
+    updateGameFile(0, *game);
     // ,struct Node** b_list
 
     // clear board
@@ -105,11 +105,21 @@ void findColumnWithPawn(s_game game, int *currentActiveColumn, char action)
     }
 }
 
+// int isAnyPawnOnBar(s_game game)
+// {
+// }
+
 int shouldUseBarPawn(s_game game)
 {
-    if (game.board.bar.pawnIds.count > 0 && game.board.bar.pawnIds.ptr[0].color == game.turn)
+    if (game.board.bar.pawnIds.count == 0)
+        return 0;
+
+    for (int i = 0; i < game.board.bar.pawnIds.count; ++i)
     {
-        return 1;
+        if (game.board.bar.pawnIds.ptr[i].color == game.turn)
+        {
+            return 1;
+        }
     }
     return 0;
 }

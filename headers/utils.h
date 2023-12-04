@@ -28,5 +28,6 @@ int isBarActive(vector_t_pawn barPawnIds, s_game game);
 int isWhiteTurn(s_game game);
 char getTurn(s_game game);
 int getPawnBarCount(s_game game);
+int findPawnIndex(vector_t_pawn pawns, char turn);
 
 #endif // UTILS_H

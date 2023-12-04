@@ -40,6 +40,18 @@ s_boardColumn findColumnBasedOnColX(s_game game, int currentActiveColumn)
     return game.board.columns[0];
 }
 
+int findPawnIndex(vector_t_pawn pawns, char turn)
+{
+    for (int i = 0; i < pawns.count; ++i)
+    {
+        if (pawns.ptr[i].color == turn)
+        {
+            return i;
+        }
+    }
+    return -10;
+}
+
 vector_t_pawn *findColumnPawnIds(s_game *game, int currentActiveColumn)
 {
     for (int i = 0; i < COLUMNS_COUNT; ++i)
@@ -117,7 +129,6 @@ int min(int a, int b)
 {
     return (a < b) ? a : b;
 }
-
 
 // int isBarActive(vector_t_pawn barPawnIds, s_game game) {
 //     for (int i =0; i < barPawnIds.count; i++) {

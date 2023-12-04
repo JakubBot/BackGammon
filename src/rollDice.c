@@ -33,12 +33,15 @@ int *rollDice(int *diceSize)
         }
         return dice;
     }
-    if (*diceSize == 4) {
+    if (*diceSize == 4)
+    {
         for (int i = 0; i < *diceSize; i++)
         {
             dice[i] = tempArr[0];
         }
-    } else {
+    }
+    else
+    {
         dice[0] = min(tempArr[0], tempArr[1]);
         dice[1] = max(tempArr[0], tempArr[1]);
     }

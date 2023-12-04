@@ -14,6 +14,10 @@
 #define BOARD_WIDTH 52
 #define BOARD_HEIGHT 14
 
+#define WHITE_COURT -1
+#define BLACK_COURT 24
+#define NOT_FOUND -10
+
 void clrButtonPrints(int posY, int nLines);
 
 void changeTurn(s_game *game);

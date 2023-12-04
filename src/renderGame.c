@@ -464,66 +464,105 @@ void renderBoard(s_game *game, WINDOW *gameWin, int selectColumn, int targetColu
     setSelectedColumn(game, gameWin, b_list, currentActiveColumn, selectColumn, targetColumn);
 }
 
-int existsCapture(s_game game, struct Node *b_list, int *souceTargetCapture)
+void getPossibleMovesArray(int moveArr[4], s_game game, int availableDiceMoves)
+{
+    int allNormalMovesAvailable = availableDiceMoves == 3;
+    int isDoublet = game.diceInfo.isDoublet;
+
+    int move1 = game.diceInfo.dice[0];
+    int move2 = game.diceInfo.dice[1];
+
+    int moveLeft = move1 == -1 ? move2 : move1;
+    if (isDoublet)
+    {
+        for (int j = 0; j < availableDiceMoves; ++j)
+        {
+            moveArr[j] = game.diceInfo.dice[0] * (j + 1);
+        }
+    }
+    else if (allNormalMovesAvailable)
+    {
+        moveArr[0] = move1;
+        moveArr[1] = move2;
+        moveArr[2] = move1 + move2;
+    }
+    else
+    {
+        moveArr[0] = moveLeft;
+    }
+}
+
+int existsCapture(s_game game, struct Node *b_list, int *souceTargetCapture, int checkOnlyBar)
 {
     char color = getTurn(game);
-    int whiteTurn = getTurn(game) == 'w' ? 1 : 0;
+    int whiteTurn = color == 'w' ? 1 : 0;
+
+    int isDoublet = game.diceInfo.isDoublet;
+    int availableDiceMoves = game.diceInfo.availableDiceMoves;
+    int allNormalMovesAvailable = availableDiceMoves == 3;
+
+    int moves = isDoublet ? availableDiceMoves : allNormalMovesAvailable ? 3
+                                                                         : 1;
+    int moveArr[4];
+    getPossibleMovesArray(moveArr, game, availableDiceMoves);
+
+    if (checkOnlyBar)
+    {
+        for (int k = 0; k < moves; ++k)
+        {
+            int currentColIndex = whiteTurn ? WHITE_COURT : BLACK_COURT;
+            int nextColIndex = getNextMoveCalculation(currentColIndex, moveArr[k], whiteTurn, 'l');
+            s_boardColumn nextCol = findColumnBasedOnColX(game, nextColIndex);
+            if (nextCol.pawnIds.count == 1 && nextCol.pawnIds.ptr[0].color != game.turn)
+            {
+                souceTargetCapture[0] = currentColIndex;
+                souceTargetCapture[1] = nextColIndex;
+
+                return currentColIndex;
+            }
+        }
+
+        return NOT_FOUND;
+    }
 
     for (int currentColIndex = 0; currentColIndex < COLUMNS_COUNT; ++currentColIndex)
     {
         s_boardColumn currentColumn = findColumnBasedOnColX(game, currentColIndex);
+
         if (currentColumn.pawnIds.count == 0 || currentColumn.pawnIds.ptr[0].color != color)
         {
             continue;
         }
 
-        if (game.diceInfo.isDoublet)
+        for (int k = 0; k < moves; ++k)
         {
-        }
-        else
-        {
-            int move1 = game.diceInfo.dice[0];
-            int move2 = game.diceInfo.dice[1];
-            int move3 = move1 + move2;
-            int moves = game.diceInfo.availableDiceMoves;
-
-            if (moves == 3)
+            int nextColIndex = getNextMoveCalculation(currentColIndex, moveArr[k], whiteTurn, 'l');
+            s_boardColumn nextCol = findColumnBasedOnColX(game, nextColIndex);
+            if (nextCol.pawnIds.count == 1 && nextCol.pawnIds.ptr[0].color != game.turn)
             {
-                int moveArr[3] = {move1, move2, move3};
-                for (int k = 0; k < moves; ++k)
-                {
-                    int nextColIndex = getNextMoveCalculation(currentColIndex, moveArr[k], whiteTurn, 'l');
-                    s_boardColumn nextCol = findColumnBasedOnColX(game, nextColIndex);
-                    if (nextCol.pawnIds.count == 1 && nextCol.pawnIds.ptr[0].color != game.turn)
-                    {
-                        souceTargetCapture[0] = currentColIndex;
-                        souceTargetCapture[1] = nextColIndex;
+                souceTargetCapture[0] = currentColIndex;
+                souceTargetCapture[1] = nextColIndex;
 
-                        return currentColIndex;
-                    }
-                }
-            }
-            else
-            {
-                int moveLeft = move1 == -1 ? move2 : move1;
-                int nextColIndex = getNextMoveCalculation(currentColIndex, moveLeft, whiteTurn, 'l');
-                s_boardColumn nextCol = findColumnBasedOnColX(game, nextColIndex);
-                if (nextCol.pawnIds.count == 1 && nextCol.pawnIds.ptr[0].color != game.turn)
-                {
-                    souceTargetCapture[0] = currentColIndex;
-                    souceTargetCapture[1] = nextColIndex;
-                    return currentColIndex;
-                }
+                return currentColIndex;
             }
         }
-
-        // if (pawnIds.count == 1 && pawnIds.ptr[0].color != color)
-        // {
-        //     return 1;
-        // }
     }
+    return NOT_FOUND;
+}
+void handleForcedCapture(s_game *game, struct Node *b_list, int checkOnlyBar)
+{
 
-    return -10;
+    int souceTargetCapture[2];
+    int existsCap = existsCapture(*game, b_list, souceTargetCapture, checkOnlyBar);
+
+    if (existsCap != NOT_FOUND)
+    {
+        if (checkOnlyBar != 1)
+        {
+            game->board.sourceColumn = souceTargetCapture[0];
+        }
+        game->board.forcedTargetColumn = souceTargetCapture[1];
+    }
 }
 
 void setSourceColumn(s_game *game, WINDOW *gameWin, struct Node *b_list)
@@ -540,16 +579,27 @@ void setSourceColumn(s_game *game, WINDOW *gameWin, struct Node *b_list)
         {
             game->board.sourceColumn = 24;
         }
+
+        handleForcedCapture(game, b_list, 1);
+        // int souceTargetCapture[2];
+        // int existsCap = existsCapture(*game, b_list, souceTargetCapture, 1);
+
+        // if (existsCap != NOT_FOUND)
+        // {
+        //     game->board.forcedTargetColumn = souceTargetCapture[1];
+        // }
     }
     else
     {
-        int souceTargetCapture[2];
-        int existsCap = existsCapture(*game, b_list, souceTargetCapture);
-        if (existsCap != -10)
-        {
-            game->board.sourceColumn = souceTargetCapture[0];
-            game->board.forcedTargetColumn = souceTargetCapture[1];
-        }
+        handleForcedCapture(game, b_list, 0);
+        // int souceTargetCapture[2];
+        // int existsCap = existsCapture(*game, b_list, souceTargetCapture, 0);
+
+        // if (existsCap != NOT_FOUND)
+        // {
+        //     game->board.sourceColumn = souceTargetCapture[0];
+        //     game->board.forcedTargetColumn = souceTargetCapture[1];
+        // }
         else
         {
             game->board.isBarActive = 0;

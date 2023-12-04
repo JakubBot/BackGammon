@@ -105,10 +105,6 @@ void findColumnWithPawn(s_game game, int *currentActiveColumn, char action)
     }
 }
 
-// int isAnyPawnOnBar(s_game game)
-// {
-// }
-
 int shouldUseBarPawn(s_game game)
 {
     if (game.board.bar.pawnIds.count == 0)

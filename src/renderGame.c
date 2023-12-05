@@ -241,25 +241,61 @@ int findNextLegalMove(s_game *game, char action, struct Node **b_list, int *curr
     return 0;
 }
 
+// int getClrPair(int colX, int currentActiveColumn, int forcedTargetColumn)
+// {
+//     if (colX == currentActiveColumn)
+//     {
+//         return COLOR_COLUMN_ID;
+//     }
+//     else if (colX == forcedTargetColumn)
+//     {
+//         return FORCED_COLUMN_MOVE_ID;
+//     }
+//     else
+//     {
+//         return POSSIBLE_COLUMN_MOVE_ID;
+//     }
+// }
+
+int getDotsColor(s_game game, char activeTurn)
+{
+    int sourceColumn = game.board.sourceColumn;
+    int forcedTargetColumn = game.board.forcedTargetColumn;
+
+    int courtId = activeTurn == 'w' ? BLACK_COURT : WHITE_COURT;
+    if ((sourceColumn == courtId && game.board.isBarActive) || (game.board.pawnMoveToCourt == 1 && getTurn(game) == activeTurn))
+    {
+        return COLOR_COLUMN_ID;
+    }
+    else if ((activeTurn == 'w' && getTurn(game) == 'w' && forcedTargetColumn == BLACK_COURT) || (activeTurn == 'b' && getTurn(game) == 'b' && forcedTargetColumn == WHITE_COURT))
+    {
+        return FORCED_COLUMN_MOVE_ID;
+    }
+    return NOT_FOUND;
+}
 void barActiveDots(s_game game)
 {
     // additional square for start and end for each color
-    if ((game.board.sourceColumn == 24 && game.board.isBarActive) || (game.board.pawnMoveToCourt == 1 && getTurn(game) == 'w'))
+    // int clr = getClrPair(game.board.sourceColumn,game.board.isBarActive);
+    int clrA = getDotsColor(game, 'w');
+    if (clrA != NOT_FOUND)
     {
-        attron(COLOR_PAIR(2));
+
+        attron(COLOR_PAIR(clrA));
         mvprintw(4, 53, SQUARE);
-        attroff(COLOR_PAIR(2));
+        attroff(COLOR_PAIR(clrA));
     }
     else
     {
         mvprintw(4, 53, " ");
     }
 
-    if ((game.board.sourceColumn == -1 && game.board.isBarActive) || (game.board.pawnMoveToCourt == 1 && getTurn(game) == 'b'))
+    int clrB = getDotsColor(game, 'b');
+    if (clrB != NOT_FOUND)
     {
-        attron(COLOR_PAIR(2));
+        attron(COLOR_PAIR(clrB));
         mvprintw(15, 53, SQUARE);
-        attroff(COLOR_PAIR(2));
+        attroff(COLOR_PAIR(clrB));
     }
     else
     {

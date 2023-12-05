@@ -201,18 +201,7 @@ int findNextLegalMove(s_game *game, char action, struct Node **b_list, int *curr
     int edge = (move == -1) || (move == COLUMNS_COUNT) ? 1 : 0;
     int pawnGoToHome = game->isPawnsHome && (game->removeFurthestPawn == 1 || edge) ? 1 : 0;
     // int pawnGoToHome = allPawnsHome(*game) && ((move == -1) || (move == COLUMNS_COUNT)) ? 1 : 0;
-    if (game->removeFurthestPawn != 1)
-    {
-        refresh();
-        mvprintw(18, 80, "siemasaddas");
-        refresh();
-    }
-    else
-    {
-        refresh();
-        mvprintw(18, 80, "juz");
-        refresh();
-    }
+
     if (pawnGoToHome)
     {
         game->board.pawnMoveToCourt = 1;
@@ -706,7 +695,55 @@ int checkIfRemoveFurthestPawn(s_game *game)
     int furthestPawn = findFurthesPawn(*game);
     int whiteTurn = isWhiteTurn(*game);
     int relativePawnPosition = whiteTurn ? (COLUMNS_COUNT - 1) - furthestPawn : furthestPawn;
-    if (minStep > relativePawnPosition)
+
+    int moveArr[4];
+    int availableDiceMoves = game->diceInfo.availableDiceMoves;
+
+    int isDoublet = game->diceInfo.isDoublet;
+    int allNormalMovesAvailable = availableDiceMoves == 3;
+
+    int moves = isDoublet ? availableDiceMoves : allNormalMovesAvailable ? 3
+                                                                         : 1;
+    getPossibleMovesArray(moveArr, *game, availableDiceMoves);
+
+    int removeExcactDistancePawn = NOT_FOUND;
+
+    for (int currentColIndex = 0; currentColIndex < COLUMNS_COUNT; ++currentColIndex)
+    {
+
+        if (removeExcactDistancePawn != NOT_FOUND)
+            break;
+
+        s_boardColumn nextCol = findColumnBasedOnColX(*game, currentColIndex);
+        if (nextCol.pawnIds.count == 0 || nextCol.pawnIds.ptr[0].color != game->turn)
+        {
+            continue;
+        }
+
+        for (int k = 0; k < moves; ++k)
+        {
+            int nextColIndex = getNextMoveCalculation(currentColIndex, moveArr[k], whiteTurn);
+            if (nextColIndex == BLACK_COURT || nextColIndex == WHITE_COURT)
+            {
+                removeExcactDistancePawn = currentColIndex;
+                break;
+            }
+        }
+    }
+    if (removeExcactDistancePawn != NOT_FOUND)
+    {
+        game->board.sourceColumn = removeExcactDistancePawn;
+        if (whiteTurn)
+        {
+            game->board.forcedTargetColumn = BLACK_COURT;
+        }
+        else
+        {
+            game->board.forcedTargetColumn = WHITE_COURT;
+        }
+        return 1;
+    }
+    else if (minStep > relativePawnPosition)
     {
         game->board.sourceColumn = furthestPawn;
         game->removeFurthestPawn = 1;

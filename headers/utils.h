@@ -17,6 +17,7 @@
 #define WHITE_COURT -1
 #define BLACK_COURT 24
 #define NOT_FOUND -10
+#define NO_MOVE -20
 
 void clrButtonPrints(int posY, int nLines);
 

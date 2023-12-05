@@ -62,7 +62,7 @@ void movePawn(s_game *game)
         //         pawnIndex = i;
         //     }
         // }
-        
+
         if (pawnIndex != -10)
         {
             s_pawn pawn = erasePawn(barPawnIds, pawnIndex);
@@ -81,6 +81,7 @@ void movePawn(s_game *game)
     game->board.isBarActive = 0;
     game->board.pawnMoveToCourt = 0;
     game->board.forcedTargetColumn = -10;
+    game->removeFurthestPawn = 0;
     //    game->diceInfo = -1;
 
     refresh();

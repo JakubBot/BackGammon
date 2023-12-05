@@ -157,7 +157,7 @@ int makeMove(struct Node **b_list, char action)
     return 1;
 }
 
-int isValidNextMove(s_game *game, struct Node **b_list, int move)
+int isValidNextMove(int move)
 {
 
     if ((move < 0) || (move > (COLUMNS_COUNT - 1)))
@@ -198,7 +198,21 @@ int findNextLegalMove(s_game *game, char action, struct Node **b_list, int *curr
     int step = nextElement->data;
 
     int move = getNextMoveCalculation(sourceColX, step, whiteTurn);
-    int pawnGoToHome = allPawnsHome(*game) && ((move == -1) || (move == COLUMNS_COUNT)) ? 1 : 0;
+    int edge = (move == -1) || (move == COLUMNS_COUNT) ? 1 : 0;
+    int pawnGoToHome = game->isPawnsHome && (game->removeFurthestPawn == 1 || edge) ? 1 : 0;
+    // int pawnGoToHome = allPawnsHome(*game) && ((move == -1) || (move == COLUMNS_COUNT)) ? 1 : 0;
+    if (game->removeFurthestPawn != 1)
+    {
+        refresh();
+        mvprintw(18, 80, "siemasaddas");
+        refresh();
+    }
+    else
+    {
+        refresh();
+        mvprintw(18, 80, "juz");
+        refresh();
+    }
     if (pawnGoToHome)
     {
         game->board.pawnMoveToCourt = 1;
@@ -214,7 +228,7 @@ int findNextLegalMove(s_game *game, char action, struct Node **b_list, int *curr
         game->board.pawnMoveToCourt = 0;
     }
 
-    int validNext = isValidNextMove(game, b_list, move);
+    int validNext = isValidNextMove(move);
     if (!validNext)
         return 0;
 
@@ -499,6 +513,93 @@ void getPossibleMovesArray(int moveArr[4], s_game game, int availableDiceMoves)
     }
 }
 
+int findPawn(int moves, int currentColIndex, int *moveArr, int whiteTurn, s_game game, int *souceTargetCapture)
+{
+    for (int k = 0; k < moves; ++k)
+    {
+        int nextColIndex = getNextMoveCalculation(currentColIndex, moveArr[k], whiteTurn);
+        s_boardColumn nextCol = findColumnBasedOnColX(game, nextColIndex);
+        int isValidNextCol = isValidNextMove(nextColIndex);
+        if (!isValidNextCol)
+            continue;
+
+        if (nextCol.pawnIds.count == 1 && nextCol.pawnIds.ptr[0].color != game.turn)
+        {
+            souceTargetCapture[0] = currentColIndex;
+            souceTargetCapture[1] = nextColIndex;
+
+            return currentColIndex;
+        }
+    }
+    return NOT_FOUND;
+}
+
+int hasFreeColumnToMove(int moves, int currentColIndex, int *moveArr, int whiteTurn, s_game game)
+{
+    for (int k = 0; k < moves; ++k)
+    {
+        int nextColIndex = getNextMoveCalculation(currentColIndex, moveArr[k], whiteTurn);
+        // s_boardColumn nextCol = findColumnBasedOnColX(game, nextColIndex);
+
+        int hasValidMove = validPawnToColumnMove(&game, nextColIndex);
+        int pawnGoToHome = allPawnsHome(game) && ((nextColIndex <= WHITE_COURT) || (nextColIndex >= BLACK_COURT)) ? 1 : 0;
+        int isValidNextCol = isValidNextMove(nextColIndex);
+
+        if ((hasValidMove == 1 && isValidNextCol) || pawnGoToHome)
+        {
+
+            return currentColIndex;
+        }
+    }
+    return NO_MOVE;
+}
+
+int hasNextLegalMove(s_game game)
+{
+    int useBarPawn = shouldUseBarPawn(game);
+
+    char color = getTurn(game);
+    int whiteTurn = color == 'w' ? 1 : 0;
+
+    int isDoublet = game.diceInfo.isDoublet;
+    int availableDiceMoves = game.diceInfo.availableDiceMoves;
+    int allNormalMovesAvailable = availableDiceMoves == 3;
+
+    int moves = isDoublet ? availableDiceMoves : allNormalMovesAvailable ? 3
+                                                                         : 1;
+    int moveArr[4];
+    getPossibleMovesArray(moveArr, game, availableDiceMoves);
+
+    if (useBarPawn)
+    {
+
+        int currentColIndex = whiteTurn ? WHITE_COURT : BLACK_COURT;
+        int foundedIndex = hasFreeColumnToMove(moves, currentColIndex, moveArr, whiteTurn, game);
+
+        if (foundedIndex != NO_MOVE)
+            return foundedIndex;
+
+        return NO_MOVE;
+    }
+
+    for (int currentColIndex = 0; currentColIndex < COLUMNS_COUNT; ++currentColIndex)
+    {
+        s_boardColumn currentColumn = findColumnBasedOnColX(game, currentColIndex);
+
+        if (currentColumn.pawnIds.count == 0 || currentColumn.pawnIds.ptr[0].color != color)
+        {
+            continue;
+        }
+
+        int foundedIndex = hasFreeColumnToMove(moves, currentColIndex, moveArr, whiteTurn, game);
+
+        if (foundedIndex != NO_MOVE)
+            return foundedIndex;
+    }
+
+    return NO_MOVE;
+}
+
 int existsCapture(s_game game, struct Node *b_list, int *souceTargetCapture, int checkOnlyBar)
 {
     char color = getTurn(game);
@@ -515,19 +616,11 @@ int existsCapture(s_game game, struct Node *b_list, int *souceTargetCapture, int
 
     if (checkOnlyBar)
     {
-        for (int k = 0; k < moves; ++k)
-        {
-            int currentColIndex = whiteTurn ? WHITE_COURT : BLACK_COURT;
-            int nextColIndex = getNextMoveCalculation(currentColIndex, moveArr[k], whiteTurn);
-            s_boardColumn nextCol = findColumnBasedOnColX(game, nextColIndex);
-            if (nextCol.pawnIds.count == 1 && nextCol.pawnIds.ptr[0].color != game.turn)
-            {
-                souceTargetCapture[0] = currentColIndex;
-                souceTargetCapture[1] = nextColIndex;
 
-                return currentColIndex;
-            }
-        }
+        int currentColIndex = whiteTurn ? WHITE_COURT : BLACK_COURT;
+        int foundedIndex = findPawn(moves, currentColIndex, moveArr, whiteTurn, game, souceTargetCapture);
+        if (foundedIndex != NOT_FOUND)
+            return foundedIndex;
 
         return NOT_FOUND;
     }
@@ -540,19 +633,9 @@ int existsCapture(s_game game, struct Node *b_list, int *souceTargetCapture, int
         {
             continue;
         }
-
-        for (int k = 0; k < moves; ++k)
-        {
-            int nextColIndex = getNextMoveCalculation(currentColIndex, moveArr[k], whiteTurn);
-            s_boardColumn nextCol = findColumnBasedOnColX(game, nextColIndex);
-            if (nextCol.pawnIds.count == 1 && nextCol.pawnIds.ptr[0].color != game.turn)
-            {
-                souceTargetCapture[0] = currentColIndex;
-                souceTargetCapture[1] = nextColIndex;
-
-                return currentColIndex;
-            }
-        }
+        int foundedIndex = findPawn(moves, currentColIndex, moveArr, whiteTurn, game, souceTargetCapture);
+        if (foundedIndex != NOT_FOUND)
+            return foundedIndex;
     }
     return NOT_FOUND;
 }
@@ -574,7 +657,67 @@ int handleForcedCapture(s_game *game, struct Node *b_list, int checkOnlyBar)
     return 0;
 }
 
-void setSourceColumn(s_game *game, WINDOW *gameWin, struct Node *b_list)
+int findFurthesPawn(s_game game)
+{
+    int whiteTurn = isWhiteTurn(game);
+    int furthest = 0;
+    int currentPosition = whiteTurn ? (COLUMNS_COUNT - 1) : 0;
+    while ((currentPosition <= (COLUMNS_COUNT - 1)) && (currentPosition >= 0))
+    {
+        s_boardColumn currentColumn = findColumnBasedOnColX(game, currentPosition);
+
+        if (currentColumn.pawnIds.count > 0 && currentColumn.pawnIds.ptr[0].color == game.turn)
+        {
+            furthest = currentPosition;
+        }
+
+        if (whiteTurn)
+        {
+            currentPosition--;
+        }
+        else
+        {
+            currentPosition++;
+        }
+    }
+    return furthest;
+}
+
+int checkIfRemoveFurthestPawn(s_game *game)
+{
+
+    // min step
+    int dice1 = game->diceInfo.dice[0];
+    int dice2 = game->diceInfo.dice[1];
+    int minStep = 0;
+
+    if (dice1 == -1)
+    {
+        minStep = dice2;
+    }
+    else if (dice2 == -1)
+    {
+        minStep = dice1;
+    }
+    else
+    {
+        minStep = min(dice1, dice2);
+    }
+    int furthestPawn = findFurthesPawn(*game);
+    int whiteTurn = isWhiteTurn(*game);
+    int relativePawnPosition = whiteTurn ? (COLUMNS_COUNT - 1) - furthestPawn : furthestPawn;
+    if (minStep > relativePawnPosition)
+    {
+        game->board.sourceColumn = furthestPawn;
+        game->removeFurthestPawn = 1;
+
+        return 1;
+    }
+
+    return 0;
+}
+
+int setSourceColumn(s_game *game, WINDOW *gameWin, struct Node *b_list)
 {
 
     if (shouldUseBarPawn(*game))
@@ -597,29 +740,40 @@ void setSourceColumn(s_game *game, WINDOW *gameWin, struct Node *b_list)
         // {
         //     game->board.forcedTargetColumn = souceTargetCapture[1];
         // }
+        return 1;
     }
-    else
-    {
-        int hasForcedCapture = handleForcedCapture(game, b_list, 0);
-        // int souceTargetCapture[2];
-        // int existsCap = existsCapture(*game, b_list, souceTargetCapture, 0);
+    int hasForcedCapture = handleForcedCapture(game, b_list, 0);
 
-        // if (existsCap != NOT_FOUND)
-        // {
-        //     game->board.sourceColumn = souceTargetCapture[0];
-        //     game->board.forcedTargetColumn = souceTargetCapture[1];
-        // }
-        if (!hasForcedCapture)
+    if (hasForcedCapture)
+    {
+        return 1;
+    }
+    // int souceTargetCapture[2];
+    // int existsCap = existsCapture(*game, b_list, souceTargetCapture, 0);
+
+    // if (existsCap != NOT_FOUND)
+    // {
+    //     game->board.sourceColumn = souceTargetCapture[0];
+    //     game->board.forcedTargetColumn = souceTargetCapture[1];
+    // }
+
+    if (game->isPawnsHome)
+    {
+        int hasFurthestPawn = checkIfRemoveFurthestPawn(game);
+        if (hasFurthestPawn)
         {
-            game->board.isBarActive = 0;
-            int srcIds[] = {5};
-            // int srcIds[] = {5, 8};
-            hideMenu();
-            refresh();
-            renderMenu(srcIds, sizeof(srcIds) / sizeof(srcIds[0]), 0, 0, 19, NULL, game);
-            renderBoard(game, gameWin, 1, 0, NULL);
+            return 1;
         }
     }
+
+    game->board.isBarActive = 0;
+    int srcIds[] = {5};
+    // int srcIds[] = {5, 8};
+    hideMenu();
+    refresh();
+    renderMenu(srcIds, sizeof(srcIds) / sizeof(srcIds[0]), 0, 0, 19, NULL, game);
+    renderBoard(game, gameWin, 1, 0, NULL);
+    return 1;
 }
 
 void moveRepeater(s_game *game, WINDOW *gameWin)
@@ -629,6 +783,19 @@ void moveRepeater(s_game *game, WINDOW *gameWin)
 
     while (game->diceInfo.availableDiceMoves > 0)
     {
+        int pawnsHome = allPawnsHome(*game);
+        game->isPawnsHome = pawnsHome;
+
+        int hasLegalMove = hasNextLegalMove(*game);
+        if (hasLegalMove == NO_MOVE)
+        {
+            // show invalid move
+            hideMenu();
+            int invalidMvId[] = {9};
+            renderMenu(invalidMvId, sizeof(invalidMvId) / sizeof(invalidMvId[0]), 0, 0, 19, NULL, game);
+            break;
+        }
+
         // source col
         setSourceColumn(game, gameWin, b_list);
 
@@ -678,6 +845,8 @@ void initializeGame(s_game *game)
     vector_t_pawn *barPawn = &game->board.bar.pawnIds;
 
     game->board.isBarActive = 0;
+
+    game->removeFurthestPawn = 0;
 
     init(barPawn);
 

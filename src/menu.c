@@ -167,6 +167,8 @@ void menuAction(s_game *game, int *diceSize, int btnIds[], int btnCount, int sel
         case 'e':
             exit(1);
             break;
+            // v - not move
+        case 'v':
         default:
             break;
         }

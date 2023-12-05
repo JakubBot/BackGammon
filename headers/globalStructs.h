@@ -65,6 +65,9 @@ typedef struct
   s_pawn bPawns[PAWNS_COUNT];
   vector_t_pawn courtPawns;
   s_diceInfo diceInfo;
+  int isPawnsHome;
+  int removeFurthestPawn;
+
   FILE *file;
   int gameLoadedFromFile;
 } s_game;

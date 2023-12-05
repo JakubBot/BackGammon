@@ -56,6 +56,7 @@ s_btnOption *getBtnElements(int btnIds[], int btnCount, s_game *game)
             (s_btnOption){"Select a column", 6, 'c'},
             (s_btnOption){formatOptionText(game), 7, 'd'},
             (s_btnOption){"Exit & Save changes", 8, 'h'},
+            (s_btnOption){"You do not have any moves", 9, 'v'},
     };
     int count = sizeof(data) / sizeof(data[0]);
 

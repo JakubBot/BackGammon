@@ -128,7 +128,7 @@ void renderColumn(s_boardColumn boardColumn, int barOffset)
     }
 }
 
-int getNextMoveCalculation(int firstVal, int secondVal, int whiteTurn, char action)
+int getNextMoveCalculation(int firstVal, int secondVal, int whiteTurn)
 {
     if (whiteTurn)
     {
@@ -140,7 +140,7 @@ int getNextMoveCalculation(int firstVal, int secondVal, int whiteTurn, char acti
     }
 }
 
-int makeMove(s_game *game, struct Node **b_list, char action)
+int makeMove(struct Node **b_list, char action)
 {
     if (action == 'l')
     {
@@ -157,7 +157,7 @@ int makeMove(s_game *game, struct Node **b_list, char action)
     return 1;
 }
 
-int isValidNextMove(s_game *game, struct Node **b_list, char action, int move)
+int isValidNextMove(s_game *game, struct Node **b_list, int move)
 {
 
     if ((move < 0) || (move > (COLUMNS_COUNT - 1)))
@@ -173,7 +173,7 @@ int findNextLegalMove(s_game *game, char action, struct Node **b_list, int *curr
     int sourceColX = game->board.sourceColumn;
     int whiteTurn = isWhiteTurn(*game);
 
-    struct Node *nextElement;
+    struct Node *nextElement = NULL;
 
     if (action == 'l')
     {
@@ -181,16 +181,23 @@ int findNextLegalMove(s_game *game, char action, struct Node **b_list, int *curr
         if (nextElement == NULL)
             return 0;
     }
-    else if (action == 'r')
+    else
     {
+        // action == 'r'
         nextElement = prev(*b_list);
         if (nextElement == NULL)
             return 0;
     }
+    // else if (action == 'r')
+    // {
+    //     nextElement = prev(*b_list);
+    //     if (nextElement == NULL)
+    //         return 0;
+    // }
 
     int step = nextElement->data;
 
-    int move = getNextMoveCalculation(sourceColX, step, whiteTurn, action);
+    int move = getNextMoveCalculation(sourceColX, step, whiteTurn);
     int pawnGoToHome = allPawnsHome(*game) && ((move == -1) || (move == COLUMNS_COUNT)) ? 1 : 0;
     if (pawnGoToHome)
     {
@@ -198,7 +205,7 @@ int findNextLegalMove(s_game *game, char action, struct Node **b_list, int *curr
 
         *currentActiveColumn = move;
 
-        int validMv = makeMove(game, b_list, action);
+        int validMv = makeMove(b_list, action);
 
         return 0;
     }
@@ -207,7 +214,7 @@ int findNextLegalMove(s_game *game, char action, struct Node **b_list, int *curr
         game->board.pawnMoveToCourt = 0;
     }
 
-    int validNext = isValidNextMove(game, b_list, action, move);
+    int validNext = isValidNextMove(game, b_list, move);
     if (!validNext)
         return 0;
 
@@ -215,7 +222,7 @@ int findNextLegalMove(s_game *game, char action, struct Node **b_list, int *curr
 
     if (!isValidCol)
     {
-        int validMv = makeMove(game, b_list, action);
+        int validMv = makeMove(b_list, action);
         *skippedColumns = *skippedColumns + 1;
         int res = findNextLegalMove(game, action, b_list, currentActiveColumn, skippedColumns);
         return res;
@@ -225,7 +232,7 @@ int findNextLegalMove(s_game *game, char action, struct Node **b_list, int *curr
         *skippedColumns = 0;
     }
 
-    int validMv = makeMove(game, b_list, action);
+    int validMv = makeMove(b_list, action);
     *currentActiveColumn = move;
 
     return 0;
@@ -376,7 +383,7 @@ void printMainBoard(s_game game, int currentActiveColumn)
     }
 }
 
-void printBar(s_game game, int currentActiveColumn)
+void printBar(s_game game)
 {
     int barPawnCount = getPawnBarCount(game);
     // int barElements = (MAX_PAWN_ON_COL * 2) + COLUMNGAP;
@@ -444,7 +451,7 @@ void renderBoard(s_game *game, WINDOW *gameWin, int selectColumn, int targetColu
         printMainBoard(*game, currentActiveColumn);
 
         // render bar that is between 6 and 7 column
-        printBar(*game, currentActiveColumn);
+        printBar(*game);
 
         printBarPawn(*game);
 
@@ -511,7 +518,7 @@ int existsCapture(s_game game, struct Node *b_list, int *souceTargetCapture, int
         for (int k = 0; k < moves; ++k)
         {
             int currentColIndex = whiteTurn ? WHITE_COURT : BLACK_COURT;
-            int nextColIndex = getNextMoveCalculation(currentColIndex, moveArr[k], whiteTurn, 'l');
+            int nextColIndex = getNextMoveCalculation(currentColIndex, moveArr[k], whiteTurn);
             s_boardColumn nextCol = findColumnBasedOnColX(game, nextColIndex);
             if (nextCol.pawnIds.count == 1 && nextCol.pawnIds.ptr[0].color != game.turn)
             {
@@ -536,7 +543,7 @@ int existsCapture(s_game game, struct Node *b_list, int *souceTargetCapture, int
 
         for (int k = 0; k < moves; ++k)
         {
-            int nextColIndex = getNextMoveCalculation(currentColIndex, moveArr[k], whiteTurn, 'l');
+            int nextColIndex = getNextMoveCalculation(currentColIndex, moveArr[k], whiteTurn);
             s_boardColumn nextCol = findColumnBasedOnColX(game, nextColIndex);
             if (nextCol.pawnIds.count == 1 && nextCol.pawnIds.ptr[0].color != game.turn)
             {
@@ -549,7 +556,7 @@ int existsCapture(s_game game, struct Node *b_list, int *souceTargetCapture, int
     }
     return NOT_FOUND;
 }
-void handleForcedCapture(s_game *game, struct Node *b_list, int checkOnlyBar)
+int handleForcedCapture(s_game *game, struct Node *b_list, int checkOnlyBar)
 {
 
     int souceTargetCapture[2];
@@ -562,7 +569,9 @@ void handleForcedCapture(s_game *game, struct Node *b_list, int checkOnlyBar)
             game->board.sourceColumn = souceTargetCapture[0];
         }
         game->board.forcedTargetColumn = souceTargetCapture[1];
+        return 1;
     }
+    return 0;
 }
 
 void setSourceColumn(s_game *game, WINDOW *gameWin, struct Node *b_list)
@@ -591,7 +600,7 @@ void setSourceColumn(s_game *game, WINDOW *gameWin, struct Node *b_list)
     }
     else
     {
-        handleForcedCapture(game, b_list, 0);
+        int hasForcedCapture = handleForcedCapture(game, b_list, 0);
         // int souceTargetCapture[2];
         // int existsCap = existsCapture(*game, b_list, souceTargetCapture, 0);
 
@@ -600,7 +609,7 @@ void setSourceColumn(s_game *game, WINDOW *gameWin, struct Node *b_list)
         //     game->board.sourceColumn = souceTargetCapture[0];
         //     game->board.forcedTargetColumn = souceTargetCapture[1];
         // }
-        else
+        if (!hasForcedCapture)
         {
             game->board.isBarActive = 0;
             int srcIds[] = {5};

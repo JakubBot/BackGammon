@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS = -I./headers
+CFLAGS = -I./headers -fsanitize=address -Wall -Wextra -Werror -std=c99 -g
 LDFLAGS = -lncurses
 
 SRC_DIR = src

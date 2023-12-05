@@ -36,3 +36,10 @@
 1 5 b 0 0 0 0 0 0 2 1 w 1 w 1 1 w 0 1 1 w 2 1 w 1 w 0 0 0 0 0 0 0 4 1 b 1 b 1 b 1 b 0 1 1 b 1 1 b 0 1 1 b 0 0 -1 -1 17 1 b 1 b 1 w 1 b 1 b 1 w 1 b 1 w 1 w 1 b 1 w 1 b 1 w 1 w 1 b 1 w 1 w
 1 5 w 0 0 0 0 0 0 2 1 w 1 w 1 1 w 0 1 1 w 2 1 w 1 w 0 0 0 0 0 0 0 2 1 b 1 b 0 1 1 b 1 1 b 0 1 1 b 0 0 -1 -1 19 1 b 1 b 1 w 1 b 1 b 1 w 1 b 1 w 1 w 1 b 1 w 1 b 1 w 1 w 1 b 1 w 1 w 1 b 1 b
 1 5 b 0 0 0 0 0 0 0 2 1 w 1 w 0 1 1 w 2 1 w 1 w 0 0 0 0 0 0 0 2 1 b 1 b 0 1 1 b 1 1 b 0 1 1 b 0 0 -1 -1 20 1 b 1 b 1 w 1 b 1 b 1 w 1 b 1 w 1 w 1 b 1 w 1 b 1 w 1 w 1 b 1 w 1 w 1 b 1 b 1 w
+1 5 w 0 0 0 0 0 0 0 2 1 w 1 w 0 1 1 w 2 1 w 1 w 0 0 0 0 0 0 0 1 1 b 0 0 1 1 b 0 2 1 b 1 b 0 0 -1 -1 21 1 b 1 b 1 w 1 b 1 b 1 w 1 b 1 w 1 w 1 b 1 w 1 b 1 w 1 w 1 b 1 w 1 w 1 b 1 b 1 w 1 b
+1 5 b 0 0 0 0 0 0 0 1 1 w 0 1 1 w 2 1 w 1 w 0 0 0 0 0 0 0 1 1 b 0 0 1 1 b 0 2 1 b 1 b 0 0 -1 -1 22 1 b 1 b 1 w 1 b 1 b 1 w 1 b 1 w 1 w 1 b 1 w 1 b 1 w 1 w 1 b 1 w 1 w 1 b 1 b 1 w 1 b 1 w
+1 5 w 0 0 0 0 0 0 0 1 1 w 0 1 1 w 2 1 w 1 w 0 0 0 0 0 0 0 0 0 1 1 b 0 0 2 1 b 1 b 0 0 -1 -1 23 1 b 1 b 1 w 1 b 1 b 1 w 1 b 1 w 1 w 1 b 1 w 1 b 1 w 1 w 1 b 1 w 1 w 1 b 1 b 1 w 1 b 1 w 1 b
+1 5 b 0 0 0 0 0 0 0 0 0 1 1 w 2 1 w 1 w 0 0 0 0 0 0 0 0 0 1 1 b 0 0 2 1 b 1 b 0 0 -1 -1 24 1 b 1 b 1 w 1 b 1 b 1 w 1 b 1 w 1 w 1 b 1 w 1 b 1 w 1 w 1 b 1 w 1 w 1 b 1 b 1 w 1 b 1 w 1 b 1 w
+1 5 w 0 0 0 0 0 0 0 0 0 1 1 w 2 1 w 1 w 0 0 0 0 0 0 0 0 0 0 0 0 1 1 b 0 0 -1 -1 26 1 b 1 b 1 w 1 b 1 b 1 w 1 b 1 w 1 w 1 b 1 w 1 b 1 w 1 w 1 b 1 w 1 w 1 b 1 b 1 w 1 b 1 w 1 b 1 w 1 b 1 b
+1 5 b 0 0 0 0 0 0 0 0 0 0 1 1 w 0 0 0 0 0 0 0 0 0 0 0 0 1 1 b 0 0 -1 -1 28 1 b 1 b 1 w 1 b 1 b 1 w 1 b 1 w 1 w 1 b 1 w 1 b 1 w 1 w 1 b 1 w 1 w 1 b 1 b 1 w 1 b 1 w 1 b 1 w 1 b 1 b 1 w 1 w
+1 5 w 0 0 0 0 0 0 0 0 0 0 1 1 w 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 -1 29 1 b 1 b 1 w 1 b 1 b 1 w 1 b 1 w 1 w 1 b 1 w 1 b 1 w 1 w 1 b 1 w 1 w 1 b 1 b 1 w 1 b 1 w 1 b 1 w 1 b 1 b 1 w 1 w 1 b

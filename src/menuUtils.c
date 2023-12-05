@@ -6,7 +6,6 @@
 #include "../headers/utils.h"
 #include "../headers/menuUtils.h"
 
-
 int getTextLength(char *text)
 {
     int i = 0;
@@ -44,19 +43,36 @@ char *formatOptionText(s_game *game)
     }
 }
 
+char *formatGameWinnerText(s_game *game)
+{
+    if (game == NULL)
+        return "";
+
+    if (game->endGame.winner == 1)
+    {
+        return "Player 1 wins";
+    }
+    else if (game->endGame.winner == 2)
+    {
+        return "Player 2 wins";
+    }
+    return "";
+}
+
 s_btnOption *getBtnElements(int btnIds[], int btnCount, s_game *game)
 {
     s_btnOption data[] = {
-            (s_btnOption){"Start", 0, 's'},
-            (s_btnOption){"Load Game", 1, 'l'},
-            (s_btnOption){"Author", 2, 'a'},
-            (s_btnOption){"Exit", 3, 'e'},
-            (s_btnOption){"Roll Dice", 4, 'r'},
-            (s_btnOption){"Select a pawn you want to move", 5, 'm'},
-            (s_btnOption){"Select a column", 6, 'c'},
-            (s_btnOption){formatOptionText(game), 7, 'd'},
-            (s_btnOption){"Exit & Save changes", 8, 'h'},
-            (s_btnOption){"You do not have any moves", 9, 'v'},
+        (s_btnOption){"Start", 0, 's'},
+        (s_btnOption){"Load Game", 1, 'l'},
+        (s_btnOption){"Author", 2, 'a'},
+        (s_btnOption){"Exit", 3, 'e'},
+        (s_btnOption){"Roll Dice", 4, 'r'},
+        (s_btnOption){"Select a pawn you want to move", 5, 'm'},
+        (s_btnOption){"Select a column", 6, 'c'},
+        (s_btnOption){formatOptionText(game), 7, 'd'},
+        (s_btnOption){"Exit & Save changes", 8, 'h'},
+        (s_btnOption){"You do not have any moves", 9, 'v'},
+        (s_btnOption){formatGameWinnerText(game), 10, 'g'},
     };
     int count = sizeof(data) / sizeof(data[0]);
 

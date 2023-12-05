@@ -57,6 +57,11 @@ typedef struct
 
 typedef struct
 {
+  int winner;
+  int points;
+} endGame;
+typedef struct
+{
   int initialDiceValueW;
   int initialDiceValueB;
   char turn;
@@ -70,5 +75,6 @@ typedef struct
 
   FILE *file;
   int gameLoadedFromFile;
+  endGame endGame;
 } s_game;
 #endif // GLOBALSTRUCTS_H

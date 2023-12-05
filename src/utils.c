@@ -1,5 +1,6 @@
 #include "ncurses.h"
 #include "../headers/globalStructs.h"
+#include "../headers/utils.h"
 
 void clrButtonPrints(int posY, int nLines)
 {
@@ -49,7 +50,7 @@ int findPawnIndex(vector_t_pawn pawns, char turn)
             return i;
         }
     }
-    return -10;
+    return NOT_FOUND;
 }
 
 vector_t_pawn *findColumnPawnIds(s_game *game, int currentActiveColumn)

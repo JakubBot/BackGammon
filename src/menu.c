@@ -164,11 +164,17 @@ void menuAction(s_game *game, int *diceSize, int btnIds[], int btnCount, int sel
             curs_set(0);
             // clrButtonPrints(menuPosY, 3);
             break;
+        case 'g':
+            clear();
+            refresh();
+            clearGameState(game);
+            break;
         case 'e':
             exit(1);
             break;
             // v - not move
         case 'v':
+
         default:
             break;
         }

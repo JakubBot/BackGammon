@@ -241,22 +241,6 @@ int findNextLegalMove(s_game *game, char action, struct Node **b_list, int *curr
     return 0;
 }
 
-// int getClrPair(int colX, int currentActiveColumn, int forcedTargetColumn)
-// {
-//     if (colX == currentActiveColumn)
-//     {
-//         return COLOR_COLUMN_ID;
-//     }
-//     else if (colX == forcedTargetColumn)
-//     {
-//         return FORCED_COLUMN_MOVE_ID;
-//     }
-//     else
-//     {
-//         return POSSIBLE_COLUMN_MOVE_ID;
-//     }
-// }
-
 int getDotsColor(s_game game, char activeTurn)
 {
     int sourceColumn = game.board.sourceColumn;
@@ -307,13 +291,16 @@ void barActiveDots(s_game game)
 
 void setSelectedColumn(s_game *game, WINDOW *gameWin, struct Node *b_list, int currentActiveColumn, int selectColumn, int targetColumn)
 {
+
     if (selectColumn)
     {
         game->board.sourceColumn = currentActiveColumn;
     }
     else if (targetColumn)
     {
-        if ((game->board.forcedTargetColumn != -10) && (currentActiveColumn != game->board.forcedTargetColumn))
+        // game->board.pawnMoveToCourt
+
+        if ((game->board.forcedTargetColumn != NOT_FOUND) && (currentActiveColumn != game->board.forcedTargetColumn))
         {
             moveToTop(&b_list);
             return renderBoard(game, gameWin, selectColumn, targetColumn, b_list);
@@ -465,11 +452,11 @@ void printBarPawn(s_game game)
 void setDefaultActiveColumn(s_game game, int *currentActiveColumn, int targetColumn, int selectColumn)
 {
 
-    if (targetColumn && *currentActiveColumn == -1)
+    if (targetColumn && *currentActiveColumn == INITIAL_ACTIVE_COLUMN)
     {
         *currentActiveColumn = game.board.sourceColumn;
     }
-    else if (selectColumn && *currentActiveColumn == -1)
+    else if (selectColumn && *currentActiveColumn == INITIAL_ACTIVE_COLUMN)
     {
         findColumnWithPawn(game, currentActiveColumn, ' ');
     }
@@ -478,7 +465,7 @@ void setDefaultActiveColumn(s_game game, int *currentActiveColumn, int targetCol
 void renderBoard(s_game *game, WINDOW *gameWin, int selectColumn, int targetColumn, struct Node *b_list)
 {
     // currentActiveColumn represents column(colX) that is active
-    int currentActiveColumn = -1;
+    int currentActiveColumn = INITIAL_ACTIVE_COLUMN;
 
     int skippedColumns = 0;
     do
@@ -730,7 +717,6 @@ int checkIfRemoveFurthestPawn(s_game *game)
     }
     int furthestPawn = findFurthesPawn(*game);
     int whiteTurn = isWhiteTurn(*game);
-    int relativePawnPosition = whiteTurn ? (COLUMNS_COUNT - 1) - furthestPawn : furthestPawn;
 
     int moveArr[4];
     int availableDiceMoves = game->diceInfo.availableDiceMoves;
@@ -766,6 +752,8 @@ int checkIfRemoveFurthestPawn(s_game *game)
             }
         }
     }
+    int relativePawnPosition = whiteTurn ? (COLUMNS_COUNT - 1) - furthestPawn : furthestPawn;
+
     if (removeExcactDistancePawn != NOT_FOUND)
     {
         game->board.sourceColumn = removeExcactDistancePawn;
@@ -914,14 +902,16 @@ void initializeGame(s_game *game)
     game->board.sourceColumn = -1;
     game->board.targetColumn = -1;
 
-    game->board.forcedTargetColumn = -10;
+    game->board.forcedTargetColumn = NOT_FOUND;
     vector_t_pawn *barPawn = &game->board.bar.pawnIds;
+
+    init(barPawn);
 
     game->board.isBarActive = 0;
 
     game->removeFurthestPawn = 0;
 
-    init(barPawn);
+    game->endGame.winner = 0;
 
     vector_t_pawn *courtPawns = &game->courtPawns;
     init(courtPawns);
@@ -938,10 +928,48 @@ void initializeGame(s_game *game)
     //    }
 }
 
+int checkGameEnd(s_game *game)
+{
+    int whitePawns = 0;
+    int blackPawns = 0;
+    vector_t_pawn courtPawns = game->courtPawns;
+
+    for (int i = 0; i < courtPawns.count; ++i)
+    {
+        if (courtPawns.ptr[i].color == 'w')
+        {
+            whitePawns++;
+        }
+        else
+        {
+            blackPawns++;
+        }
+    }
+    int winner = -1;
+    if (whitePawns == 15)
+    {
+        winner = 1;
+    }
+    else if (blackPawns == 15)
+    {
+        winner = 2;
+    }
+
+    if (winner != -1)
+    {
+        game->endGame.winner = winner;
+        int gameEndedId[] = {10};
+        hideMenu();
+        renderMenu(gameEndedId, sizeof(gameEndedId) / sizeof(gameEndedId[0]), 0, 0, 19, NULL, game);
+        return 1;
+    }
+    return 0;
+}
+
 void gameLoop(s_game game, WINDOW *gameWin)
 {
 
-    while (1)
+    while (game.endGame.winner == 0)
     {
 
         // this will render menu with roll dice option
@@ -961,9 +989,21 @@ void gameLoop(s_game game, WINDOW *gameWin)
         clearSidebarInfo();
 
         saveCurrentState(game);
+
+        checkGameEnd(&game);
     }
 
     // gameLoop(game, gameWin);
+}
+
+void initGame()
+{
+    while (1)
+    {
+        int menuIds[] = {0, 1, 2, 3};
+        renderMenu(menuIds, sizeof(menuIds) / sizeof(menuIds[0]), 0, 0, 0, NULL, NULL);
+    }
+    // initGame();
 }
 
 void renderGame(int loadFromFile)
@@ -1005,10 +1045,4 @@ void renderGame(int loadFromFile)
     {
         fclose(game.file);
     }
-}
-
-void initGame()
-{
-    int menuIds[] = {0, 1, 2, 3};
-    renderMenu(menuIds, sizeof(menuIds) / sizeof(menuIds[0]), 0, 0, 0, NULL, NULL);
 }

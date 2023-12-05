@@ -63,7 +63,7 @@ void movePawn(s_game *game)
         //     }
         // }
 
-        if (pawnIndex != -10)
+        if (pawnIndex != NOT_FOUND)
         {
             s_pawn pawn = erasePawn(barPawnIds, pawnIndex);
             push_back(targetPawnIds, pawn);

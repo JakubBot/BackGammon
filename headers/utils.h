@@ -18,6 +18,7 @@
 #define BLACK_COURT 24
 #define NOT_FOUND -10
 #define NO_MOVE -20
+#define INITIAL_ACTIVE_COLUMN -100
 
 void clrButtonPrints(int posY, int nLines);
 

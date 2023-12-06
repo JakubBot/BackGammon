@@ -37,21 +37,31 @@ void *renderMenu(int btnIds[], int btnCount, int activeBtnId, int menuPosX, int 
         int ch = getch();
         if (ch == KEY_LEFT)
         {
-            if (currentIndex > 0)
+            if ((currentIndex - 1) >= 0)
             {
                 s_btnOption btn = findBtn(buttons, btnIds[currentIndex - 1], btnCount);
                 selectedBtn = btn.id;
                 //                selectedBtn--;
             }
+            else
+            {
+                s_btnOption btn = findBtn(buttons, btnIds[btnCount - 1], btnCount);
+                selectedBtn = btn.id;
+            }
         }
         else if (ch == KEY_RIGHT)
         {
-            if (currentIndex < btnCount)
+            if ((currentIndex + 1) < btnCount)
             //            if (selectedBtn < btnCount - 1)
             {
                 s_btnOption btn = findBtn(buttons, btnIds[currentIndex + 1], btnCount);
                 selectedBtn = btn.id;
                 //                selectedBtn++;
+            }
+            else
+            {
+                s_btnOption btn = findBtn(buttons, btnIds[0], btnCount);
+                selectedBtn = btn.id;
             }
         }
         else if (ch == 10)

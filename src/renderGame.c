@@ -430,7 +430,7 @@ void printBarPawn(s_game game)
     for (int i = 0; i < barPawnCount; ++i)
     {
 
-        char clr = pawn->ptr[0].color;
+        char clr = pawn->ptr[i].color;
 
         char *pawnLabel = clr == 'b' ? BLACK_PAWN : WHITE_PAWN;
 
@@ -837,6 +837,44 @@ int setSourceColumn(s_game *game, WINDOW *gameWin, struct Node *b_list)
     return 1;
 }
 
+int checkGameEnd(s_game *game)
+{
+    int whitePawns = 0;
+    int blackPawns = 0;
+    vector_t_pawn courtPawns = game->courtPawns;
+
+    for (int i = 0; i < courtPawns.count; ++i)
+    {
+        if (courtPawns.ptr[i].color == 'w')
+        {
+            whitePawns++;
+        }
+        else
+        {
+            blackPawns++;
+        }
+    }
+    int winner = -1;
+    if (whitePawns == 15)
+    {
+        winner = 1;
+    }
+    else if (blackPawns == 15)
+    {
+        winner = 2;
+    }
+
+    if (winner != -1)
+    {
+        game->endGame.winner = winner;
+        int gameEndedId[] = {10};
+        hideMenu();
+        renderMenu(gameEndedId, sizeof(gameEndedId) / sizeof(gameEndedId[0]), 0, 0, 19, NULL, game);
+        return 1;
+    }
+    return 0;
+}
+
 void moveRepeater(s_game *game, WINDOW *gameWin)
 {
     struct Node *b_list = NULL;
@@ -844,6 +882,11 @@ void moveRepeater(s_game *game, WINDOW *gameWin)
 
     while (game->diceInfo.availableDiceMoves > 0)
     {
+        int gameEnded = checkGameEnd(game);
+        if (gameEnded == 1)
+        {
+            break;
+        }
         int pawnsHome = allPawnsHome(*game);
         game->isPawnsHome = pawnsHome;
 
@@ -928,50 +971,18 @@ void initializeGame(s_game *game)
     //    }
 }
 
-int checkGameEnd(s_game *game)
-{
-    int whitePawns = 0;
-    int blackPawns = 0;
-    vector_t_pawn courtPawns = game->courtPawns;
-
-    for (int i = 0; i < courtPawns.count; ++i)
-    {
-        if (courtPawns.ptr[i].color == 'w')
-        {
-            whitePawns++;
-        }
-        else
-        {
-            blackPawns++;
-        }
-    }
-    int winner = -1;
-    if (whitePawns == 15)
-    {
-        winner = 1;
-    }
-    else if (blackPawns == 15)
-    {
-        winner = 2;
-    }
-
-    if (winner != -1)
-    {
-        game->endGame.winner = winner;
-        int gameEndedId[] = {10};
-        hideMenu();
-        renderMenu(gameEndedId, sizeof(gameEndedId) / sizeof(gameEndedId[0]), 0, 0, 19, NULL, game);
-        return 1;
-    }
-    return 0;
-}
-
 void gameLoop(s_game game, WINDOW *gameWin)
 {
 
+    // initial position
+    saveCurrentState(game);
     while (game.endGame.winner == 0)
     {
-
+        int gameEnded = checkGameEnd(&game);
+        if (gameEnded == 1)
+        {
+            break;
+        }
         // this will render menu with roll dice option
         int menuIds[] = {4, 8};
         int diceSize = 0;
@@ -989,8 +1000,6 @@ void gameLoop(s_game game, WINDOW *gameWin)
         clearSidebarInfo();
 
         saveCurrentState(game);
-
-        checkGameEnd(&game);
     }
 
     // gameLoop(game, gameWin);
@@ -1000,7 +1009,7 @@ void initGame()
 {
     while (1)
     {
-        int menuIds[] = {0, 1, 2, 3};
+        int menuIds[] = {0, 1, 2, 11, 3};
         renderMenu(menuIds, sizeof(menuIds) / sizeof(menuIds[0]), 0, 0, 0, NULL, NULL);
     }
     // initGame();

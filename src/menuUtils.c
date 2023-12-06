@@ -73,6 +73,7 @@ s_btnOption *getBtnElements(int btnIds[], int btnCount, s_game *game)
         (s_btnOption){"Exit & Save changes", 8, 'h'},
         (s_btnOption){"You do not have any moves", 9, 'v'},
         (s_btnOption){formatGameWinnerText(game), 10, 'g'},
+        (s_btnOption){"Review your saved game", 11, 'j'},
     };
     int count = sizeof(data) / sizeof(data[0]);
 

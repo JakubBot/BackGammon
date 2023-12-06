@@ -21,7 +21,7 @@ void saveCurrentState(s_game game)
   fprintf(file, " %d", barPawn->count);
   for (int i = 0; i < barPawn->count; ++i)
   {
-    fprintf(file, " %d", barPawn->ptr[i].id);
+    fprintf(file, " %d %c", barPawn->ptr[i].id, barPawn->ptr[i].color);
   }
 
   fprintf(file, " %d %d %d", game.board.isBarActive, game.board.sourceColumn, game.board.targetColumn);

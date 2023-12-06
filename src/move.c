@@ -21,19 +21,49 @@ void capturePawn(s_game *game, int colX)
     }
 }
 
+void resetGameState(s_game *game)
+{
+    game->board.sourceColumn = -1;
+    game->board.targetColumn = -1;
+    game->board.isBarActive = 0;
+    game->board.pawnMoveToCourt = 0;
+    game->board.forcedTargetColumn = -10;
+    game->removeFurthestPawn = 0;
+}
+
+void handleMove(s_game *game, vector_t_pawn *sourcePawnIds, vector_t_pawn *targetPawnIds, vector_t_pawn *courtPawns, vector_t_pawn *barPawnIds, int isBarActive)
+{
+    if (game->board.pawnMoveToCourt)
+    {
+        s_pawn pawn = pop_back(sourcePawnIds);
+        push_back(courtPawns, pawn);
+    }
+    else if (isBarActive)
+    {
+        int pawnIndex = findPawnIndex(*barPawnIds, game->turn);
+
+        if (pawnIndex != NOT_FOUND)
+        {
+            s_pawn pawn = erasePawn(barPawnIds, pawnIndex);
+            push_back(targetPawnIds, pawn);
+        }
+    }
+    else
+    {
+        s_pawn pawn = pop_back(sourcePawnIds);
+        push_back(targetPawnIds, pawn);
+    }
+}
+
 void movePawn(s_game *game)
 {
-    int sourceColId = game->board.sourceColumn;
-    int targetColId = game->board.targetColumn;
+    int sColId = game->board.sourceColumn;
+    int tColId = game->board.targetColumn;
 
-    //    if ((targetPawnIds->count == 1) && (targetPawnIds->ptr[0].color != game->turn))
-    //    {
-    //    }
+    capturePawn(game, tColId);
 
-    capturePawn(game, targetColId);
-
-    vector_t_pawn *sourcePawnIds = findColumnPawnIds(game, sourceColId);
-    vector_t_pawn *targetPawnIds = findColumnPawnIds(game, targetColId);
+    vector_t_pawn *sourcePawnIds = findColumnPawnIds(game, sColId);
+    vector_t_pawn *targetPawnIds = findColumnPawnIds(game, tColId);
     vector_t_pawn *courtPawns = &game->courtPawns;
 
     vector_t_pawn *barPawnIds = &game->board.bar.pawnIds;
@@ -47,42 +77,8 @@ void movePawn(s_game *game)
         }
     }
 
-    if (game->board.pawnMoveToCourt)
-    {
-        s_pawn pawn = pop_back(sourcePawnIds);
-        push_back(courtPawns, pawn);
-    }
-    else if (isBarActive)
-    {
-        int pawnIndex = findPawnIndex(*barPawnIds, game->turn);
-        // for (int i = 0; i < game->board.bar.pawnIds.count; ++i)
-        // {
-        //     if (game->board.bar.pawnIds.ptr[i].color == game->turn)
-        //     {
-        //         pawnIndex = i;
-        //     }
-        // }
+    handleMove(game, sourcePawnIds, targetPawnIds, courtPawns, barPawnIds, isBarActive);
 
-        if (pawnIndex != NOT_FOUND)
-        {
-            s_pawn pawn = erasePawn(barPawnIds, pawnIndex);
-            push_back(targetPawnIds, pawn);
-        }
-    }
-    else
-    {
-        //  isBarActive ? pop_back(barPawnIds) :
-        s_pawn pawn = pop_back(sourcePawnIds);
-        push_back(targetPawnIds, pawn);
-    }
-
-    game->board.sourceColumn = -1;
-    game->board.targetColumn = -1;
-    game->board.isBarActive = 0;
-    game->board.pawnMoveToCourt = 0;
-    game->board.forcedTargetColumn = -10;
-    game->removeFurthestPawn = 0;
-    //    game->diceInfo = -1;
-
+    resetGameState(game);
     refresh();
 }

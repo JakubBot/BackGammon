@@ -149,35 +149,35 @@ void addPawns(vector_t_pawn *boardColumn, int id, char c)
     push_back(boardColumn, (s_pawn){.id = 1, .color = c});
 }
 
-void getInitialColumnsIds(vector_t_pawn *boardColumn, int col)
+void getInitialColumnsIds(vector_t_pawn *bColumn, int col)
 {
     char c = col == 0 || col == 11 || col == 16 || col == 18 ? 'b' : 'w';
     if (col == 11 || 23 == col)
     {
-        addPawns(boardColumn, 0, c);
-        addPawns(boardColumn, 1, c);
+        addPawns(bColumn, 0, c);
+        addPawns(bColumn, 1, c);
     }
     else if (col == 0 || col == 12)
     {
-        addPawns(boardColumn, 2, c);
-        addPawns(boardColumn, 3, c);
-        addPawns(boardColumn, 4, c);
-        addPawns(boardColumn, 5, c);
-        addPawns(boardColumn, 6, c);
+        addPawns(bColumn, 2, c);
+        addPawns(bColumn, 3, c);
+        addPawns(bColumn, 4, c);
+        addPawns(bColumn, 5, c);
+        addPawns(bColumn, 6, c);
     }
     else if (col == 4 || col == 16)
     {
-        addPawns(boardColumn, 12, c);
-        addPawns(boardColumn, 13, c);
-        addPawns(boardColumn, 14, c);
+        addPawns(bColumn, 12, c);
+        addPawns(bColumn, 13, c);
+        addPawns(bColumn, 14, c);
     }
     else if (col == 6 || col == 18)
     {
-        addPawns(boardColumn, 7, c);
-        addPawns(boardColumn, 8, c);
-        addPawns(boardColumn, 9, c);
-        addPawns(boardColumn, 10, c);
-        addPawns(boardColumn, 11, c);
+        addPawns(bColumn, 7, c);
+        addPawns(bColumn, 8, c);
+        addPawns(bColumn, 9, c);
+        addPawns(bColumn, 10, c);
+        addPawns(bColumn, 11, c);
     }
 }
 
@@ -242,5 +242,61 @@ void updateDice(s_game *game, struct Node *b_list)
         game->diceInfo.dice[moveIndex - 1] = -1;
 
         removeFirstNodeWithValue(&b_list, diceVal);
+    }
+}
+
+int getNextMoveCalculation(int firstVal, int secondVal, int whiteTurn)
+{
+    if (whiteTurn)
+    {
+        return firstVal + secondVal;
+    }
+    else
+    {
+        return firstVal - secondVal;
+    }
+}
+
+int makeMove(struct Node **b_list, char action)
+{
+    if (action == 'l')
+    {
+        int valid = moveNext(b_list);
+        if (!valid)
+            return 0;
+    }
+    else if (action == 'r')
+    {
+        int valid = movePrev(b_list);
+        if (!valid)
+            return 0;
+    }
+    return 1;
+}
+
+int isValidNextMove(int move)
+{
+
+    if ((move < 0) || (move > (COLUMNS_COUNT - 1)))
+    {
+        return 0;
+    }
+
+    return 1;
+}
+
+int getClrPair(int colX, int currentActiveColumn, int forcedTargetColumn)
+{
+    if (colX == currentActiveColumn)
+    {
+        return COLOR_COLUMN_ID;
+    }
+    else if (colX == forcedTargetColumn)
+    {
+        return FORCED_COLUMN_MOVE_ID;
+    }
+    else
+    {
+        return POSSIBLE_COLUMN_MOVE_ID;
     }
 }

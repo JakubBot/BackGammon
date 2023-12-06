@@ -59,27 +59,38 @@ char *formatGameWinnerText(s_game *game)
     return "";
 }
 
-s_btnOption *getBtnElements(int btnIds[], int btnCount, s_game *game)
+void btnCont(s_game *game, s_btnOption _data[])
 {
     s_btnOption data[] = {
-        (s_btnOption){"Start", 0, 's'},
-        (s_btnOption){"Load Game", 1, 'l'},
-        (s_btnOption){"Author", 2, 'a'},
-        (s_btnOption){"Exit", 3, 'e'},
-        (s_btnOption){"Roll Dice", 4, 'r'},
-        (s_btnOption){"Select a pawn you want to move", 5, 'm'},
-        (s_btnOption){"Select a column", 6, 'c'},
-        (s_btnOption){formatOptionText(game), 7, 'd'},
-        (s_btnOption){"Exit & Save changes", 8, 'h'},
-        (s_btnOption){"You do not have any moves", 9, 'v'},
-        (s_btnOption){formatGameWinnerText(game), 10, 'g'},
-        (s_btnOption){"Review your saved game", 11, 'j'},
-        (s_btnOption){"Next", 12, 'n'},
-        (s_btnOption){"Prev", 13, 'p'},
-        (s_btnOption){"Start game", 14, 'z'},
-        (s_btnOption){"End game", 15, 'x'},
-        (s_btnOption){"Exit game review", 16, 'q'},
+        {"Start", 0, 's'},
+        {"Load Game", 1, 'l'},
+        {"Author", 2, 'a'},
+        {"Exit", 3, 'e'},
+        {"Roll Dice", 4, 'r'},
+        {"Select a pawn", 5, 'm'},
+        {"Select a column", 6, 'c'},
+        {formatOptionText(game), 7, 'd'},
+        {"Exit & Save changes", 8, 'h'},
+        {"You do not have any moves", 9, 'v'},
+        {formatGameWinnerText(game), 10, 'g'},
+        {"Review your saved game", 11, 'j'},
+        {"Next", 12, 'n'},
+        {"Prev", 13, 'p'},
+        {"Start game", 14, 'z'},
+        {"End game", 15, 'x'},
+        {"Exit game review", 16, 'q'},
     };
+    for (int i = 0; i < MENU_BUTTONS_COUNT; i++)
+    {
+        _data[i] = data[i];
+    }
+}
+
+s_btnOption *getBtnElements(int btnIds[], int btnCount, s_game *game)
+{
+    s_btnOption data[MENU_BUTTONS_COUNT];
+    btnCont(game, data);
+
     int count = sizeof(data) / sizeof(data[0]);
 
     s_btnOption *btns = malloc(btnCount * sizeof(s_btnOption));

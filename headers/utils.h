@@ -22,6 +22,11 @@
 #define INITIAL_ACTIVE_COLUMN -100
 #define EXIT_GAME -1000
 
+#define DOT_X_W 4
+#define DOT_X_B 15
+#define DOT_Y 53
+
+#define MENU_BUTTONS_COUNT 17
 
 #define ERROR_PRINT_X 90
 #define ERROR_PRINT_Y 20

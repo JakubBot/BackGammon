@@ -16,5 +16,9 @@ void getInitialColumnsIds(vector_t_pawn *boardColumn, int col);
 void updateDiceDublet(s_game *game, struct Node *b_list);
 void updateDice(s_game *game, struct Node *b_list);
 void clearGameState(s_game* game);
+int getNextMoveCalculation(int firstVal, int secondVal, int whiteTurn);
+int makeMove(struct Node **b_list, char action);
+int isValidNextMove(int move);
+int getClrPair(int colX, int currentActiveColumn, int forcedTargetColumn);
 
 #endif //BACKGAMMON2_RENDERGAMEUTILS_H

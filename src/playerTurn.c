@@ -36,29 +36,31 @@ void clearSidebarInfo()
   refresh();
 }
 
-void showColorsDefinition()
+void showColDefinition()
 {
-  int offsetX = 4;
-  int offsetY = -4;
-  int startDefinitionY = POSITION_Y + BOARD_HEIGHT + offsetY;
-  int startDefinitionX = POSITION_X;
+  int offY = -4;
+  int y = POSITION_Y + BOARD_HEIGHT + offY;
+  int x = POSITION_X;
 
-  mvprintw(startDefinitionY, startDefinitionX, "Colors definition:");
-  attron(COLOR_PAIR(COLOR_COLUMN_ID));
-  mvprintw(startDefinitionY + 1, startDefinitionX, SQUARE);
-  attroff(COLOR_PAIR(COLOR_COLUMN_ID));
-  mvprintw(startDefinitionY + 1, startDefinitionX + 1, " - current column");
+  mvprintw(y, x, "Colors definition:");
 
-  attron(COLOR_PAIR(POSSIBLE_COLUMN_MOVE_ID));
-  mvprintw(startDefinitionY + 2, startDefinitionX, SQUARE);
-  attroff(COLOR_PAIR(POSSIBLE_COLUMN_MOVE_ID));
-  mvprintw(startDefinitionY + 2, startDefinitionX + 1, " - source column");
+  int colClr = COLOR_PAIR(COLOR_COLUMN_ID);
+  attron(colClr);
+  mvprintw(y + 1, x, SQUARE);
+  attroff(colClr);
+  mvprintw(y + 1, x + 1, " - current column");
 
-  attron(COLOR_PAIR(FORCED_COLUMN_MOVE_ID));
-  mvprintw(startDefinitionY + 3, startDefinitionX, SQUARE);
-  attroff(COLOR_PAIR(FORCED_COLUMN_MOVE_ID));
-  mvprintw(startDefinitionY + 3, startDefinitionX + 1, " - forced target column");
+  int possibleClr = COLOR_PAIR(FORCED_COLUMN_MOVE_ID);
+  attron(possibleClr);
+  mvprintw(y + 2, x, SQUARE);
+  attroff(possibleClr);
+  mvprintw(y + 2, x + 1, " - source column");
 
+  int forcedClr = COLOR_PAIR(FORCED_COLUMN_MOVE_ID);
+  attron(forcedClr);
+  mvprintw(y + 3, x, SQUARE);
+  attroff(forcedClr);
+  mvprintw(y + 3, x + 1, " - forced target column");
 }
 
 void showTurnInfo(s_game game)
@@ -80,7 +82,14 @@ void showTurnInfo(s_game game)
       displayPosition++;
     }
   }
-  showColorsDefinition();
+  showColDefinition();
+}
+
+void printTurnInfo(char startCol)
+{
+  mvprintw(POSITION_Y + 6, POSITION_X, "Player %c starts the game", (startCol == 'w') ? '1' : '2');
+
+  mvprintw(POSITION_Y + 12, POSITION_X, "Turn -> Player %c", (startCol == 'w') ? '1' : '2');
 }
 
 void updateInitialDiceValues(s_game *game)
@@ -105,9 +114,7 @@ void updateInitialDiceValues(s_game *game)
 
   char startCol = p1 >= p2 ? 'w' : 'b';
 
-  mvprintw(POSITION_Y + 6, POSITION_X, "Player %c starts the game", (startCol == 'w') ? '1' : '2');
-
-  mvprintw(POSITION_Y + 12, POSITION_X, "Turn -> Player %c", (startCol == 'w') ? '1' : '2');
+  printTurnInfo(startCol);
 
   game->turn = startCol;
 }

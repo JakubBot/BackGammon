@@ -954,7 +954,14 @@ void initializeGame(s_game *game)
 
     game->removeFurthestPawn = 0;
 
+    game->endGame.points = 0;
     game->endGame.winner = 0;
+
+    game->gameReview.exitGameReview = 0;
+    game->gameReview.currentFilePosition = 1;
+    game->gameReview.fileLength = 0;
+
+    game->currentMenuBtnIndex = 0;
 
     vector_t_pawn *courtPawns = &game->courtPawns;
     init(courtPawns);
@@ -1009,10 +1016,71 @@ void initGame()
 {
     while (1)
     {
+        clear();
+        refresh();
+
         int menuIds[] = {0, 1, 2, 11, 3};
         renderMenu(menuIds, sizeof(menuIds) / sizeof(menuIds[0]), 0, 0, 0, NULL, NULL);
     }
     // initGame();
+}
+
+WINDOW *boardInitialization(s_game *game)
+{
+    int yStart = 3, xStart = 0;
+    WINDOW *gameWin = newwin(BOARD_HEIGHT, BOARD_WIDTH, yStart, xStart);
+    wrefresh(gameWin);
+    box(gameWin, 0, 0);
+    wrefresh(gameWin);
+    renderBoard(game, gameWin, 0, 0, NULL);
+
+    refresh();
+    wrefresh(gameWin);
+
+    return gameWin;
+}
+
+void gameReview()
+{
+    erase();
+    refresh();
+    mvprintw(0, 0, "Review Your Game");
+
+    s_game game = {};
+    initializeGame(&game);
+
+    updateGameFile(1, game);
+
+    WINDOW *gameWin = boardInitialization(&game);
+
+    FILE *file = fopen(CURRENT_GAME, "r");
+    int fileLength = countLines(file);
+    game.gameReview.fileLength = fileLength;
+
+    int stopLoop = 0;
+    curs_set(0);
+
+    int menuIds[] = {12, 13, 14, 15, 16};
+    hideMenu();
+
+    // game.gameReview.exitGameReview != 1
+    while (1)
+    {
+
+        renderMenu(menuIds, sizeof(menuIds) / sizeof(menuIds[0]), game.currentMenuBtnIndex, 0, 19, NULL, &game);
+        if (game.gameReview.exitGameReview == 1)
+        {
+            break;
+        }
+        int currentPosition = game.gameReview.currentFilePosition;
+        loadFile(&game, currentPosition);
+
+        renderBoard(&game, gameWin, 0, 0, NULL);
+        refresh();
+        wrefresh(gameWin);
+    }
+
+    delwin(gameWin);
 }
 
 void renderGame(int loadFromFile)
@@ -1030,17 +1098,19 @@ void renderGame(int loadFromFile)
     if (loadFromFile == 1)
     {
         updateGameFile(1, game);
-        loadFile(&game);
+        loadFile(&game, FILE_LAST_LINE);
     }
 
-    int yStart = 3, xStart = 0;
-    WINDOW *gameWin = newwin(BOARD_HEIGHT, BOARD_WIDTH, yStart, xStart);
-    wrefresh(gameWin);
-    box(gameWin, 0, 0);
-    wrefresh(gameWin);
-    renderBoard(&game, gameWin, 0, 0, NULL);
+    WINDOW *gameWin = boardInitialization(&game);
+    // int yStart = 3, xStart = 0;
+    // WINDOW *gameWin = newwin(BOARD_HEIGHT, BOARD_WIDTH, yStart, xStart);
+    // wrefresh(gameWin);
+    // box(gameWin, 0, 0);
+    // wrefresh(gameWin);
+    // renderBoard(&game, gameWin, 0, 0, NULL);
 
-    refresh();
+    // refresh();
+
     if (loadFromFile == 0)
     {
         updateInitialDiceValues(&game);
@@ -1054,4 +1124,5 @@ void renderGame(int loadFromFile)
     {
         fclose(game.file);
     }
+    delwin(gameWin);
 }

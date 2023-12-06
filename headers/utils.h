@@ -17,15 +17,21 @@
 #define WHITE_COURT -1
 #define BLACK_COURT 24
 #define NOT_FOUND -10
+#define FILE_LAST_LINE -2
 #define NO_MOVE -20
 #define INITIAL_ACTIVE_COLUMN -100
+#define EXIT_GAME -1000
+
+
+#define ERROR_PRINT_X 90
+#define ERROR_PRINT_Y 20
 
 void clrButtonPrints(int posY, int nLines);
 
 void changeTurn(s_game *game);
 
 s_boardColumn findColumnBasedOnColX(s_game game, int currentActiveColumn);
-vector_t_pawn* findColumnPawnIds(s_game *game, int currentActiveColumn);
+vector_t_pawn *findColumnPawnIds(s_game *game, int currentActiveColumn);
 int allPawnsHome(s_game game);
 
 int max(int a, int b);

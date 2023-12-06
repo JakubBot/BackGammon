@@ -6,5 +6,6 @@
 
 void renderGame(int loadFromFile);
 void initGame();
+void gameReview();
 
 #endif //RENDERGAME_H

@@ -1,5 +1,6 @@
 #include "stdlib.h"
 #include "../headers/globalStructs.h"
+#include "../headers/utils.h"
 
 void saveCurrentState(s_game game)
 {
@@ -136,15 +137,72 @@ void readGameState(FILE *file, s_game *game)
   //        &game->diceInfo.initialDiceValues[0], &game->diceInfo.initialDiceValues[1]);
 }
 
-void loadFile(s_game *game)
+void loadFile(s_game *game, int loadPosition)
 {
   FILE *file = fopen(SAVED_GAME, "r");
-  fseek(file, -2, SEEK_END); // Przesunięcie kursora na przedostatnią pozycję
-  while (fgetc(file) != '\n')
+
+  if (file == NULL)
   {
-    fseek(file, -2, SEEK_CUR); // Przesunięcie kursora w lewo, pomijając znak nowej linii
+
+    mvprintw(ERROR_PRINT_Y, ERROR_PRINT_X, "Nie można otworzyć pliku ");
+    return;
+  }
+
+  if (loadPosition >= 0)
+  {
+    fseek(file, 0, SEEK_SET); // Przesunięcie kursora na początek pliku
+
+    int currentLine = 0;
+    char currentChar;
+
+    while (currentLine < loadPosition)
+    {
+      currentChar = fgetc(file);
+
+      if (currentChar == EOF)
+      {
+        // Obsługa błędu - osiągnięcie końca pliku przed osiągnięciem żądanego wiersza
+        fclose(file);
+        return;
+      }
+
+      if (currentChar == '\n')
+      {
+        currentLine++;
+      }
+    }
+  }
+  else
+  {
+    fseek(file, -2, SEEK_END); // Przesunięcie kursora na przedostatnią pozycję
+    while (fgetc(file) != '\n')
+    {
+      fseek(file, -2, SEEK_CUR); // Przesunięcie kursora w lewo, pomijając znak nowej linii
+    }
   }
 
   readGameState(file, game);
   fclose(file);
+}
+
+int countLines(FILE *file)
+{
+  int count = 0;
+  int ch;
+
+  while ((ch = fgetc(file)) != EOF)
+  {
+    if (ch == '\n')
+    {
+      count++;
+    }
+  }
+
+  // Dodaj jedną do count, jeśli plik nie zakończył się znakiem nowej linii
+  if (ch != '\n' && count > 0)
+  {
+    count++;
+  }
+
+  return count;
 }

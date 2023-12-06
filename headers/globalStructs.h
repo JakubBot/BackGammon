@@ -59,15 +59,22 @@ typedef struct
 {
   int winner;
   int points;
-} endGame;
+} s_endGame;
+
+typedef struct
+{
+  int exitGameReview;
+  int currentFilePosition;
+  int fileLength;
+} s_gameReview;
 typedef struct
 {
   int initialDiceValueW;
   int initialDiceValueB;
   char turn;
   s_board board;
-  s_pawn wPawns[PAWNS_COUNT];
-  s_pawn bPawns[PAWNS_COUNT];
+  // s_pawn wPawns[PAWNS_COUNT];
+  // s_pawn bPawns[PAWNS_COUNT];
   vector_t_pawn courtPawns;
   s_diceInfo diceInfo;
   int isPawnsHome;
@@ -75,6 +82,10 @@ typedef struct
 
   FILE *file;
   int gameLoadedFromFile;
-  endGame endGame;
+  s_endGame endGame;
+
+  s_gameReview gameReview;
+
+  int currentMenuBtnIndex;
 } s_game;
 #endif // GLOBALSTRUCTS_H

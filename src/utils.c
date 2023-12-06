@@ -142,3 +142,4 @@ int getPawnBarCount(s_game game)
 {
     return game.board.bar.pawnIds.count;
 }
+

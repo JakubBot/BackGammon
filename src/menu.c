@@ -20,11 +20,11 @@ void *renderMenu(int btnIds[], int btnCount, int activeBtnId, int menuPosX, int 
     curs_set(0);
     s_btnOption *buttons = getBtnElements(btnIds, btnCount, game);
     int selectedBtn = activeBtnId ? activeBtnId : btnIds[0];
-    //    int selectedBtn = activeBtnId;
     int currentIndex = 0;
 
     while (selectedBtn != -1)
     {
+
         for (int i = 0; i < btnCount; ++i)
         {
             if (btnIds[i] == selectedBtn)
@@ -41,27 +41,28 @@ void *renderMenu(int btnIds[], int btnCount, int activeBtnId, int menuPosX, int 
             {
                 s_btnOption btn = findBtn(buttons, btnIds[currentIndex - 1], btnCount);
                 selectedBtn = btn.id;
-                //                selectedBtn--;
+                // game->currentMenuBtnIndex = selectedBtn;
             }
             else
             {
                 s_btnOption btn = findBtn(buttons, btnIds[btnCount - 1], btnCount);
                 selectedBtn = btn.id;
+                // game->currentMenuBtnIndex = selectedBtn;
             }
         }
         else if (ch == KEY_RIGHT)
         {
             if ((currentIndex + 1) < btnCount)
-            //            if (selectedBtn < btnCount - 1)
             {
                 s_btnOption btn = findBtn(buttons, btnIds[currentIndex + 1], btnCount);
                 selectedBtn = btn.id;
-                //                selectedBtn++;
+                // game->currentMenuBtnIndex = selectedBtn;
             }
             else
             {
                 s_btnOption btn = findBtn(buttons, btnIds[0], btnCount);
                 selectedBtn = btn.id;
+                // game->currentMenuBtnIndex = selectedBtn;
             }
         }
         else if (ch == 10)
@@ -74,6 +75,11 @@ void *renderMenu(int btnIds[], int btnCount, int activeBtnId, int menuPosX, int 
             break;
         }
     }
+    if (game != NULL)
+    {
+        game->currentMenuBtnIndex = selectedBtn;
+    }
+
     menuAction(game, diceSize, btnIds, btnCount, selectedBtn, menuPosY, buttons);
 
     free(buttons);
@@ -181,6 +187,38 @@ void menuAction(s_game *game, int *diceSize, int btnIds[], int btnCount, int sel
             break;
         case 'e':
             exit(1);
+            break;
+            // (s_btnOption){"Next", 12, 'n'},
+            // (s_btnOption){"Prev", 13, 'p'},
+            // (s_btnOption){"Start game", 14, 'z'},
+            // (s_btnOption){"End game", 15, 'x'},
+            // (s_btnOption){"Exit game review", 16, 'q'},
+        // game review options
+        case 'j':
+            // read from file
+            gameReview();
+            break;
+        case 'n':
+            if (game->gameReview.currentFilePosition < (game->gameReview.fileLength - 1))
+            {
+                game->gameReview.currentFilePosition++;
+            }
+            break;
+        case 'p':
+            if (game->gameReview.currentFilePosition > 0)
+            {
+                game->gameReview.currentFilePosition--;
+            }
+
+            break;
+        case 'z':
+            game->gameReview.currentFilePosition = 0;
+            break;
+        case 'x':
+            game->gameReview.currentFilePosition = FILE_LAST_LINE;
+            break;
+        case 'q':
+            game->gameReview.exitGameReview = 1;
             break;
             // v - not move
         case 'v':

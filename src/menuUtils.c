@@ -104,3 +104,75 @@ s_btnOption *getBtnElements(int btnIds[], int btnCount, s_game *game)
     }
     return btns;
 }
+
+void handleGameReviewOption(char action, s_game *game)
+{
+
+    switch (action)
+    {
+
+    case 'j':
+        // read from file
+        gameReview();
+        break;
+    case 'n':
+        if (game->gameReview.currentFilePosition < (game->gameReview.fileLength - 1))
+        {
+            game->gameReview.currentFilePosition++;
+        }
+        break;
+    case 'p':
+        if (game->gameReview.currentFilePosition > 0)
+        {
+            game->gameReview.currentFilePosition--;
+        }
+
+        break;
+    case 'z':
+        game->gameReview.currentFilePosition = 0;
+        break;
+    case 'x':
+        game->gameReview.currentFilePosition = FILE_LAST_LINE;
+        break;
+    case 'q':
+        game->gameReview.exitGameReview = 1;
+        break;
+    }
+}
+
+void handleInitialBtns(char action, s_game *game, int *diceSize, int btnIds[], int btnCount, s_btnOption *buttons)
+{
+    switch (action)
+    {
+    case 's':
+        // start
+        renderGame(0);
+        break;
+    case 'l':
+        renderGame(1);
+        break;
+    case 'a':
+        // author
+        authorInfo();
+
+        // set author btn active
+        s_btnOption btn = findBtn(buttons, 2, btnCount);
+        renderMenu(btnIds, btnCount, btn.id, 0, 0, diceSize, game);
+        break;
+    }
+}
+
+void exitGame(s_game *game)
+{
+    clear();
+    refresh();
+    clearGameState(game);
+    initGame();
+}
+
+void playerRoll(s_game *game, int menuY)
+{
+    game->turn = (game->turn == 'w') ? 'b' : 'w';
+    clrButtonPrints(menuY, 3);
+    refresh();
+}

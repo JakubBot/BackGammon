@@ -15,7 +15,7 @@ void fillBList(struct Node **b_list, s_game *game);
 void getInitialColumnsIds(vector_t_pawn *boardColumn, int col);
 void updateDiceDublet(s_game *game, struct Node *b_list);
 void updateDice(s_game *game, struct Node *b_list);
-void clearGameState(s_game* game);
+void clearGameState(s_game *game);
 int getNextMoveCalculation(int firstVal, int secondVal, int whiteTurn);
 int makeMove(struct Node **b_list, char action);
 int isValidNextMove(int move);
@@ -31,8 +31,11 @@ void printBottomColAdditionalPawns(int offset_y, int offset_x, int x, int labelR
 void printUpperColAdditionalPawns(int offset_y, int offset_x, int x, int labelRowId, int col);
 int handleBoardMoveRight(s_game *game, int *currentActiveColumn, struct Node **b_list, int *skippedColumns);
 int handleBoardMoveLeft(s_game game, int *currentActiveColumn);
-struct Node *getListElement(char action, struct Node **b_list, int *currentActiveColumn, int *skippedColumns);
+struct Node *getListElement(char action, struct Node **b_list);
 int handlePawnToHome(s_game *game, int move, int *currentActiveColumn, char action, struct Node **b_list);
+int checkGameTurnPawns(s_boardColumn currentColumn, char color);
+void printSelectPawn(s_game *game, WINDOW *gameWin);
+int checkCourtEnter(s_game *game, int colIdx, int *moveArr, int moves, int whiteTurn);
+int getCurrentMinDiceVal(s_game game);
 
-
-#endif //BACKGAMMON2_RENDERGAMEUTILS_H
+#endif // BACKGAMMON2_RENDERGAMEUTILS_H

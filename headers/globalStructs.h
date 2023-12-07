@@ -67,6 +67,17 @@ typedef struct
   int currentFilePosition;
   int fileLength;
 } s_gameReview;
+
+typedef struct
+{
+  char color;
+  int whiteTurn;
+  int moves;
+  int moveArr[4];
+  // int isDoublet;
+  // int availableDiceMoves;
+  // int allNormalMovesAvailable;
+} s_diceContainer;
 typedef struct
 {
   int initialDiceValueW;
@@ -88,4 +99,5 @@ typedef struct
 
   int currentMenuBtnIndex;
 } s_game;
+
 #endif // GLOBALSTRUCTS_H

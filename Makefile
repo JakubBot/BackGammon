@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS = -I./headers 
+CFLAGS = -I./headers
 LDFLAGS = -lncurses
 
 SRC_DIR = src

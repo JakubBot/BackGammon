@@ -2,9 +2,9 @@
 #include "ncurses.h"
 #include "stdlib.h"
 #include "stdio.h"
+#include "../headers/globalStructs.h"
 #include "../headers/menu.h"
 #include "../headers/playerTurn.h"
-#include "../headers/globalStructs.h"
 #include "../headers/utils.h"
 #include "../headers/move.h"
 #include "../headers/bidirectionalList.h"
@@ -407,97 +407,183 @@ int hasFreeColumnToMove(int moves, int currentColIndex, int *moveArr, int whiteT
     return NO_MOVE;
 }
 
-int hasNextLegalMove(s_game game)
+int handlePawnLegalMv(s_game game, int *moveArr, int whiteTurn, int moves, int currentColIndex)
 {
-    int useBarPawn = shouldUseBarPawn(game);
+    int foundedIndex = hasFreeColumnToMove(moves, currentColIndex, moveArr, whiteTurn, game);
 
-    char color = getTurn(game);
-    int whiteTurn = color == 'w' ? 1 : 0;
-
-    int isDoublet = game.diceInfo.isDoublet;
-    int availableDiceMoves = game.diceInfo.availableDiceMoves;
-    int allNormalMovesAvailable = availableDiceMoves == 3;
-
-    int moves = isDoublet ? availableDiceMoves : allNormalMovesAvailable ? 3
-                                                                         : 1;
-    int moveArr[4];
-    getPossibleMovesArray(moveArr, game, availableDiceMoves);
-
-    if (useBarPawn)
-    {
-
-        int currentColIndex = whiteTurn ? WHITE_COURT : BLACK_COURT;
-        int foundedIndex = hasFreeColumnToMove(moves, currentColIndex, moveArr, whiteTurn, game);
-
-        if (foundedIndex != NO_MOVE)
-            return foundedIndex;
-
-        return NO_MOVE;
-    }
-
-    for (int currentColIndex = 0; currentColIndex < COLUMNS_COUNT; ++currentColIndex)
-    {
-        s_boardColumn currentColumn = findColumnBasedOnColX(game, currentColIndex);
-
-        if (currentColumn.pawnIds.count == 0 || currentColumn.pawnIds.ptr[0].color != color)
-        {
-            continue;
-        }
-
-        int foundedIndex = hasFreeColumnToMove(moves, currentColIndex, moveArr, whiteTurn, game);
-
-        if (foundedIndex != NO_MOVE)
-            return foundedIndex;
-    }
+    if (foundedIndex != NO_MOVE)
+        return foundedIndex;
 
     return NO_MOVE;
 }
 
-int existsCapture(s_game game, struct Node *b_list, int *souceTargetCapture, int checkOnlyBar)
+int checkValidPosition(s_game game, int useBarPawn, int whiteTurn, int *moveArr, int moves, char clr)
 {
+    if (useBarPawn)
+    {
+        int colIndex = whiteTurn ? WHITE_COURT : BLACK_COURT;
+
+        return handlePawnLegalMv(game, moveArr, whiteTurn, moves, colIndex);
+    }
+
+    for (int colIndex = 0; colIndex < COLUMNS_COUNT; ++colIndex)
+    {
+        s_boardColumn currentColumn = findColumnBasedOnColX(game, colIndex);
+
+        if (checkGameTurnPawns(currentColumn, clr))
+        {
+            continue;
+        }
+
+        int legalMv = handlePawnLegalMv(game, moveArr, whiteTurn, moves, colIndex);
+        if (legalMv != NO_MOVE)
+        {
+            return legalMv;
+        }
+    }
+    return NO_MOVE;
+}
+
+s_diceContainer getDiceData(s_game game)
+{
+    s_diceContainer diceContainer = {};
+
     char color = getTurn(game);
     int whiteTurn = color == 'w' ? 1 : 0;
-
     int isDoublet = game.diceInfo.isDoublet;
     int availableDiceMoves = game.diceInfo.availableDiceMoves;
     int allNormalMovesAvailable = availableDiceMoves == 3;
 
     int moves = isDoublet ? availableDiceMoves : allNormalMovesAvailable ? 3
                                                                          : 1;
-    int moveArr[4];
-    getPossibleMovesArray(moveArr, game, availableDiceMoves);
 
-    if (checkOnlyBar)
+    // diceContainer.isDoublet = game.diceInfo.isDoublet;
+    // diceContainer.availableDiceMoves = availableDiceMoves;
+    // diceContainer.allNormalMovesAvailable = allNormalMovesAvailable;
+    // int moveArr[4];
+    // getPossibleMovesArray(moveArr, game, availableDiceMoves);
+
+    diceContainer.color = color;
+    diceContainer.whiteTurn = whiteTurn;
+
+    diceContainer.moves = moves;
+
+    getPossibleMovesArray(diceContainer.moveArr, game, availableDiceMoves);
+
+    return diceContainer;
+}
+
+int hasNextLegalMove(s_game game)
+{
+    int useBarPawn = shouldUseBarPawn(game);
+
+    // char color = getTurn(game);
+    // int whiteTurn = color == 'w' ? 1 : 0;
+
+    // int isDoublet = game.diceInfo.isDoublet;
+    // int availableDiceMoves = game.diceInfo.availableDiceMoves;
+    // int allNormalMovesAvailable = availableDiceMoves == 3;
+
+    // int moves = isDoublet ? availableDiceMoves : allNormalMovesAvailable ? 3
+    //                                                                      : 1;
+    // int moveArr[4];
+    // getPossibleMovesArray(moveArr, game, availableDiceMoves);
+    s_diceContainer diceInfo = getDiceData(game);
+    // if (useBarPawn)
+    // {
+    //     int currentColIndex = whiteTurn ? WHITE_COURT : BLACK_COURT;
+
+    //     return handlePawnLegalMv(game, moveArr, whiteTurn, moves, currentColIndex);
+    // }
+
+    // for (int currentColIndex = 0; currentColIndex < COLUMNS_COUNT; ++currentColIndex)
+    // {
+    //     s_boardColumn currentColumn = findColumnBasedOnColX(game, currentColIndex);
+
+    //     if (currentColumn.pawnIds.count == 0 || currentColumn.pawnIds.ptr[0].color != color)
+    //     // if (checkGameTurnPawns(currentColumn, color))
+    //     {
+    //         continue;
+    //     }
+
+    //     // int handlePawnLegalMv(s_game game, int *moveArr, int whiteTurn, int moves, int currentColIndex)
+    //     // {
+    //     //     int foundedIndex = hasFreeColumnToMove(moves, currentColIndex, moveArr, whiteTurn, game);
+
+    //     //     if (foundedIndex != NO_MOVE)
+    //     //         return foundedIndex;
+
+    //     //     return NO_MOVE;
+    //     // }
+
+    //     int legalMv = handlePawnLegalMv(game, moveArr, whiteTurn, moves, currentColIndex);
+    //     if (legalMv != NO_MOVE)
+    //     {
+    //         return legalMv;
+    //     }
+    //     // int foundedIndex = hasFreeColumnToMove(moves, currentColIndex, moveArr, whiteTurn, game);
+
+    //     // if (foundedIndex != NO_MOVE)
+    //     //     return foundedIndex;
+    // }
+    // // return NO_MOVE;
+    return checkValidPosition(game, useBarPawn, diceInfo.whiteTurn, diceInfo.moveArr, diceInfo.moves, diceInfo.color);
+}
+
+int getCourt(int whiteT)
+{
+    return whiteT ? WHITE_COURT : BLACK_COURT;
+}
+
+int existsCapture(s_game game, int *captureData, int checkBar)
+{
+    s_diceContainer dice = getDiceData(game);
+
+    int white = dice.whiteTurn;
+    // int isDoublet = game.diceInfo.isDoublet;
+    // int availableDiceMoves = game.diceInfo.availableDiceMoves;
+    // int allNormalMovesAvailable = availableDiceMoves == 3;
+
+    // int moves = isDoublet ? availableDiceMoves : allNormalMovesAvailable ? 3
+    //                                                                      : 1;
+    // int moveArr[4];
+    // getPossibleMovesArray(moveArr, game, availableDiceMoves);
+
+    if (checkBar)
     {
-
-        int currentColIndex = whiteTurn ? WHITE_COURT : BLACK_COURT;
-        int foundedIndex = findPawn(moves, currentColIndex, moveArr, whiteTurn, game, souceTargetCapture);
-        if (foundedIndex != NOT_FOUND)
-            return foundedIndex;
+        int pIdx = findPawn(dice.moves, getCourt(white), dice.moveArr, white, game, captureData);
+        if (pIdx != NOT_FOUND)
+            return pIdx;
 
         return NOT_FOUND;
     }
 
-    for (int currentColIndex = 0; currentColIndex < COLUMNS_COUNT; ++currentColIndex)
+    int i = white ? 0 : COLUMNS_COUNT - 1;
+    while (i < COLUMNS_COUNT && i >= 0)
     {
-        s_boardColumn currentColumn = findColumnBasedOnColX(game, currentColIndex);
+        s_boardColumn col = findColumnBasedOnColX(game, i);
 
-        if (currentColumn.pawnIds.count == 0 || currentColumn.pawnIds.ptr[0].color != color)
+        if (!checkGameTurnPawns(col, dice.color))
         {
-            continue;
+            // continue;
+            int pIdx = findPawn(dice.moves, i, dice.moveArr, white, game, captureData);
+            if (pIdx != NOT_FOUND)
+                return pIdx;
         }
-        int foundedIndex = findPawn(moves, currentColIndex, moveArr, whiteTurn, game, souceTargetCapture);
-        if (foundedIndex != NOT_FOUND)
-            return foundedIndex;
+
+        if (white)
+            i++;
+        else
+            i--;
     }
+
     return NOT_FOUND;
 }
 
 int handleForcedCapture(s_game *game, struct Node *b_list, int checkOnlyBar)
 {
-
     int souceTargetCapture[2];
-    int existsCap = existsCapture(*game, b_list, souceTargetCapture, checkOnlyBar);
+    int existsCap = existsCapture(*game, souceTargetCapture, checkOnlyBar);
 
     if (existsCap != NOT_FOUND)
     {
@@ -537,63 +623,10 @@ int findFurthesPawn(s_game game)
     return furthest;
 }
 
-int checkIfRemoveFurthestPawn(s_game *game)
+int setDistancePawnSource(s_game *game, int minStep, int removeExcactDistancePawn)
 {
-
-    // min step
-    int dice1 = game->diceInfo.dice[0];
-    int dice2 = game->diceInfo.dice[1];
-    int minStep = 0;
-
-    if (dice1 == -1)
-    {
-        minStep = dice2;
-    }
-    else if (dice2 == -1)
-    {
-        minStep = dice1;
-    }
-    else
-    {
-        minStep = min(dice1, dice2);
-    }
     int furthestPawn = findFurthesPawn(*game);
-    int whiteTurn = isWhiteTurn(*game);
-
-    int moveArr[4];
-    int availableDiceMoves = game->diceInfo.availableDiceMoves;
-
-    int isDoublet = game->diceInfo.isDoublet;
-    int allNormalMovesAvailable = availableDiceMoves == 3;
-
-    int moves = isDoublet ? availableDiceMoves : allNormalMovesAvailable ? 3
-                                                                         : 1;
-    getPossibleMovesArray(moveArr, *game, availableDiceMoves);
-
-    int removeExcactDistancePawn = NOT_FOUND;
-
-    for (int currentColIndex = 0; currentColIndex < COLUMNS_COUNT; ++currentColIndex)
-    {
-
-        if (removeExcactDistancePawn != NOT_FOUND)
-            break;
-
-        s_boardColumn nextCol = findColumnBasedOnColX(*game, currentColIndex);
-        if (nextCol.pawnIds.count == 0 || nextCol.pawnIds.ptr[0].color != game->turn)
-        {
-            continue;
-        }
-
-        for (int k = 0; k < moves; ++k)
-        {
-            int nextColIndex = getNextMoveCalculation(currentColIndex, moveArr[k], whiteTurn);
-            if (nextColIndex == BLACK_COURT || nextColIndex == WHITE_COURT)
-            {
-                removeExcactDistancePawn = currentColIndex;
-                break;
-            }
-        }
-    }
+    int whiteTurn = game->turn == 'w' ? 1 : 0;
     int relativePawnPosition = whiteTurn ? (COLUMNS_COUNT - 1) - furthestPawn : furthestPawn;
 
     if (removeExcactDistancePawn != NOT_FOUND)
@@ -616,6 +649,90 @@ int checkIfRemoveFurthestPawn(s_game *game)
 
         return 1;
     }
+    return 0;
+}
+
+int checkIfRemoveFurthestPawn(s_game *game)
+{
+    // min step
+    // int dice1 = game->diceInfo.dice[0];
+    // int dice2 = game->diceInfo.dice[1];
+    int minStep = getCurrentMinDiceVal(*game);
+
+    // if (dice1 == -1)
+    // {
+    //     minStep = dice2;
+    // }
+    // else if (dice2 == -1)
+    // {
+    //     minStep = dice1;
+    // }
+    // else
+    // {
+    //     minStep = min(dice1, dice2);
+    // }
+
+    s_diceContainer diceC = getDiceData(*game);
+
+    int whiteTurn = diceC.whiteTurn;
+
+    // int availableDiceMoves = game->diceInfo.availableDiceMoves;
+
+    // int isDoublet = game->diceInfo.isDoublet;
+    // int allNormalMovesAvailable = availableDiceMoves == 3;
+    // getPossibleMovesArray(moveArr, *game, availableDiceMoves);
+
+    int distancePawn = NOT_FOUND;
+
+    for (int colIdx = 0; colIdx < COLUMNS_COUNT; ++colIdx)
+    {
+        if (distancePawn != NOT_FOUND)
+            break;
+
+        s_boardColumn col = findColumnBasedOnColX(*game, colIdx);
+
+        // if (nextCol.pawnIds.count == 0 || nextCol.pawnIds.ptr[0].color != game->turn)
+        if (checkGameTurnPawns(col, diceC.color))
+        {
+            continue;
+        }
+
+        distancePawn = checkCourtEnter(game, colIdx, diceC.moveArr, diceC.moves, whiteTurn);
+        // for (int k = 0; k < moves; ++k)
+        // {
+        //     int nextColIdx = getNextMoveCalculation(colIdx, moveArr[k], whiteTurn);
+        //     if (nextColIdx == BLACK_COURT || nextColIdx == WHITE_COURT)
+        //     {
+        //         hasExcactDistancePawn = colIdx;
+        //         break;
+        //     }
+        // }
+    }
+    // int relativePawnPosition = whiteTurn ? (COLUMNS_COUNT - 1) - furthestPawn : furthestPawn;
+
+    // if (removeExcactDistancePawn != NOT_FOUND)
+    // {
+    //     game->board.sourceColumn = removeExcactDistancePawn;
+    //     if (whiteTurn)
+    //     {
+    //         game->board.forcedTargetColumn = BLACK_COURT;
+    //     }
+    //     else
+    //     {
+    //         game->board.forcedTargetColumn = WHITE_COURT;
+    //     }
+    //     return 1;
+    // }
+    // else if (minStep > relativePawnPosition)
+    // {
+    //     game->board.sourceColumn = furthestPawn;
+    //     game->removeFurthestPawn = 1;
+
+    //     return 1;
+    // }
+    int hasDistancePawn = setDistancePawnSource(game, minStep, distancePawn);
+    if (hasDistancePawn)
+        return 1;
 
     return 0;
 }
@@ -655,13 +772,14 @@ int setSourceColumn(s_game *game, WINDOW *gameWin, struct Node *b_list)
         }
     }
 
-    game->board.isBarActive = 0;
-    int srcIds[] = {5};
+    // game->board.isBarActive = 0;
+    // int srcIds[] = {5};
 
-    hideMenu();
-    refresh();
-    renderMenu(srcIds, sizeof(srcIds) / sizeof(srcIds[0]), 0, 0, 19, NULL, game);
-    renderBoard(game, gameWin, 1, 0, NULL);
+    // hideMenu();
+    // refresh();
+    // renderMenu(srcIds, sizeof(srcIds) / sizeof(srcIds[0]), 0, 0, 19, NULL, game);
+    // renderBoard(game, gameWin, 1, 0, NULL);
+    printSelectPawn(game, gameWin);
     return 1;
 }
 
@@ -718,6 +836,7 @@ void moveRepeater(s_game *game, WINDOW *gameWin)
         game->isPawnsHome = pawnsHome;
 
         int hasLegalMove = hasNextLegalMove(*game);
+
         if (hasLegalMove == NO_MOVE)
         {
             // show invalid move

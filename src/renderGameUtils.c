@@ -80,7 +80,7 @@ int findNextPossibleMove(s_game game, int currentActiveColumn, char action)
         if ((cColumn.count > 0) && (bColumn.colX != game.board.sourceColumn))
         {
             char color = cColumn.ptr[0].color;
-            if ((game.turn == 'w' && color == 'w') || game.turn == 'b' && color == 'b')
+            if ((game.turn == 'w' && color == 'w') || (game.turn == 'b' && color == 'b'))
             {
                 return bColumn.colX;
             }
@@ -155,7 +155,7 @@ void fillBList(struct Node **b_list, s_game *game)
 
 void addPawns(vector_t_pawn *boardColumn, int id, char c)
 {
-    push_back(boardColumn, (s_pawn){.id = 1, .color = c});
+    push_back(boardColumn, (s_pawn){.id = id, .color = c});
 }
 
 void getInitialColumnsIds(vector_t_pawn *bColumn, int col)
@@ -313,7 +313,6 @@ int getClrPair(int colX, int currentActiveColumn, int forcedTargetColumn)
 void showGameReviewOptions(s_game *game, WINDOW *gameWin)
 {
 
-    int stopLoop = 0;
     curs_set(0);
 
     int menuIds[] = {12, 13, 14, 15, 16};
@@ -471,7 +470,7 @@ int handlePawnToHome(s_game *game, int move, int *currentActiveColumn, char acti
 
         *currentActiveColumn = move;
 
-        int validMv = makeMove(b_list, action);
+        makeMove(b_list, action);
 
         return 1;
     }
@@ -482,7 +481,7 @@ int handlePawnToHome(s_game *game, int move, int *currentActiveColumn, char acti
     return 0;
 }
 
-int validateNextMove(s_game *game, int move, int whiteTurn, int *currentActiveColumn, int *skippedColumns, char action, struct Node **b_list, int sourceColX, int step)
+int validateNextMove(s_game *game, int move, int *currentActiveColumn, int *skippedColumns, char action, struct Node **b_list)
 {
 
     int goHome = handlePawnToHome(game, move, currentActiveColumn, action, b_list);
@@ -513,7 +512,7 @@ int validateNextMove(s_game *game, int move, int whiteTurn, int *currentActiveCo
 
     if (!isValidCol)
     {
-        int validMv = makeMove(b_list, action);
+        makeMove(b_list, action);
         *skippedColumns = *skippedColumns + 1;
         int res = findNextLegalMove(game, action, b_list, currentActiveColumn, skippedColumns);
         return res;
@@ -525,7 +524,7 @@ int validateNextMove(s_game *game, int move, int whiteTurn, int *currentActiveCo
     return 1;
 }
 
-struct Node *getListElement(char action, struct Node **b_list, int *currentActiveColumn, int *skippedColumns)
+struct Node *getListElement(char action, struct Node **b_list)
 {
     if (action == 'l')
     {
@@ -542,7 +541,7 @@ int findNextLegalMove(s_game *game, char action, struct Node **b_list, int *curr
     int sCol = game->board.sourceColumn;
     int whiteTurn = isWhiteTurn(*game);
 
-    struct Node *nextElement = getListElement(action, b_list, currentActiveColumn, skippedColumns);
+    struct Node *nextElement = getListElement(action, b_list);
     if (nextElement == NULL)
         return 0;
 
@@ -562,7 +561,7 @@ int findNextLegalMove(s_game *game, char action, struct Node **b_list, int *curr
     int step = nextElement->data;
     int move = getNextMoveCalculation(sCol, step, whiteTurn);
 
-    int valid = validateNextMove(game, move, whiteTurn, currentActiveColumn, skippedColumns, action, b_list, sCol, step);
+    int valid = validateNextMove(game, move, currentActiveColumn, skippedColumns, action, b_list);
     if (valid == 0)
         return 0;
     // int move = getNextMoveCalculation(sourceColX, step, whiteTurn);
@@ -606,4 +605,53 @@ int findNextLegalMove(s_game *game, char action, struct Node **b_list, int *curr
     *currentActiveColumn = move;
 
     return 0;
+}
+
+int checkGameTurnPawns(s_boardColumn currentColumn, char color)
+{
+    return (currentColumn.pawnIds.count == 0 || currentColumn.pawnIds.ptr[0].color != color);
+}
+
+void printSelectPawn(s_game *game, WINDOW *gameWin)
+{
+    game->board.isBarActive = 0;
+    int srcIds[] = {5};
+
+    hideMenu();
+    refresh();
+    renderMenu(srcIds, sizeof(srcIds) / sizeof(srcIds[0]), 0, 0, 19, NULL, game);
+    renderBoard(game, gameWin, 1, 0, NULL);
+}
+
+int checkCourtEnter(s_game *game, int colIdx, int *moveArr, int moves, int whiteTurn)
+{
+    for (int k = 0; k < moves; ++k)
+    {
+        int nextColIdx = getNextMoveCalculation(colIdx, moveArr[k], whiteTurn);
+        if (nextColIdx == BLACK_COURT || nextColIdx == WHITE_COURT)
+        {
+            return colIdx;
+        }
+    }
+    return NOT_FOUND;
+}
+
+int getCurrentMinDiceVal(s_game game)
+{
+    int dice1 = game.diceInfo.dice[0];
+    int dice2 = game.diceInfo.dice[1];
+    int minStep = 0;
+    if (dice1 == -1)
+    {
+        minStep = dice2;
+    }
+    else if (dice2 == -1)
+    {
+        minStep = dice1;
+    }
+    else
+    {
+        minStep = min(dice1, dice2);
+    }
+    return minStep;
 }

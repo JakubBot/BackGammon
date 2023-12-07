@@ -51,6 +51,8 @@ void rollDice(int *diceSize, s_game *game)
     {
         game->diceInfo.dice[0] = min(tempArr[0], tempArr[1]);
         game->diceInfo.dice[1] = max(tempArr[0], tempArr[1]);
+        game->diceInfo.dice[2] = 0;
+        game->diceInfo.dice[3] = 0;
     }
 
     for (int i = 0; i < 2; ++i)

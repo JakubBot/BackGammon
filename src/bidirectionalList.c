@@ -120,49 +120,103 @@ void removeFirstNodeWithValue(struct Node **head, int value)
             {
                 current->next->prev = current->prev;
             }
-
-            free(current);
+            if (current != NULL)
+            {
+                free(current);
+            }
             return;
         }
-
-        current = current->next;
+        if (next(current) != NULL)
+        {
+            current = current->next;
+        }
+        else
+        {
+            break;
+        }
     }
 }
 
-void removeLastNode(struct Node **head)
+struct Node *removeLastNode(struct Node *head)
 {
-    if (*head == NULL)
+    if (head == NULL)
+        return NULL;
+
+    if (head->next == NULL)
     {
-        return;
+        free(head);
+        return NULL;
     }
 
-    struct Node *current = *head;
-    struct Node *previous = NULL;
+    struct Node *second_last = head;
+    while (second_last->next->next != NULL)
+        second_last = second_last->next;
 
-    while (current->next != NULL)
-    {
-        previous = current;
-        current = current->next;
-    }
+    free(second_last->next);
 
-    if (previous != NULL)
-    {
-        previous->next = NULL;
-    }
-    else
-    {
-        *head = NULL;
-    }
+    second_last->next = NULL;
 
-    free(current);
+    return head;
 }
+
+// void removeLastNode(struct Node **head)
+// {
+//     if (*head == NULL)
+//     {
+//         return;
+//     }
+
+//     struct Node *current = *head;
+//     struct Node *previous = NULL;
+
+//     while (current->next != NULL)
+//     {
+//         previous = current;
+//         current = current->next;
+//     }
+
+//     if (previous != NULL)
+//     {
+//         previous->next = NULL;
+//     }
+//     else
+//     {
+//         *head = NULL;
+//     }
+
+//     if (current != NULL)
+//     {
+
+//         free(current);
+//     }
+// }
 
 void freeList(struct Node **b_list)
 {
     while (*b_list != NULL)
     {
+
         struct Node *temp = *b_list;
         *b_list = (*b_list)->next;
         free(temp);
     }
+}
+
+int findLevel(struct Node *head, int value)
+{
+    int level = 0;
+    struct Node *current = head;
+
+    while (current != NULL)
+    {
+        if (current->data == value)
+        {
+            return level;
+        }
+        current = current->next;
+        level++;
+    }
+
+    // Wartość nie została znaleziona
+    return -1;
 }

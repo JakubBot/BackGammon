@@ -192,6 +192,19 @@ void getInitialColumnsIds(vector_t_pawn *bColumn, int col)
 
 int getMoveDicePosition(struct Node *b_list, s_game game)
 {
+    // int val = b_list->data;
+    // moveToTop(&b_list);
+    // int pos = findLevel(b_list, val);
+    // if (pos == -1 || pos == 3)
+    // {
+    //     return pos;
+    // }
+    // else if (pos == 1 || pos == 2)
+    // {
+    //     return 1;
+    // }
+    // return 0;
+
     int moveIndex = countDepthRecursive(b_list);
     if (moveIndex == 3 || moveIndex == 0)
         return moveIndex;
@@ -222,29 +235,40 @@ void updateDiceDublet(s_game *game, struct Node *b_list)
             game->diceInfo.dice[i - 1] = -1;
         }
 
-        moveToTop(&b_list);
-        for (int i = 0; i < moveIndex; ++i)
+        if (b_list != NULL)
         {
-            removeLastNode(&b_list);
+
+            moveToTop(&b_list);
+
+            for (int i = 0; i < moveIndex; ++i)
+            {
+                // removeLastNode(&b_list);
+                b_list = removeLastNode(b_list);
+            }
         }
     }
 }
 
 void updateDice(s_game *game, struct Node *b_list)
 {
+
     int moveIndex = getMoveDicePosition(b_list, *game);
 
     if (moveIndex != 0)
     {
-
         game->diceInfo.availableDiceMoves = game->diceInfo.availableDiceMoves - moveIndex;
 
+        // int dice1 = game->diceInfo.dice[10];
         int dice1 = game->diceInfo.dice[0];
         int dice2 = game->diceInfo.dice[1];
 
         if (dice1 != -1 && dice2 != -1 && moveIndex != 3)
         {
-            removeLastNode(&b_list);
+            if (b_list != NULL)
+            {
+                moveToTop(&b_list);
+                b_list = removeLastNode(b_list);
+            }
         }
 
         int diceVal = game->diceInfo.dice[moveIndex - 1];
@@ -486,7 +510,7 @@ int validateNextMove(s_game *game, int move, int *currentActiveColumn, int *skip
 
     int goHome = handlePawnToHome(game, move, currentActiveColumn, action, b_list);
     if (goHome == 1)
-        return 1;
+        return 0;
     // int pawnGoToHome = game->isPawnsHome && (game->removeFurthestPawn == 1 || edge) ? 1 : 0;
 
     // if (pawnGoToHome)

@@ -17,7 +17,9 @@ int moveNext(struct Node** current);
 int movePrev(struct Node** current);
 int countDepthRecursive(struct Node* node);
 void removeFirstNodeWithValue(struct Node** head, int value);
-void removeLastNode(struct Node** head);
+struct Node* removeLastNode(struct Node* head);
+int findLevel(struct Node* head, int value);
+// void removeLastNode(struct Node** head);
 void moveToTop(struct Node** current);
 void freeList(struct Node** b_list);
 

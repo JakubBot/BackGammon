@@ -50,7 +50,7 @@ void showColDefinition()
   attroff(colClr);
   mvprintw(y + 1, x + 1, " - current column");
 
-  int possibleClr = COLOR_PAIR(FORCED_COLUMN_MOVE_ID);
+  int possibleClr = COLOR_PAIR(POSSIBLE_COLUMN_MOVE_ID);
   attron(possibleClr);
   mvprintw(y + 2, x, SQUARE);
   attroff(possibleClr);
@@ -72,8 +72,10 @@ void showTurnInfo(s_game game)
   mvprintw(POSITION_Y + 4, POSITION_X, "Moves left:");
 
   int displayPosition = 0;
+
   for (int i = 0; i < game.diceInfo.diceSize; ++i)
   {
+    // int diceMove = game.diceInfo.dice[132];
     int diceMove = game.diceInfo.dice[i];
     // if -1 we already used it, so just skip this step
     if (diceMove != -1)
@@ -82,6 +84,7 @@ void showTurnInfo(s_game game)
       displayPosition++;
     }
   }
+
   showColDefinition();
 }
 

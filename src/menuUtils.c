@@ -106,10 +106,10 @@ void getBtnElements(int btnIds[], int btnCount, s_game *game, s_btnOption btns[]
     // }
     // if (btns != NULL)
     // {
-        for (int i = 0; i < btnCount; ++i)
-        {
-            btns[i] = findBtn(data, btnIds[i], count);
-        }
+    for (int i = 0; i < btnCount; ++i)
+    {
+        btns[i] = findBtn(data, btnIds[i], count);
+    }
     // }
     // return btns;
 }
@@ -167,6 +167,9 @@ void handleInitialBtns(char action, s_game *game, int *diceSize, int btnIds[], i
         // set author btn active
         s_btnOption btn = findBtn(buttons, 2, btnCount);
         renderMenu(btnIds, btnCount, btn.id, 0, 0, diceSize, game);
+        break;
+    case 'e':
+        exit(0);
         break;
     }
 }

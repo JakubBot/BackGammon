@@ -363,6 +363,8 @@ void getPossibleMovesArray(int moveArr[4], s_game game, int availableDiceMoves)
     else
     {
         moveArr[0] = moveLeft;
+        moveArr[1] = 0;
+        moveArr[2] = 0;
     }
 }
 
@@ -654,33 +656,12 @@ int setDistancePawnSource(s_game *game, int minStep, int removeExcactDistancePaw
 
 int checkIfRemoveFurthestPawn(s_game *game)
 {
-    // min step
-    // int dice1 = game->diceInfo.dice[0];
-    // int dice2 = game->diceInfo.dice[1];
-    int minStep = getCurrentMinDiceVal(*game);
 
-    // if (dice1 == -1)
-    // {
-    //     minStep = dice2;
-    // }
-    // else if (dice2 == -1)
-    // {
-    //     minStep = dice1;
-    // }
-    // else
-    // {
-    //     minStep = min(dice1, dice2);
-    // }
+    int minStep = getCurrentMinDiceVal(*game);
 
     s_diceContainer diceC = getDiceData(*game);
 
     int whiteTurn = diceC.whiteTurn;
-
-    // int availableDiceMoves = game->diceInfo.availableDiceMoves;
-
-    // int isDoublet = game->diceInfo.isDoublet;
-    // int allNormalMovesAvailable = availableDiceMoves == 3;
-    // getPossibleMovesArray(moveArr, *game, availableDiceMoves);
 
     int distancePawn = NOT_FOUND;
 
@@ -698,38 +679,8 @@ int checkIfRemoveFurthestPawn(s_game *game)
         }
 
         distancePawn = checkCourtEnter(game, colIdx, diceC.moveArr, diceC.moves, whiteTurn);
-        // for (int k = 0; k < moves; ++k)
-        // {
-        //     int nextColIdx = getNextMoveCalculation(colIdx, moveArr[k], whiteTurn);
-        //     if (nextColIdx == BLACK_COURT || nextColIdx == WHITE_COURT)
-        //     {
-        //         hasExcactDistancePawn = colIdx;
-        //         break;
-        //     }
-        // }
     }
-    // int relativePawnPosition = whiteTurn ? (COLUMNS_COUNT - 1) - furthestPawn : furthestPawn;
 
-    // if (removeExcactDistancePawn != NOT_FOUND)
-    // {
-    //     game->board.sourceColumn = removeExcactDistancePawn;
-    //     if (whiteTurn)
-    //     {
-    //         game->board.forcedTargetColumn = BLACK_COURT;
-    //     }
-    //     else
-    //     {
-    //         game->board.forcedTargetColumn = WHITE_COURT;
-    //     }
-    //     return 1;
-    // }
-    // else if (minStep > relativePawnPosition)
-    // {
-    //     game->board.sourceColumn = furthestPawn;
-    //     game->removeFurthestPawn = 1;
-
-    //     return 1;
-    // }
     int hasDistancePawn = setDistancePawnSource(game, minStep, distancePawn);
     if (hasDistancePawn)
         return 1;
@@ -847,11 +798,16 @@ void moveRepeater(s_game *game, WINDOW *gameWin)
         handleSourceTargetMove(game, gameWin, b_list);
         movePawn(game);
 
-        renderBoard(game, gameWin, 0, 0, NULL);
+        renderBoard(game, gameWin, 0, 0, b_list);
     }
-    
-    moveToTop(&b_list);
-    freeList(&b_list);
+
+    if (b_list != NULL)
+    {
+        moveToTop(&b_list);
+        freeList(&b_list);
+
+        b_list = NULL;
+    }
 }
 
 void initializeGame(s_game *game)

@@ -131,6 +131,9 @@ int shouldUseBarPawn(s_game game)
 
 void fillBList(struct Node **b_list, s_game *game)
 {
+    if (game == NULL)
+        return;
+
     int *dice = game->diceInfo.dice;
     // initial value
     append(b_list, 0);
@@ -138,7 +141,7 @@ void fillBList(struct Node **b_list, s_game *game)
     {
         for (int i = 0; i < game->diceInfo.diceSize; ++i)
         {
-            append(b_list, dice[i] * (i + 1));
+            append(b_list, dice[0] * (i + 1));
         }
     }
     else

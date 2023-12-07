@@ -91,9 +91,11 @@ void *renderMenu(int btnIds[], int btnCount, int activeBtnId, int menuX, int men
         if (mv == -1)
             break;
     }
+
     assignIndexIdToGame(game, selectedBtn);
 
     menuAction(game, diceSize, btnIds, btnCount, selectedBtn, menuY, btns);
+
     // if (btns != NULL)
     // {
     //     free(btns);
@@ -128,6 +130,9 @@ void displayMenuBtn(int btnCount, int menuX, int menuY, int selectedBtn, s_btnOp
 
 void menuRollDiceAction(s_game *game, int *diceSize)
 {
+    if (diceSize == NULL)
+        return;
+
     rollDice(diceSize, game);
     // game->diceInfo.dice = diceRes;
 
@@ -135,7 +140,6 @@ void menuRollDiceAction(s_game *game, int *diceSize)
     // {
     //     game->diceInfo.initialDiceValues[i] = diceRes[i];
     // }
-
     int isDoublet = game->diceInfo.dice[0] == game->diceInfo.dice[1] ? 1 : 0;
     game->diceInfo.diceSize = *diceSize;
     game->diceInfo.availableDiceMoves = *diceSize + (isDoublet ? 0 : 1);

@@ -196,6 +196,7 @@ void setSelectedColumn(s_game *game, WINDOW *gameWin, struct Node *b_list, int a
         game->board.targetColumn = activeColumn;
 
         clearSidebarInfo();
+
         showTurnInfo(*game);
     }
 }
@@ -734,6 +735,32 @@ int setSourceColumn(s_game *game, WINDOW *gameWin, struct Node *b_list)
     return 1;
 }
 
+int noPawnsOnBoard(s_game game)
+{
+    int turn = getTurn(game);
+
+    for (int i = 0; i < COLUMNS_COUNT; ++i)
+    {
+        s_boardColumn currentCol = findColumnBasedOnColX(game, i);
+        vector_t_pawn pawn = currentCol.pawnIds;
+        if (pawn.count > 0 && pawn.ptr[0].color == turn)
+        {
+            return 0;
+        }
+    }
+
+    vector_t_pawn barPawn = game.board.bar.pawnIds;
+    for (int i = 0; i < barPawn.count; ++i)
+    {
+        if (barPawn.ptr[i].color == turn)
+        {
+            return 0;
+        }
+    }
+
+    return 1;
+}
+
 int checkGameEnd(s_game *game)
 {
     int whitePawns = 0;
@@ -752,11 +779,11 @@ int checkGameEnd(s_game *game)
         }
     }
     int winner = -1;
-    if (whitePawns == 15)
+    if (whitePawns == 15 || noPawnsOnBoard(*game))
     {
         winner = 1;
     }
-    else if (blackPawns == 15)
+    else if (blackPawns == 15 || noPawnsOnBoard(*game))
     {
         winner = 2;
     }
@@ -779,9 +806,6 @@ void moveRepeater(s_game *game, WINDOW *gameWin)
 
     while (game->diceInfo.availableDiceMoves > 0)
     {
-        int gameEnd = checkGameEnd(game);
-        if (gameEnd == 1)
-            break;
 
         int pawnsHome = allPawnsHome(*game);
         game->isPawnsHome = pawnsHome;
@@ -796,9 +820,14 @@ void moveRepeater(s_game *game, WINDOW *gameWin)
         }
 
         handleSourceTargetMove(game, gameWin, b_list);
+
         movePawn(game);
 
         renderBoard(game, gameWin, 0, 0, b_list);
+
+        int gameEnd = checkGameEnd(game);
+        if (gameEnd == 1)
+            break;
     }
 
     if (b_list != NULL)
@@ -854,8 +883,9 @@ void gameLoop(s_game game, WINDOW *gameWin)
         int menuIds[] = {4, 8};
         int diceSize = 0;
         hideMenu();
-        renderMenu(menuIds, sizeof(menuIds) / sizeof(menuIds[0]), 0, 0, 19, &diceSize, &game);
 
+        // w tym jest error
+        renderMenu(menuIds, sizeof(menuIds) / sizeof(menuIds[0]), 0, 0, 19, &diceSize, &game);
         curs_set(0);
 
         moveRepeater(&game, gameWin);

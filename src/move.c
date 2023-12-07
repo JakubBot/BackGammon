@@ -23,6 +23,9 @@ void capturePawn(s_game *game, int colX)
 
 void resetGameState(s_game *game)
 {
+    if (game == NULL)
+        return;
+        
     game->board.sourceColumn = -1;
     game->board.targetColumn = -1;
     game->board.isBarActive = 0;

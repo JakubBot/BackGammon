@@ -14,6 +14,9 @@ void clrButtonPrints(int posY, int nLines)
 
 void changeTurn(s_game *game)
 {
+    if (game == NULL)
+        return;
+
     if (game->turn == 'w')
     {
         game->turn = 'b';
@@ -142,4 +145,3 @@ int getPawnBarCount(s_game game)
 {
     return game.board.bar.pawnIds.count;
 }
-

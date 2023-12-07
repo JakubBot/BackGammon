@@ -2,31 +2,39 @@
 #include <stdlib.h>
 #include <string.h>
 
-typedef struct {
+typedef struct
+{
     int id;
     char color;
 } s_pawn;
 
-typedef struct {
+typedef struct
+{
     int allocated_size;
     int count;
     s_pawn *ptr;
 } vector_t_pawn;
 
-void init(vector_t_pawn *v) {
+void init(vector_t_pawn *v)
+{
     v->count = 0;
     v->allocated_size = 5;
     v->ptr = (s_pawn *)malloc(v->allocated_size * sizeof(s_pawn));
 }
 
-void cleanup(vector_t_pawn *v) {
-    free(v->ptr);
-    v->ptr = NULL;
-    v->count = 0;
-    v->allocated_size = 0;
+void cleanup(vector_t_pawn *v)
+{
+    if (v->ptr != NULL)
+    {
+        free(v->ptr);
+        v->ptr = NULL;
+        v->count = 0;
+        v->allocated_size = 0;
+    }
 }
 
-void reallocate(vector_t_pawn *v, int reallocate_size) {
+void reallocate(vector_t_pawn *v, int reallocate_size)
+{
     v->allocated_size = reallocate_size;
     s_pawn *newPtr = (s_pawn *)malloc(v->allocated_size * sizeof(s_pawn));
     memcpy(newPtr, v->ptr, v->count * sizeof(s_pawn));
@@ -34,14 +42,16 @@ void reallocate(vector_t_pawn *v, int reallocate_size) {
     v->ptr = newPtr;
 }
 
-void push_back(vector_t_pawn *v, s_pawn val) {
+void push_back(vector_t_pawn *v, s_pawn val)
+{
     if (v->count == v->allocated_size)
         reallocate(v, 2 * v->allocated_size);
     v->ptr[v->count] = val;
     v->count++;
 }
 
-s_pawn pop_back(vector_t_pawn *v) {
+s_pawn pop_back(vector_t_pawn *v)
+{
     v->count--;
     s_pawn retv = v->ptr[v->count];
 
@@ -50,11 +60,12 @@ s_pawn pop_back(vector_t_pawn *v) {
     return retv;
 }
 
-
-s_pawn erasePawn(vector_t_pawn *v, int index) {
+s_pawn erasePawn(vector_t_pawn *v, int index)
+{
     s_pawn removedPawn;
 
-    if (index < 0 || index >= v->count) {
+    if (index < 0 || index >= v->count)
+    {
         // Invalid index, return a default-initialized s_pawn or handle error as needed
         return removedPawn;
     }
@@ -62,7 +73,8 @@ s_pawn erasePawn(vector_t_pawn *v, int index) {
     removedPawn = v->ptr[index];
 
     // Shift elements to fill the gap
-    for (int i = index; i < v->count - 1; i++) {
+    for (int i = index; i < v->count - 1; i++)
+    {
         v->ptr[i] = v->ptr[i + 1];
     }
 
@@ -70,7 +82,8 @@ s_pawn erasePawn(vector_t_pawn *v, int index) {
     v->count--;
 
     // Check if reallocation is needed
-    if (4 * v->count <= v->allocated_size) {
+    if (4 * v->count <= v->allocated_size)
+    {
         reallocate(v, v->allocated_size / 2);
     }
 

@@ -91,23 +91,27 @@ void btnCont(s_game *game, s_btnOption _data[])
     }
 }
 
-s_btnOption *getBtnElements(int btnIds[], int btnCount, s_game *game)
+void getBtnElements(int btnIds[], int btnCount, s_game *game, s_btnOption btns[])
 {
     s_btnOption data[MENU_BUTTONS_COUNT];
     btnCont(game, data);
 
     int count = sizeof(data) / sizeof(data[0]);
 
-    s_btnOption *btns = malloc(btnCount * sizeof(s_btnOption));
-
-    if (btns != NULL)
-    {
+    // s_btnOption *btns = malloc(btnCount * sizeof(s_btnOption));
+    // if (btns == NULL)
+    // {
+    //     printf("Błąd alokacji pamięci.\n");
+    //     exit(1);
+    // }
+    // if (btns != NULL)
+    // {
         for (int i = 0; i < btnCount; ++i)
         {
             btns[i] = findBtn(data, btnIds[i], count);
         }
-    }
-    return btns;
+    // }
+    // return btns;
 }
 
 void handleGameReviewOption(char action, s_game *game)

@@ -75,7 +75,8 @@ void assignIndexIdToGame(s_game *game, int selectedBtn)
 void *renderMenu(int btnIds[], int btnCount, int activeBtnId, int menuX, int menuY, int *diceSize, s_game *game)
 {
     curs_set(0);
-    s_btnOption *btns = getBtnElements(btnIds, btnCount, game);
+    s_btnOption btns[btnCount];
+    getBtnElements(btnIds, btnCount, game, btns);
     int selectedBtn = activeBtnId ? activeBtnId : btnIds[0];
     int i = 0;
 
@@ -93,8 +94,10 @@ void *renderMenu(int btnIds[], int btnCount, int activeBtnId, int menuX, int men
     assignIndexIdToGame(game, selectedBtn);
 
     menuAction(game, diceSize, btnIds, btnCount, selectedBtn, menuY, btns);
-
-    free(btns);
+    // if (btns != NULL)
+    // {
+    //     free(btns);
+    // }
     return NULL;
 }
 
@@ -125,13 +128,13 @@ void displayMenuBtn(int btnCount, int menuX, int menuY, int selectedBtn, s_btnOp
 
 void menuRollDiceAction(s_game *game, int *diceSize)
 {
-    int *diceRes = (int *)rollDice(diceSize);
-    game->diceInfo.dice = diceRes;
+    rollDice(diceSize, game);
+    // game->diceInfo.dice = diceRes;
 
-    for (int i = 0; i < 2; ++i)
-    {
-        game->diceInfo.initialDiceValues[i] = diceRes[i];
-    }
+    // for (int i = 0; i < 2; ++i)
+    // {
+    //     game->diceInfo.initialDiceValues[i] = diceRes[i];
+    // }
 
     int isDoublet = game->diceInfo.dice[0] == game->diceInfo.dice[1] ? 1 : 0;
     game->diceInfo.diceSize = *diceSize;
@@ -141,8 +144,6 @@ void menuRollDiceAction(s_game *game, int *diceSize)
     clearSidebarInfo();
     showTurnInfo(*game);
 }
-
-
 
 void handleBtnAction(char action, s_game *game, int *diceSize, int btnIds[], int btnCount, s_btnOption *btns, int menuY)
 {

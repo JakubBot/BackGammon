@@ -849,6 +849,8 @@ void moveRepeater(s_game *game, WINDOW *gameWin)
 
         renderBoard(game, gameWin, 0, 0, NULL);
     }
+    
+    moveToTop(&b_list);
     freeList(&b_list);
 }
 

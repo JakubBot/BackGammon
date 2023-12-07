@@ -1,16 +1,9 @@
-//
-// Created by jakub bot on 18/11/2023.
-//
+#include "../headers/globalStructs.h"
 
 #ifndef ROLLDICE_H
 #define ROLLDICE_H
 
-// typedef struct
-// {
-//   int size;
-//   int *dice;
-// } s_dice;
-
-int *rollDice(int *diceSize);
+// int *rollDice(int *diceSize);
+void rollDice(int *diceSize, s_game *game);
 int randomNum(int min, int max);
 #endif // ROLLDICE_H

@@ -14,7 +14,8 @@ typedef struct btnOption
 } s_btnOption;
 
 int getTextLength(char *text);
-s_btnOption *getBtnElements(int btnIds[], int btnCount, s_game *game);
+void getBtnElements(int btnIds[], int btnCount, s_game *game, s_btnOption *btns);
+// s_btnOption *getBtnElements(int btnIds[], int btnCount, s_game *game);
 s_btnOption findBtn(s_btnOption *btns, int id, int btnCount);
 char *formatOptionText(s_game *game);
 void playerRoll(s_game *game, int menuY);

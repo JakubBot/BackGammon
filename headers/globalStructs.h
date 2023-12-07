@@ -48,7 +48,8 @@ typedef struct
 
 typedef struct
 {
-  int *dice;
+  int dice[4];
+  // int *dice;
   int diceSize;
   int isDoublet;
   int availableDiceMoves;

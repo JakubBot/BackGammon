@@ -5,6 +5,11 @@
 #include "../headers/globalStructs.h"
 #include "../headers/utils.h"
 #include "../headers/menuUtils.h"
+#include "../headers/menu.h"
+#include "../headers/renderGame.h"
+#include "../headers/renderGameUtils.h"
+#include "../headers/author.h"
+#include "../headers/fileActions.h"
 
 int getTextLength(char *text)
 {
@@ -132,7 +137,7 @@ void handleGameReviewOption(char action, s_game *game)
         game->gameReview.currentFilePosition = 0;
         break;
     case 'x':
-        game->gameReview.currentFilePosition = FILE_LAST_LINE;
+        game->gameReview.currentFilePosition = game->gameReview.fileLength - 2;
         break;
     case 'q':
         game->gameReview.exitGameReview = 1;

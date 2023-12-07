@@ -13,11 +13,6 @@
 
 void renderBoard(s_game *game, WINDOW *gameWin, int selectColumn, int targetColumn, struct Node *b_list);
 
-void hideMenu()
-{
-    clrButtonPrints(19, 3);
-}
-
 void initializeColumns(s_game *game)
 {
     for (int i = 0; i < COLUMNS_COUNT; ++i)
@@ -38,9 +33,9 @@ void initializeColumns(s_game *game)
     }
 }
 
-void printUpperCol(int offset_y, int offset_x, int x, int labelRowId, char *pawnLabel, int columnCount, char *label)
+void printUpperCol(int offset_y, int offset_x, int x, int labelRowId, char *pawnLabel, int colCount, char *label)
 {
-    int colElem = columnCount;
+    int col = colCount;
     x = x - (COLUMNS_COUNT / 2);
 
     for (int row = 0; row < BOARD_COLUMN_HEIGHT; ++row)
@@ -48,37 +43,27 @@ void printUpperCol(int offset_y, int offset_x, int x, int labelRowId, char *pawn
         // normal chars
         int yOffset = row + offset_y;
         int xOffset = offset_x + (x * COLUMN_WIDTH);
-        if (columnCount > 0)
+        if (colCount > 0)
         {
             mvprintw(yOffset, xOffset, pawnLabel);
-            columnCount--;
+            colCount--;
         }
         else
         {
             mvprintw(yOffset, xOffset, label);
         }
     }
-    int labelPositionY = offset_y - 2;
-    int labelPositionX = offset_x + (x * COLUMN_WIDTH);
-    mvprintw(labelPositionY, offset_x + (x * COLUMN_WIDTH), "%d", labelRowId);
 
-    if (colElem > 5)
-    {
-        mvprintw(labelPositionY - 1, labelPositionX - 1, "(%d)", colElem - 5);
-    }
-    else
-    {
-        mvprintw(labelPositionY - 1, labelPositionX - 1, "   ");
-    }
+    printUpperColAdditionalPawns(offset_y, offset_x, x, labelRowId, col);
 }
 
-void printBottomCol(int offset_y, int offset_x, int x, int labelRowId, char *pawnLabel, int columnCount, char *label, int count, int columnVerticalOffset)
+void printBottomCol(int offset_y, int offset_x, int x, int labelRowId, char *pawnLabel, int colCount, char *label, int count, int verticalOffset)
 {
     x = (COLUMNS_COUNT / 2) - x - 1;
 
     for (int row = 0; row < BOARD_COLUMN_HEIGHT; ++row)
     {
-        int yOffset = row + offset_y + columnVerticalOffset + COLUMNGAP;
+        int yOffset = row + offset_y + verticalOffset + COLUMNGAP;
         int xOffset = offset_x + (x * COLUMN_WIDTH);
         if (count > 0)
         {
@@ -90,17 +75,8 @@ void printBottomCol(int offset_y, int offset_x, int x, int labelRowId, char *paw
             mvprintw(yOffset, xOffset, pawnLabel);
         }
     }
-    int labelPositionY = BOARD_COLUMN_HEIGHT + offset_y + columnVerticalOffset + COLUMNGAP + 1;
-    int labelPositionX = offset_x + (x * COLUMN_WIDTH);
-    mvprintw(labelPositionY, offset_x + (x * COLUMN_WIDTH), "%d", labelRowId);
-    if (columnCount > 5)
-    {
-        mvprintw(labelPositionY + 1, labelPositionX - 1, "(%d)", columnCount - 5);
-    }
-    else
-    {
-        mvprintw(labelPositionY + 1, labelPositionX - 1, "   ");
-    }
+
+    printBottomColAdditionalPawns(offset_y, offset_x, x, labelRowId, colCount, verticalOffset);
 }
 
 void renderColumn(s_boardColumn boardColumn, int barOffset)
@@ -109,7 +85,6 @@ void renderColumn(s_boardColumn boardColumn, int barOffset)
     // reversed 1 means that we want to reverse column
     int offset_y = 4;
     int offset_x = 1 + barOffset;
-    int colVerticalOffset = COLUMN_WIDTH;
     char *label = (x % 2) == 1 ? rev ? "/\\" : "\\/" : "--";
 
     vector_t_pawn currCol = boardColumn.pawnIds;
@@ -120,77 +95,12 @@ void renderColumn(s_boardColumn boardColumn, int barOffset)
     int count = BOARD_COLUMN_HEIGHT - colCount;
     if (rev)
     {
-        printBottomCol(offset_y, offset_x, x, labelRowId, p_label, colCount, label, count, colVerticalOffset);
+        printBottomCol(offset_y, offset_x, x, labelRowId, p_label, colCount, label, count, COLUMN_WIDTH);
     }
     else
     {
         printUpperCol(offset_y, offset_x, x, labelRowId, p_label, colCount, label);
     }
-}
-
-int findNextLegalMove(s_game *game, char action, struct Node **b_list, int *currentActiveColumn, int *skippedColumns)
-{
-    int sourceColX = game->board.sourceColumn;
-    int whiteTurn = isWhiteTurn(*game);
-
-    struct Node *nextElement = NULL;
-
-    if (action == 'l')
-    {
-        nextElement = next(*b_list);
-        if (nextElement == NULL)
-            return 0;
-    }
-    else
-    {
-        nextElement = prev(*b_list);
-        if (nextElement == NULL)
-            return 0;
-    }
-
-    int step = nextElement->data;
-
-    int move = getNextMoveCalculation(sourceColX, step, whiteTurn);
-    int edge = (move == -1) || (move == COLUMNS_COUNT) ? 1 : 0;
-    int pawnGoToHome = game->isPawnsHome && (game->removeFurthestPawn == 1 || edge) ? 1 : 0;
-
-    if (pawnGoToHome)
-    {
-        game->board.pawnMoveToCourt = 1;
-
-        *currentActiveColumn = move;
-
-        int validMv = makeMove(b_list, action);
-
-        return 0;
-    }
-    else
-    {
-        game->board.pawnMoveToCourt = 0;
-    }
-
-    int validNext = isValidNextMove(move);
-    if (!validNext)
-        return 0;
-
-    int isValidCol = validPawnToColumnMove(game, move);
-
-    if (!isValidCol)
-    {
-        int validMv = makeMove(b_list, action);
-        *skippedColumns = *skippedColumns + 1;
-        int res = findNextLegalMove(game, action, b_list, currentActiveColumn, skippedColumns);
-        return res;
-    }
-    else
-    {
-        *skippedColumns = 0;
-    }
-
-    int validMv = makeMove(b_list, action);
-    *currentActiveColumn = move;
-
-    return 0;
 }
 
 int getDotsColor(s_game game, char activeTurn)
@@ -240,94 +150,84 @@ void barActiveDots(s_game game)
     refresh();
 }
 
-void setSelectedColumn(s_game *game, WINDOW *gameWin, struct Node *b_list, int currentActiveColumn, int selectColumn, int targetColumn)
+void updateDiceInfo(s_game *game, struct Node *b_list)
 {
+    if (game->diceInfo.isDoublet)
+    {
+        updateDiceDublet(game, b_list);
+    }
+    else
+    {
+        updateDice(game, b_list);
+    }
+}
 
+int handleReRenderBoardOnIllegalMove(s_game *game, WINDOW *gameWin, struct Node *b_list, int activeColumn, int selectColumn, int targetColumn)
+{
+    if ((game->board.forcedTargetColumn != NOT_FOUND) && (activeColumn != game->board.forcedTargetColumn))
+    {
+        moveToTop(&b_list);
+        renderBoard(game, gameWin, selectColumn, targetColumn, b_list);
+        return 1;
+    }
+    else if ((activeColumn == WHITE_COURT || activeColumn == BLACK_COURT) && game->board.pawnMoveToCourt != 1)
+    {
+        // block if pawn is on bar with source -1 or 24, he has to move it
+        renderBoard(game, gameWin, selectColumn, targetColumn, b_list);
+        return 1;
+    }
+    return 0;
+}
+
+void setSelectedColumn(s_game *game, WINDOW *gameWin, struct Node *b_list, int activeColumn, int selectColumn, int targetColumn)
+{
     if (selectColumn)
     {
-        game->board.sourceColumn = currentActiveColumn;
+        game->board.sourceColumn = activeColumn;
     }
     else if (targetColumn)
     {
-        if ((game->board.forcedTargetColumn != NOT_FOUND) && (currentActiveColumn != game->board.forcedTargetColumn))
-        {
-            moveToTop(&b_list);
-            return renderBoard(game, gameWin, selectColumn, targetColumn, b_list);
-        }
-        else if ((currentActiveColumn == -1 || currentActiveColumn == 24) && game->board.pawnMoveToCourt != 1)
-        {
-            // block if pawn is on bar with source -1 or 24, he has to move it
-            return renderBoard(game, gameWin, selectColumn, targetColumn, b_list);
-        }
-        if (game->diceInfo.isDoublet)
-        {
-            updateDiceDublet(game, b_list);
-        }
-        else
-        {
-            updateDice(game, b_list);
-        }
+        int reRender = handleReRenderBoardOnIllegalMove(game, gameWin, b_list, activeColumn, selectColumn, targetColumn);
+        if (reRender)
+            return;
 
-        game->board.targetColumn = currentActiveColumn;
+        updateDiceInfo(game, b_list);
+
+        game->board.targetColumn = activeColumn;
 
         clearSidebarInfo();
         showTurnInfo(*game);
     }
 }
 
-int handleBoardMove(s_game *game, struct Node **b_list, int selectColumn, int targetColumn, int *currentActiveColumn, int *skippedColumns)
+int handleBoardMove(s_game *game, struct Node **b_list, int selectColumn, int targetColumn, int *activeColumn, int *skippedColumns)
 {
     if (selectColumn == 1)
     {
-        int ch = getch();
-        curs_set(0);
-        if (ch == KEY_LEFT)
-        {
-            findColumnWithPawn(*game, currentActiveColumn, 'l');
-        }
-        else if (ch == KEY_RIGHT)
-        {
-            findColumnWithPawn(*game, currentActiveColumn, 'r');
-        }
-        else if (ch == 10)
-        {
-            return 0;
-        }
+        return handleBoardMoveLeft(*game, activeColumn);
     }
     else if (targetColumn == 1)
     {
-        int ch = getch();
-        curs_set(0);
-        if (ch == KEY_LEFT)
-        {
-            findNextLegalMove(game, 'l', b_list, currentActiveColumn, skippedColumns);
-        }
-        else if (ch == KEY_RIGHT)
-        {
-            findNextLegalMove(game, 'r', b_list, currentActiveColumn, skippedColumns);
-        }
-        else if (ch == 10)
-        {
-            return 0;
-        }
+        return handleBoardMoveRight(game, activeColumn, b_list, skippedColumns);
     }
     return 1;
 }
 
-void printMainBoard(s_game game, int currentActiveColumn)
+void printMainBoard(s_game game, int activeColumn)
 {
-
     for (int i = 0; i < COLUMNS_COUNT; ++i)
     {
         s_boardColumn boardColumn = game.board.columns[i];
+        int colX = boardColumn.colX;
+
         int barOffset = 0;
-        if (boardColumn.colX < 6 || boardColumn.colX > 17)
+        if (colX < 6 || colX > 17)
         {
             barOffset = 4;
         }
-        if ((boardColumn.colX == currentActiveColumn) || (boardColumn.colX == game.board.sourceColumn) || (boardColumn.colX == game.board.forcedTargetColumn))
+        if ((colX == activeColumn) || (colX == game.board.sourceColumn) || (colX == game.board.forcedTargetColumn))
         {
-            int colorPair = getClrPair(boardColumn.colX, currentActiveColumn, game.board.forcedTargetColumn);
+            int colorPair = getClrPair(colX, activeColumn, game.board.forcedTargetColumn);
             attron(COLOR_PAIR(colorPair));
             renderColumn(boardColumn, barOffset);
 
@@ -379,51 +279,63 @@ void printBarPawn(s_game game)
     }
 }
 
-void setDefaultActiveColumn(s_game game, int *currentActiveColumn, int targetColumn, int selectColumn)
+void setDefaultActiveColumn(s_game game, int *activeColumn, int targetColumn, int selectColumn)
 {
-    if (targetColumn && *currentActiveColumn == INITIAL_ACTIVE_COLUMN)
+    if (targetColumn && *activeColumn == INITIAL_ACTIVE_COLUMN)
     {
-        *currentActiveColumn = game.board.sourceColumn;
+        *activeColumn = game.board.sourceColumn;
     }
-    else if (selectColumn && *currentActiveColumn == INITIAL_ACTIVE_COLUMN)
+    else if (selectColumn && *activeColumn == INITIAL_ACTIVE_COLUMN)
     {
-        findColumnWithPawn(game, currentActiveColumn, ' ');
+        findColumnWithPawn(game, activeColumn, ' ');
     }
+}
+
+void printBoard(s_game game, WINDOW *gameWin, int activeColumn)
+{
+    barActiveDots(game);
+
+    printMainBoard(game, activeColumn);
+
+    printBar(game);
+
+    printBarPawn(game);
+
+    wrefresh(gameWin);
 }
 
 void renderBoard(s_game *game, WINDOW *gameWin, int selectColumn, int targetColumn, struct Node *b_list)
 {
-    // currentActiveColumn represents column(colX) that is active
-    int currentActiveColumn = INITIAL_ACTIVE_COLUMN;
+    int activeColumn = INITIAL_ACTIVE_COLUMN;
 
-    int skippedColumns = 0;
+    int skipCol = 0;
     do
     {
-        setDefaultActiveColumn(*game, &currentActiveColumn, targetColumn, selectColumn);
+        setDefaultActiveColumn(*game, &activeColumn, targetColumn, selectColumn);
 
-        barActiveDots(*game);
+        printBoard(*game, gameWin, activeColumn);
+        // barActiveDots(*game);
 
-        printMainBoard(*game, currentActiveColumn);
+        // printMainBoard(*game, activeColumn);
 
-        // render bar that is between 6 and 7 column
-        printBar(*game);
+        // printBar(*game);
 
-        printBarPawn(*game);
+        // printBarPawn(*game);
 
-        wrefresh(gameWin);
+        // wrefresh(gameWin);
 
-        int action = handleBoardMove(game, &b_list, selectColumn, targetColumn, &currentActiveColumn, &skippedColumns);
+        int action = handleBoardMove(game, &b_list, selectColumn, targetColumn, &activeColumn, &skipCol);
         if (action == 0)
             break;
 
     } while (selectColumn || targetColumn);
 
-    for (int i = 0; i < skippedColumns; ++i)
+    for (int i = 0; i < skipCol; ++i)
     {
         movePrev(&b_list);
     }
 
-    setSelectedColumn(game, gameWin, b_list, currentActiveColumn, selectColumn, targetColumn);
+    setSelectedColumn(game, gameWin, b_list, activeColumn, selectColumn, targetColumn);
 }
 
 void getPossibleMovesArray(int moveArr[4], s_game game, int availableDiceMoves)
@@ -798,11 +710,10 @@ void moveRepeater(s_game *game, WINDOW *gameWin)
 
     while (game->diceInfo.availableDiceMoves > 0)
     {
-        int gameEnded = checkGameEnd(game);
-        if (gameEnded == 1)
-        {
+        int gameEnd = checkGameEnd(game);
+        if (gameEnd == 1)
             break;
-        }
+
         int pawnsHome = allPawnsHome(*game);
         game->isPawnsHome = pawnsHome;
 
@@ -810,23 +721,11 @@ void moveRepeater(s_game *game, WINDOW *gameWin)
         if (hasLegalMove == NO_MOVE)
         {
             // show invalid move
-            hideMenu();
-            int invalidMvId[] = {9};
-            renderMenu(invalidMvId, sizeof(invalidMvId) / sizeof(invalidMvId[0]), 0, 0, 19, NULL, game);
+            showInvalidMenu(game);
             break;
         }
 
-        // source col
-        setSourceColumn(game, gameWin, b_list);
-
-        hideMenu();
-        // target col
-        int targetIds[] = {6};
-        // int targetIds[] = {6, 8};
-        renderMenu(targetIds, sizeof(targetIds) / sizeof(targetIds[0]), 0, 0, 19, NULL, game);
-        renderBoard(game, gameWin, 0, 1, b_list);
-        refresh();
-
+        handleSourceTargetMove(game, gameWin, b_list);
         movePawn(game);
 
         renderBoard(game, gameWin, 0, 0, NULL);
@@ -836,48 +735,25 @@ void moveRepeater(s_game *game, WINDOW *gameWin)
 
 void initializeGame(s_game *game)
 {
-    FILE *file = NULL;
-    // FILE *file = fopen(CURRENT_GAME, "a");
-    // fopen(CURRENT_GAME, "w");
-    if (game->gameLoadedFromFile == 1)
-    {
-        file = fopen(CURRENT_GAME, "a");
-    }
-    else
-    {
-        file = fopen(CURRENT_GAME, "w");
-    }
-    if (file == NULL)
-    {
-        mvprintw(0, 0, "Error while opening file");
-    }
 
-    game->file = file;
-
+    initializeFile(game);
     game->turn = 'w';
     game->initialDiceValueW = -1;
     game->initialDiceValueB = -1;
 
-    game->board.sourceColumn = -1;
-    game->board.targetColumn = -1;
-
-    game->board.forcedTargetColumn = NOT_FOUND;
-    vector_t_pawn *barPawn = &game->board.bar.pawnIds;
-
-    init(barPawn);
-
-    game->board.isBarActive = 0;
+    initializeBoardData(game);
 
     game->removeFurthestPawn = 0;
 
     game->endGame.points = 0;
     game->endGame.winner = 0;
 
-    game->gameReview.exitGameReview = 0;
-    game->gameReview.currentFilePosition = 1;
-    game->gameReview.fileLength = 0;
-
     game->currentMenuBtnIndex = 0;
+
+    initializeGameReview(game);
+
+    vector_t_pawn *barPawn = &game->board.bar.pawnIds;
+    init(barPawn);
 
     vector_t_pawn *courtPawns = &game->courtPawns;
     init(courtPawns);
@@ -961,27 +837,7 @@ void gameReview()
     int fileLength = countLines(file);
     game.gameReview.fileLength = fileLength;
 
-    int stopLoop = 0;
-    curs_set(0);
-
-    int menuIds[] = {12, 13, 14, 15, 16};
-    hideMenu();
-
-    while (1)
-    {
-
-        renderMenu(menuIds, sizeof(menuIds) / sizeof(menuIds[0]), game.currentMenuBtnIndex, 0, 19, NULL, &game);
-        if (game.gameReview.exitGameReview == 1)
-        {
-            break;
-        }
-        int currentPosition = game.gameReview.currentFilePosition;
-        loadFile(&game, currentPosition);
-
-        renderBoard(&game, gameWin, 0, 0, NULL);
-        refresh();
-        wrefresh(gameWin);
-    }
+    showGameReviewOptions(&game, gameWin);
 
     delwin(gameWin);
 }

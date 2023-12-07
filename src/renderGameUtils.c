@@ -8,6 +8,15 @@
 #include "../headers/utils.h"
 #include "../headers/bidirectionalList.h"
 #include "../headers/fileActions.h"
+#include "../headers/menu.h"
+#include "../headers/renderGame.h"
+
+int findNextLegalMove(s_game *game, char action, struct Node **b_list, int *currentActiveColumn, int *skippedColumns);
+
+void hideMenu()
+{
+    clrButtonPrints(19, 3);
+}
 
 void clearGameState(s_game *game)
 {
@@ -299,4 +308,302 @@ int getClrPair(int colX, int currentActiveColumn, int forcedTargetColumn)
     {
         return POSSIBLE_COLUMN_MOVE_ID;
     }
+}
+
+void showGameReviewOptions(s_game *game, WINDOW *gameWin)
+{
+
+    int stopLoop = 0;
+    curs_set(0);
+
+    int menuIds[] = {12, 13, 14, 15, 16};
+    hideMenu();
+    while (1)
+    {
+
+        renderMenu(menuIds, sizeof(menuIds) / sizeof(menuIds[0]), game->currentMenuBtnIndex, 0, 19, NULL, game);
+        if (game->gameReview.exitGameReview == 1)
+        {
+            break;
+        }
+        int currentPosition = game->gameReview.currentFilePosition;
+        loadFile(game, currentPosition);
+
+        renderBoard(game, gameWin, 0, 0, NULL);
+        refresh();
+        wrefresh(gameWin);
+    }
+}
+
+void initializeFile(s_game *game)
+{
+    FILE *file = NULL;
+    if (game->gameLoadedFromFile == 1)
+    {
+        file = fopen(CURRENT_GAME, "a");
+    }
+    else
+    {
+        file = fopen(CURRENT_GAME, "w");
+    }
+    if (file == NULL)
+    {
+        mvprintw(0, 0, "Error while opening file");
+    }
+
+    game->file = file;
+}
+
+void initializeGameReview(s_game *game)
+{
+    game->gameReview.exitGameReview = 0;
+    game->gameReview.currentFilePosition = 1;
+    game->gameReview.fileLength = 0;
+}
+
+void initializeBoardData(s_game *game)
+{
+    game->board.sourceColumn = -1;
+    game->board.targetColumn = -1;
+
+    game->board.forcedTargetColumn = NOT_FOUND;
+
+    game->board.isBarActive = 0;
+}
+
+void showInvalidMenu(s_game *game)
+{
+    hideMenu();
+    int invalidMvId[] = {9};
+    renderMenu(invalidMvId, sizeof(invalidMvId) / sizeof(invalidMvId[0]), 0, 0, 19, NULL, game);
+}
+
+void handleSourceTargetMove(s_game *game, WINDOW *gameWin, struct Node *b_list)
+{
+    // source col
+    setSourceColumn(game, gameWin, b_list);
+
+    hideMenu();
+    // target col
+    int targetIds[] = {6};
+    renderMenu(targetIds, sizeof(targetIds) / sizeof(targetIds[0]), 0, 0, 19, NULL, game);
+    renderBoard(game, gameWin, 0, 1, b_list);
+    refresh();
+}
+
+void printUpperColAdditionalPawns(int offset_y, int offset_x, int x, int labelRowId, int col)
+{
+    int _y = offset_y - 2;
+    int _x = offset_x + (x * COLUMN_WIDTH);
+    mvprintw(_y, _x, "%d", labelRowId);
+
+    if (col > 5)
+        mvprintw(_y - 1, _x - 1, "(%d)", col - 5);
+    else
+        mvprintw(_y - 1, _x - 1, "   ");
+}
+
+void printBottomColAdditionalPawns(int offset_y, int offset_x, int x, int labelRowId, int colCount, int verticalOffset)
+{
+    int _y = BOARD_COLUMN_HEIGHT + offset_y + verticalOffset + COLUMNGAP + 1;
+    int _x = offset_x + (x * COLUMN_WIDTH);
+    mvprintw(_y, _x, "%d", labelRowId);
+    if (colCount > 5)
+    {
+        mvprintw(_y + 1, _x - 1, "(%d)", colCount - 5);
+    }
+    else
+    {
+        mvprintw(_y + 1, _x - 1, "   ");
+    }
+}
+
+int handleBoardMoveLeft(s_game game, int *currentActiveColumn)
+{
+    int ch = getch();
+    curs_set(0);
+    if (ch == KEY_LEFT)
+    {
+        findColumnWithPawn(game, currentActiveColumn, 'l');
+    }
+    else if (ch == KEY_RIGHT)
+    {
+        findColumnWithPawn(game, currentActiveColumn, 'r');
+    }
+    else if (ch == 10)
+    {
+        return 0;
+    }
+    return 1;
+}
+int handleBoardMoveRight(s_game *game, int *currentActiveColumn, struct Node **b_list, int *skippedColumns)
+{
+    int ch = getch();
+    curs_set(0);
+    if (ch == KEY_LEFT)
+    {
+        findNextLegalMove(game, 'l', b_list, currentActiveColumn, skippedColumns);
+    }
+    else if (ch == KEY_RIGHT)
+    {
+        findNextLegalMove(game, 'r', b_list, currentActiveColumn, skippedColumns);
+    }
+    else if (ch == 10)
+    {
+        return 0;
+    }
+    return 1;
+}
+
+int isEdge(int move)
+{
+    return (move == -1) || (move == COLUMNS_COUNT) ? 1 : 0;
+}
+
+int handlePawnToHome(s_game *game, int move, int *currentActiveColumn, char action, struct Node **b_list)
+{
+    int edge = isEdge(move);
+
+    int pawnGoToHome = game->isPawnsHome && (game->removeFurthestPawn == 1 || edge) ? 1 : 0;
+    if (pawnGoToHome)
+    {
+        game->board.pawnMoveToCourt = 1;
+
+        *currentActiveColumn = move;
+
+        int validMv = makeMove(b_list, action);
+
+        return 1;
+    }
+    else
+    {
+        game->board.pawnMoveToCourt = 0;
+    }
+    return 0;
+}
+
+int validateNextMove(s_game *game, int move, int whiteTurn, int *currentActiveColumn, int *skippedColumns, char action, struct Node **b_list, int sourceColX, int step)
+{
+
+    int goHome = handlePawnToHome(game, move, currentActiveColumn, action, b_list);
+    if (goHome == 1)
+        return 1;
+    // int pawnGoToHome = game->isPawnsHome && (game->removeFurthestPawn == 1 || edge) ? 1 : 0;
+
+    // if (pawnGoToHome)
+    // {
+    //     game->board.pawnMoveToCourt = 1;
+
+    //     *currentActiveColumn = move;
+
+    //     int validMv = makeMove(b_list, action);
+
+    //     return 0;
+    // }
+    // else
+    // {
+    //     game->board.pawnMoveToCourt = 0;
+    // }
+
+    int validNext = isValidNextMove(move);
+    if (!validNext)
+        return 0;
+
+    int isValidCol = validPawnToColumnMove(game, move);
+
+    if (!isValidCol)
+    {
+        int validMv = makeMove(b_list, action);
+        *skippedColumns = *skippedColumns + 1;
+        int res = findNextLegalMove(game, action, b_list, currentActiveColumn, skippedColumns);
+        return res;
+    }
+    else
+    {
+        *skippedColumns = 0;
+    }
+    return 1;
+}
+
+struct Node *getListElement(char action, struct Node **b_list, int *currentActiveColumn, int *skippedColumns)
+{
+    if (action == 'l')
+    {
+        return next(*b_list);
+    }
+    else
+    {
+        return prev(*b_list);
+    }
+}
+
+int findNextLegalMove(s_game *game, char action, struct Node **b_list, int *currentActiveColumn, int *skippedColumns)
+{
+    int sCol = game->board.sourceColumn;
+    int whiteTurn = isWhiteTurn(*game);
+
+    struct Node *nextElement = getListElement(action, b_list, currentActiveColumn, skippedColumns);
+    if (nextElement == NULL)
+        return 0;
+
+    // if (action == 'l')
+    // {
+    //     nextElement = next(*b_list);
+    //     if (nextElement == NULL)
+    //         return 0;
+    // }
+    // else
+    // {
+    //     nextElement = prev(*b_list);
+    //     if (nextElement == NULL)
+    //         return 0;
+    // }
+
+    int step = nextElement->data;
+    int move = getNextMoveCalculation(sCol, step, whiteTurn);
+
+    int valid = validateNextMove(game, move, whiteTurn, currentActiveColumn, skippedColumns, action, b_list, sCol, step);
+    if (valid == 0)
+        return 0;
+    // int move = getNextMoveCalculation(sourceColX, step, whiteTurn);
+    // int edge = isEdge(move);
+    // int pawnGoToHome = game->isPawnsHome && (game->removeFurthestPawn == 1 || edge) ? 1 : 0;
+
+    // if (pawnGoToHome)
+    // {
+    //     game->board.pawnMoveToCourt = 1;
+
+    //     *currentActiveColumn = move;
+
+    //     int validMv = makeMove(b_list, action);
+
+    //     return 0;
+    // }
+    // else
+    // {
+    //     game->board.pawnMoveToCourt = 0;
+    // }
+
+    // int validNext = isValidNextMove(move);
+    // if (!validNext)
+    //     return 0;
+
+    // int isValidCol = validPawnToColumnMove(game, move);
+
+    // if (!isValidCol)
+    // {
+    //     int validMv = makeMove(b_list, action);
+    //     *skippedColumns = *skippedColumns + 1;
+    //     int res = findNextLegalMove(game, action, b_list, currentActiveColumn, skippedColumns);
+    //     return res;
+    // }
+    // else
+    // {
+    //     *skippedColumns = 0;
+    // }
+
+    makeMove(b_list, action);
+    *currentActiveColumn = move;
+
+    return 0;
 }

@@ -20,5 +20,19 @@ int getNextMoveCalculation(int firstVal, int secondVal, int whiteTurn);
 int makeMove(struct Node **b_list, char action);
 int isValidNextMove(int move);
 int getClrPair(int colX, int currentActiveColumn, int forcedTargetColumn);
+void showGameReviewOptions(s_game *game, WINDOW *gameWin);
+void initializeBoardData(s_game *game);
+void initializeGameReview(s_game *game);
+void initializeFile(s_game *game);
+void hideMenu();
+void handleSourceTargetMove(s_game *game, WINDOW *gameWin, struct Node *b_list);
+void showInvalidMenu(s_game *game);
+void printBottomColAdditionalPawns(int offset_y, int offset_x, int x, int labelRowId, int colCount, int verticalOffset);
+void printUpperColAdditionalPawns(int offset_y, int offset_x, int x, int labelRowId, int col);
+int handleBoardMoveRight(s_game *game, int *currentActiveColumn, struct Node **b_list, int *skippedColumns);
+int handleBoardMoveLeft(s_game game, int *currentActiveColumn);
+struct Node *getListElement(char action, struct Node **b_list, int *currentActiveColumn, int *skippedColumns);
+int handlePawnToHome(s_game *game, int move, int *currentActiveColumn, char action, struct Node **b_list);
+
 
 #endif //BACKGAMMON2_RENDERGAMEUTILS_H

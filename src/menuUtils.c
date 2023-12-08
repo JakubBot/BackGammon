@@ -1,7 +1,6 @@
-//
-// Created by jakub bot on 30/11/2023.
-//
+#include <stdio.h>
 #include <stdlib.h>
+#include "string.h"
 #include "../headers/globalStructs.h"
 #include "../headers/utils.h"
 #include "../headers/menuUtils.h"
@@ -35,37 +34,45 @@ s_btnOption findBtn(s_btnOption *btns, int id, int btnCount)
 
 char *formatOptionText(s_game *game)
 {
+    static char text[50];
     if (game == NULL)
         return "";
-    // Przykładowa logika zależna od zmiennej startingDice
+
     if (game->turn == 'w')
     {
-        return "Player 1 rolls";
+        sprintf(text, "%s rolls", game->usersData.player1.name);
+        return text;
     }
     else
     {
-        return "Player 2 rolls";
+        sprintf(text, "%s rolls", game->usersData.player2.name);
+        return text;
     }
 }
 
 char *formatGameWinnerText(s_game *game)
 {
+    static char text[50];
+
     if (game == NULL)
         return "";
 
     if (game->endGame.winner == 1)
     {
-        return "Player 1 wins";
+        sprintf(text, "%s wins", game->usersData.player1.name);
+        return text;
     }
     else if (game->endGame.winner == 2)
     {
-        return "Player 2 wins";
+        sprintf(text, "%s wins", game->usersData.player2.name);
+        return text;
     }
     return "";
 }
 
 void btnCont(s_game *game, s_btnOption _data[])
 {
+
     s_btnOption data[] = {
         {"Start", 0, 's'},
         {"Load Game", 1, 'l'},

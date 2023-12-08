@@ -13,6 +13,9 @@
     "menu.h": "c",
     "rendergameutils.h": "c",
     "fileactions.h": "c",
-    "menuutils.h": "c"
+    "menuutils.h": "c",
+    "stdio.h": "c",
+    "author.h": "c",
+    "string.h": "c"
   }
 }

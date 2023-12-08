@@ -19,8 +19,13 @@
 
 #define CURRENT_GAME "currentGame.txt"
 #define SAVED_GAME "savedGame.txt"
+#define USERS "users.txt"
 
 #define BAR_COLUMN_HEIGHT ((MAX_PAWN_ON_COL * 2) + COLUMNGAP)
+
+#define MAX_NAME_LENGTH 100
+
+#define MAX_USERS_COUNT 100
 
 typedef struct
 {
@@ -79,6 +84,20 @@ typedef struct
   // int availableDiceMoves;
   // int allNormalMovesAvailable;
 } s_diceContainer;
+
+typedef struct
+{
+  char name[MAX_NAME_LENGTH];
+  int score;
+} s_player;
+typedef struct
+{
+  s_player player1;
+  s_player player2;
+  s_player allPlayers[MAX_USERS_COUNT];
+  int userCount;
+  int firstPlayerSelects;
+} s_users;
 typedef struct
 {
   int initialDiceValueW;
@@ -99,6 +118,8 @@ typedef struct
   s_gameReview gameReview;
 
   int currentMenuBtnIndex;
+
+  s_users usersData;
 } s_game;
 
 #endif // GLOBALSTRUCTS_H

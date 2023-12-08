@@ -10,6 +10,7 @@
 #include "../headers/bidirectionalList.h"
 #include "../headers/renderGameUtils.h"
 #include "../headers/fileActions.h"
+#include "../headers/hallOfFame.h"
 
 void renderBoard(s_game *game, WINDOW *gameWin, int selectColumn, int targetColumn, struct Node *b_list);
 
@@ -856,6 +857,8 @@ void initializeGame(s_game *game)
 
     game->currentMenuBtnIndex = 0;
 
+    game->usersData.firstPlayerSelects = 1;
+
     initializeGameReview(game);
 
     vector_t_pawn *barPawn = &game->board.bar.pawnIds;
@@ -966,6 +969,9 @@ void renderGame(int loadFromFile)
         updateGameFile(1, game);
         loadFile(&game, FILE_LAST_LINE);
     }
+    curs_set(0);
+
+    selectsUserAccount(&game);
 
     WINDOW *gameWin = boardInitialization(&game);
 

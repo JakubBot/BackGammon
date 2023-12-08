@@ -4,5 +4,5 @@
 #define HALLOFFAME_H
 
 void selectsUserAccount(s_game *game);
-
+void updateWinnerScore(s_game *game);
 #endif // HALLOFFAME_H

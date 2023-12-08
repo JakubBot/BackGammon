@@ -37,5 +37,6 @@ int checkGameTurnPawns(s_boardColumn currentColumn, char color);
 void printSelectPawn(s_game *game, WINDOW *gameWin);
 int checkCourtEnter(s_game *game, int colIdx, int *moveArr, int moves, int whiteTurn);
 int getCurrentMinDiceVal(s_game game);
+void showEndGameInfo(s_game game);
 
 #endif // BACKGAMMON2_RENDERGAMEUTILS_H

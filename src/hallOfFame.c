@@ -94,10 +94,6 @@ void assignUserData(s_game *game, s_player *user)
 
     game->usersData.player2.score = user->score;
   }
-  refresh();
-  mvprintw(15, 20, "dane %s", user->name);
-  mvprintw(16, 20, "player1 %s", game->usersData.player1.name);
-  refresh();
 }
 
 void getUserName(s_game *game)
@@ -135,7 +131,7 @@ void getUserName(s_game *game)
   noecho();
 }
 
-void selectsUserAccount(s_game *game)
+void fetchUsers(s_game *game)
 {
   FILE *file = fopen(USERS, "r");
   if (file == NULL)
@@ -160,11 +156,41 @@ void selectsUserAccount(s_game *game)
 
   for (int i = 0; i < userCount; ++i)
   {
-
     game->usersData.allPlayers[i] = users[i];
   }
-
   game->usersData.userCount = userCount;
+}
+
+void selectsUserAccount(s_game *game)
+{
+  // FILE *file = fopen(USERS, "r");
+  // if (file == NULL)
+  // {
+  //   return;
+  // }
+
+  // s_player users[MAX_USERS_COUNT];
+
+  // int userCount = 0;
+  // while (fscanf(file, "%s %d", users[userCount].name, &users[userCount].score) == 2)
+  // {
+  //   userCount++;
+
+  //   if (userCount >= MAX_USERS_COUNT)
+  //   {
+  //     fprintf(stderr, "Przekroczono maksymalną liczbę użytkowników\n");
+  //     break;
+  //   }
+  // }
+  // fclose(file);
+
+  // for (int i = 0; i < userCount; ++i)
+  // {
+  //   game->usersData.allPlayers[i] = users[i];
+  // }
+  // game->usersData.userCount = userCount;
+  fetchUsers(game);
+
   printPossibleUsers(*game);
   getUserName(game);
 
@@ -176,4 +202,46 @@ void selectsUserAccount(s_game *game)
     selectsUserAccount(game);
   }
   clearTerminal();
+}
+
+void updateCurrentSavedUser(s_game *game)
+{
+  if (game->endGame.winner == 1)
+  {
+    game->usersData.player1.score = game->usersData.player1.score + 1;
+  }
+  else
+  {
+    game->usersData.player2.score = game->usersData.player2.score + 1;
+  }
+}
+
+void updateWinnerScore(s_game *game)
+{
+  int additionalPoints = 1;
+  s_player *winner = game->endGame.winner == 1 ? &game->usersData.player1 : &game->usersData.player2;
+
+  FILE *file = fopen(USERS, "w");
+  if (file == NULL)
+  {
+    return;
+  }
+
+  s_player *users = game->usersData.allPlayers;
+  int userCount = game->usersData.userCount;
+
+  for (int i = 0; i < userCount; ++i)
+  {
+    if (strcmp(users[i].name, winner->name) == 0)
+    {
+      fprintf(file, "%s %d\n", users[i].name, users[i].score + additionalPoints);
+      continue;
+    }
+    fprintf(file, "%s %d\n", users[i].name, users[i].score);
+  }
+  fclose(file);
+
+  fetchUsers(game);
+
+  updateCurrentSavedUser(game);
 }

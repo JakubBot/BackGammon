@@ -64,7 +64,6 @@ typedef struct
 typedef struct
 {
   int winner;
-  int points;
 } s_endGame;
 
 typedef struct

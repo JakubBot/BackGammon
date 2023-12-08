@@ -793,8 +793,13 @@ int checkGameEnd(s_game *game)
     {
         game->endGame.winner = winner;
         int gameEndedId[] = {10};
-        hideMenu();
+        // hideMenu();
+        clrButtonPrints(2, 30);
+        refresh();
+        updateWinnerScore(game);
+        showEndGameInfo(*game);
         renderMenu(gameEndedId, sizeof(gameEndedId) / sizeof(gameEndedId[0]), 0, 0, 19, NULL, game);
+
         return 1;
     }
     return 0;
@@ -852,7 +857,6 @@ void initializeGame(s_game *game)
 
     game->removeFurthestPawn = 0;
 
-    game->endGame.points = 0;
     game->endGame.winner = 0;
 
     game->currentMenuBtnIndex = 0;
@@ -989,4 +993,8 @@ void renderGame(int loadFromFile)
         fclose(game.file);
     }
     delwin(gameWin);
+
+    if (game.endGame.winner)
+    {
+    }
 }

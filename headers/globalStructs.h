@@ -79,9 +79,6 @@ typedef struct
   int whiteTurn;
   int moves;
   int moveArr[4];
-  // int isDoublet;
-  // int availableDiceMoves;
-  // int allNormalMovesAvailable;
 } s_diceContainer;
 
 typedef struct
@@ -103,8 +100,6 @@ typedef struct
   int initialDiceValueB;
   char turn;
   s_board board;
-  // s_pawn wPawns[PAWNS_COUNT];
-  // s_pawn bPawns[PAWNS_COUNT];
   vector_t_pawn courtPawns;
   s_diceInfo diceInfo;
   int isPawnsHome;

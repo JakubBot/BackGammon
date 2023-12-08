@@ -683,6 +683,13 @@ int getCurrentMinDiceVal(s_game game)
     return minStep;
 }
 
+void printfUserData(char player[], char name[], int score, int basePosY)
+{
+    mvprintw(basePosY, 0, "%s", player);
+    mvprintw(basePosY + 1, 0, "- nazwa: %s", name);
+    mvprintw(basePosY + 2, 0, "- punkty: %d", score);
+}
+
 void showEndGameInfo(s_game game)
 {
     int basePosX = 0;
@@ -693,12 +700,7 @@ void showEndGameInfo(s_game game)
 
     mvprintw(basePosY + 4, 0, "Aktualne dane: ");
 
-    mvprintw(basePosY + 6, 0, "Gracz 1: ");
-    mvprintw(basePosY + 7, 0, "- nazwa: %s", game.usersData.player1.name);
-    mvprintw(basePosY + 8, 0, "- punkty: %d", game.usersData.player1.score);
+    printfUserData("Gracz 1: ", game.usersData.player1.name, game.usersData.player1.score, 6);
 
-    mvprintw(basePosY + 10, 0, "Gracz 2: ");
-    mvprintw(basePosY + 11, 0, "- nazwa: %s", game.usersData.player2.name);
-    mvprintw(basePosY + 12, 0, "- punkty: %d", game.usersData.player2.score);
-
+    printfUserData("Gracz 2: ", game.usersData.player2.name, game.usersData.player2.score, 10);
 }

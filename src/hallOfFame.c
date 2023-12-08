@@ -23,9 +23,8 @@ s_player *findUser(s_game game, char userName[])
   return NULL;
 }
 
-void printPossibleUsers(s_game game)
+void headerToSelectUsers(s_game game)
 {
-  refresh();
   mvprintw(USER_WINDOW_Y, 0, "Select(type) your account, or to create new one write 'new'");
   if (game.usersData.firstPlayerSelects)
   {
@@ -35,6 +34,21 @@ void printPossibleUsers(s_game game)
   {
     mvprintw(USER_WINDOW_Y + 2, 0, "User 2");
   }
+}
+
+void printPossibleUsers(s_game game)
+{
+  refresh();
+  // mvprintw(USER_WINDOW_Y, 0, "Select(type) your account, or to create new one write 'new'");
+  // if (game.usersData.firstPlayerSelects)
+  // {
+  //   mvprintw(USER_WINDOW_Y + 2, 0, "User 1");
+  // }
+  // else
+  // {
+  //   mvprintw(USER_WINDOW_Y + 2, 0, "User 2");
+  // }
+  headerToSelectUsers(game);
   s_player *users = game.usersData.allPlayers;
   int userCount = game.usersData.userCount;
 

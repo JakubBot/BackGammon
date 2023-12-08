@@ -792,13 +792,11 @@ int checkGameEnd(s_game *game)
     if (winner != -1)
     {
         game->endGame.winner = winner;
-        int gameEndedId[] = {10};
-        // hideMenu();
+        int endId[] = {10};
         clrButtonPrints(2, 30);
-        refresh();
         updateWinnerScore(game);
         showEndGameInfo(*game);
-        renderMenu(gameEndedId, sizeof(gameEndedId) / sizeof(gameEndedId[0]), 0, 0, 19, NULL, game);
+        renderMenu(endId, sizeof(endId) / sizeof(endId[0]), 0, 0, 19, NULL, game);
 
         return 1;
     }
@@ -967,15 +965,17 @@ void renderGame(int loadFromFile)
     game.gameLoadedFromFile = loadFromFile == 1 ? 1 : 0;
 
     initializeGame(&game);
+    curs_set(0);
 
     if (loadFromFile == 1)
     {
         updateGameFile(1, game);
         loadFile(&game, FILE_LAST_LINE);
     }
-    curs_set(0);
-
-    selectsUserAccount(&game);
+    else
+    {
+        selectsUserAccount(&game);
+    }
 
     WINDOW *gameWin = boardInitialization(&game);
 
@@ -993,8 +993,4 @@ void renderGame(int loadFromFile)
         fclose(game.file);
     }
     delwin(gameWin);
-
-    if (game.endGame.winner)
-    {
-    }
 }

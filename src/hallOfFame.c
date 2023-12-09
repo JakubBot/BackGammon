@@ -3,6 +3,7 @@
 #include "stdio.h"
 #include "string.h"
 #include "../headers/globalStructs.h"
+#include "../headers/utils.h"
 
 #define USER_WINDOW_X 0
 #define USER_WINDOW_Y 2
@@ -177,32 +178,6 @@ void fetchUsers(s_game *game)
 
 void selectsUserAccount(s_game *game)
 {
-  // FILE *file = fopen(USERS, "r");
-  // if (file == NULL)
-  // {
-  //   return;
-  // }
-
-  // s_player users[MAX_USERS_COUNT];
-
-  // int userCount = 0;
-  // while (fscanf(file, "%s %d", users[userCount].name, &users[userCount].score) == 2)
-  // {
-  //   userCount++;
-
-  //   if (userCount >= MAX_USERS_COUNT)
-  //   {
-  //     fprintf(stderr, "Przekroczono maksymalną liczbę użytkowników\n");
-  //     break;
-  //   }
-  // }
-  // fclose(file);
-
-  // for (int i = 0; i < userCount; ++i)
-  // {
-  //   game->usersData.allPlayers[i] = users[i];
-  // }
-  // game->usersData.userCount = userCount;
   fetchUsers(game);
 
   printPossibleUsers(*game);
@@ -218,21 +193,80 @@ void selectsUserAccount(s_game *game)
   clearTerminal();
 }
 
-void updateCurrentSavedUser(s_game *game)
+void updateCurrentSavedUser(s_game *game, int points)
 {
   if (game->endGame.winner == 1)
   {
-    game->usersData.player1.score = game->usersData.player1.score + 1;
+    game->usersData.player1.score = game->usersData.player1.score + points;
   }
   else
   {
-    game->usersData.player2.score = game->usersData.player2.score + 1;
+    game->usersData.player2.score = game->usersData.player2.score + points;
   }
+}
+
+int checkIfHasOppositePawnsOnVector(vector_t_pawn pawns, int whiteTurn)
+{
+
+  int hasOpposite = 0;
+  for (int i = 0; i < pawns.count; ++i)
+  {
+
+    if ((pawns.ptr[i].color == 'w' && !whiteTurn) || (pawns.ptr[i].color == 'b' && whiteTurn))
+    {
+      hasOpposite = 1;
+      break;
+    }
+  }
+  return hasOpposite;
+}
+
+int getPoints(s_game game)
+{
+  char turn = getTurn(game);
+  // char turn = getTurn(game);
+  int whiteTurn = isWhiteTurn(game);
+
+  // checking opposite bar pawns
+  // vector_t_pawn barPawns = game.board.bar.pawnIds;
+  // int hasOppositeBarPawns = 0;
+  // for (int i = 0; i < barPawns.count; ++i)
+  // {
+
+  //   if ((barPawns.ptr[i].color == 'w' && !whiteTurn) || (barPawns.ptr[i].color == 'b' && whiteTurn))
+  //   {
+  //     hasOppositeBarPawns = 1;
+  //   }
+  // }
+  int hasBarPawns = checkIfHasOppositePawnsOnVector(game.board.bar.pawnIds, whiteTurn);
+
+  // checking opposite court pawns
+  // vector_t_pawn courtPawns = game.courtPawns;
+  // int hasOppositeCourtPawns = 0;
+  // for (int i = 0; i < courtPawns.count; ++i)
+  // {
+
+  //   if ((courtPawns.ptr[i].color == 'w' && !whiteTurn) || (courtPawns.ptr[i].color == 'b' && whiteTurn))
+  //   {
+  //     hasOppositeCourtPawns = 1;
+  //   }
+  // }
+  int hasCourtPawns = checkIfHasOppositePawnsOnVector(game.courtPawns, whiteTurn);
+  if (hasCourtPawns == 0 && hasBarPawns == 1)
+  {
+    return 3;
+  }
+  else if (hasCourtPawns == 0)
+  {
+    return 2;
+  }
+  return 1;
 }
 
 void updateWinnerScore(s_game *game)
 {
-  int additionalPoints = 1;
+  fetchUsers(game);
+  int points = getPoints(*game);
   s_player *winner = game->endGame.winner == 1 ? &game->usersData.player1 : &game->usersData.player2;
 
   FILE *file = fopen(USERS, "w");
@@ -242,13 +276,12 @@ void updateWinnerScore(s_game *game)
   }
 
   s_player *users = game->usersData.allPlayers;
-  int userCount = game->usersData.userCount;
 
-  for (int i = 0; i < userCount; ++i)
+  for (int i = 0; i < game->usersData.userCount; ++i)
   {
     if (strcmp(users[i].name, winner->name) == 0)
     {
-      fprintf(file, "%s %d\n", users[i].name, users[i].score + additionalPoints);
+      fprintf(file, "%s %d\n", users[i].name, users[i].score + points);
       continue;
     }
     fprintf(file, "%s %d\n", users[i].name, users[i].score);
@@ -257,5 +290,5 @@ void updateWinnerScore(s_game *game)
 
   fetchUsers(game);
 
-  updateCurrentSavedUser(game);
+  updateCurrentSavedUser(game,points);
 }

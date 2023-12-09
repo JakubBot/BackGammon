@@ -1,0 +1,10 @@
+pod fedore
+
+// instalacja make
+sudo dnf install make
+
+// instalacja gcc
+sudo dnf install gcc
+
+// instalacja ncurses
+sudo dnf install ncurses-devel

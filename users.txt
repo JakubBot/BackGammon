@@ -1,6 +1,3 @@
-Jakub 19
-Jarek 19
-Adam 21
-jakub 0
-Adam 0
-Adamzcyk 0
+Jakub 3
+Adam 10
+Franek 100

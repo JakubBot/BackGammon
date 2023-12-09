@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
-// #include "../headers/rollDice.h"
 #include "../headers/utils.h"
 #include "../headers/globalStructs.h"
 
@@ -59,7 +58,4 @@ void rollDice(int *diceSize, s_game *game)
     {
         game->diceInfo.initialDiceValues[i] = game->diceInfo.dice[i];
     }
-    // game->diceInfo.dice = diceRes;
-
-    // return dice;
 }

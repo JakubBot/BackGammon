@@ -461,12 +461,6 @@ s_diceContainer getDiceData(s_game game)
     int moves = isDoublet ? availableDiceMoves : allNormalMovesAvailable ? 3
                                                                          : 1;
 
-    // diceContainer.isDoublet = game.diceInfo.isDoublet;
-    // diceContainer.availableDiceMoves = availableDiceMoves;
-    // diceContainer.allNormalMovesAvailable = allNormalMovesAvailable;
-    // int moveArr[4];
-    // getPossibleMovesArray(moveArr, game, availableDiceMoves);
-
     diceContainer.color = color;
     diceContainer.whiteTurn = whiteTurn;
 
@@ -481,56 +475,8 @@ int hasNextLegalMove(s_game game)
 {
     int useBarPawn = shouldUseBarPawn(game);
 
-    // char color = getTurn(game);
-    // int whiteTurn = color == 'w' ? 1 : 0;
-
-    // int isDoublet = game.diceInfo.isDoublet;
-    // int availableDiceMoves = game.diceInfo.availableDiceMoves;
-    // int allNormalMovesAvailable = availableDiceMoves == 3;
-
-    // int moves = isDoublet ? availableDiceMoves : allNormalMovesAvailable ? 3
-    //                                                                      : 1;
-    // int moveArr[4];
-    // getPossibleMovesArray(moveArr, game, availableDiceMoves);
     s_diceContainer diceInfo = getDiceData(game);
-    // if (useBarPawn)
-    // {
-    //     int currentColIndex = whiteTurn ? WHITE_COURT : BLACK_COURT;
 
-    //     return handlePawnLegalMv(game, moveArr, whiteTurn, moves, currentColIndex);
-    // }
-
-    // for (int currentColIndex = 0; currentColIndex < COLUMNS_COUNT; ++currentColIndex)
-    // {
-    //     s_boardColumn currentColumn = findColumnBasedOnColX(game, currentColIndex);
-
-    //     if (currentColumn.pawnIds.count == 0 || currentColumn.pawnIds.ptr[0].color != color)
-    //     // if (checkGameTurnPawns(currentColumn, color))
-    //     {
-    //         continue;
-    //     }
-
-    //     // int handlePawnLegalMv(s_game game, int *moveArr, int whiteTurn, int moves, int currentColIndex)
-    //     // {
-    //     //     int foundedIndex = hasFreeColumnToMove(moves, currentColIndex, moveArr, whiteTurn, game);
-
-    //     //     if (foundedIndex != NO_MOVE)
-    //     //         return foundedIndex;
-
-    //     //     return NO_MOVE;
-    //     // }
-
-    //     int legalMv = handlePawnLegalMv(game, moveArr, whiteTurn, moves, currentColIndex);
-    //     if (legalMv != NO_MOVE)
-    //     {
-    //         return legalMv;
-    //     }
-    //     // int foundedIndex = hasFreeColumnToMove(moves, currentColIndex, moveArr, whiteTurn, game);
-
-    //     // if (foundedIndex != NO_MOVE)
-    //     //     return foundedIndex;
-    // }
-    // // return NO_MOVE;
     return checkValidPosition(game, useBarPawn, diceInfo.whiteTurn, diceInfo.moveArr, diceInfo.moves, diceInfo.color);
 }
 
@@ -544,14 +490,6 @@ int existsCapture(s_game game, int *captureData, int checkBar)
     s_diceContainer dice = getDiceData(game);
 
     int white = dice.whiteTurn;
-    // int isDoublet = game.diceInfo.isDoublet;
-    // int availableDiceMoves = game.diceInfo.availableDiceMoves;
-    // int allNormalMovesAvailable = availableDiceMoves == 3;
-
-    // int moves = isDoublet ? availableDiceMoves : allNormalMovesAvailable ? 3
-    //                                                                      : 1;
-    // int moveArr[4];
-    // getPossibleMovesArray(moveArr, game, availableDiceMoves);
 
     if (checkBar)
     {

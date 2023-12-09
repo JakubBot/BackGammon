@@ -77,7 +77,6 @@ void showTurnInfo(s_game game)
 
   for (int i = 0; i < game.diceInfo.diceSize; ++i)
   {
-    // int diceMove = game.diceInfo.dice[132];
     int diceMove = game.diceInfo.dice[i];
     // if -1 we already used it, so just skip this step
     if (diceMove != -1)

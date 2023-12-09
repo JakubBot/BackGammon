@@ -18,7 +18,7 @@ typedef struct
 void init(vector_t_pawn *v)
 {
     v->count = 0;
-    v->allocated_size = 10;
+    v->allocated_size = 15;
     v->ptr = (s_pawn *)malloc(v->allocated_size * sizeof(s_pawn));
 }
 

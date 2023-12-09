@@ -57,7 +57,6 @@ struct Node *prev(struct Node *current)
     }
 
     return NULL;
-    // return current->prev;
 }
 
 int moveNext(struct Node **current)
@@ -158,38 +157,6 @@ struct Node *removeLastNode(struct Node *head)
 
     return head;
 }
-
-// void removeLastNode(struct Node **head)
-// {
-//     if (*head == NULL)
-//     {
-//         return;
-//     }
-
-//     struct Node *current = *head;
-//     struct Node *previous = NULL;
-
-//     while (current->next != NULL)
-//     {
-//         previous = current;
-//         current = current->next;
-//     }
-
-//     if (previous != NULL)
-//     {
-//         previous->next = NULL;
-//     }
-//     else
-//     {
-//         *head = NULL;
-//     }
-
-//     if (current != NULL)
-//     {
-
-//         free(current);
-//     }
-// }
 
 void freeList(struct Node **b_list)
 {

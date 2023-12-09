@@ -1,6 +1,4 @@
-//
-// Created by jakub bot on 18/11/2023.
-//
+
 #include "../headers/globalStructs.h"
 
 #ifndef PLAYERTURN_H

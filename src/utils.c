@@ -134,13 +134,6 @@ int min(int a, int b)
     return (a < b) ? a : b;
 }
 
-// int isBarActive(vector_t_pawn barPawnIds, s_game game) {
-//     for (int i =0; i < barPawnIds.count; i++) {
-//         if (barPawnIds.ptr[i].color == game.turn) {
-//             return 1;
-//         }
-//     }
-// }
 int getPawnBarCount(s_game game)
 {
     return game.board.bar.pawnIds.count;

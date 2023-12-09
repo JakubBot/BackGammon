@@ -169,8 +169,6 @@ void handleInitialBtns(char action, s_game *game, int *diceSize, int btnIds[], i
         renderGame(1);
         break;
     case 'a':
-        if (diceSize == NULL)
-            return;
         // author
         authorInfo();
 

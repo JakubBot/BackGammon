@@ -1,8 +1,3 @@
-//
-// Created by jakub bot on 30/11/2023.
-//
-
-// #include "../headers/renderGameUtils.h"
 
 #include "../headers/globalStructs.h"
 #include "../headers/utils.h"
@@ -195,18 +190,6 @@ void getInitialColumnsIds(vector_t_pawn *bColumn, int col)
 
 int getMoveDicePosition(struct Node *b_list, s_game game)
 {
-    // int val = b_list->data;
-    // moveToTop(&b_list);
-    // int pos = findLevel(b_list, val);
-    // if (pos == -1 || pos == 3)
-    // {
-    //     return pos;
-    // }
-    // else if (pos == 1 || pos == 2)
-    // {
-    //     return 1;
-    // }
-    // return 0;
 
     int moveIndex = countDepthRecursive(b_list);
     if (moveIndex == 3 || moveIndex == 0)
@@ -514,22 +497,6 @@ int validateNextMove(s_game *game, int move, int *currentActiveColumn, int *skip
     int goHome = handlePawnToHome(game, move, currentActiveColumn, action, b_list);
     if (goHome == 1)
         return 0;
-    // int pawnGoToHome = game->isPawnsHome && (game->removeFurthestPawn == 1 || edge) ? 1 : 0;
-
-    // if (pawnGoToHome)
-    // {
-    //     game->board.pawnMoveToCourt = 1;
-
-    //     *currentActiveColumn = move;
-
-    //     int validMv = makeMove(b_list, action);
-
-    //     return 0;
-    // }
-    // else
-    // {
-    //     game->board.pawnMoveToCourt = 0;
-    // }
 
     int validNext = isValidNextMove(move);
     if (!validNext)
@@ -572,61 +539,12 @@ int findNextLegalMove(s_game *game, char action, struct Node **b_list, int *curr
     if (nextElement == NULL)
         return 0;
 
-    // if (action == 'l')
-    // {
-    //     nextElement = next(*b_list);
-    //     if (nextElement == NULL)
-    //         return 0;
-    // }
-    // else
-    // {
-    //     nextElement = prev(*b_list);
-    //     if (nextElement == NULL)
-    //         return 0;
-    // }
-
     int step = nextElement->data;
     int move = getNextMoveCalculation(sCol, step, whiteTurn);
 
     int valid = validateNextMove(game, move, currentActiveColumn, skippedColumns, action, b_list);
     if (valid == 0)
         return 0;
-    // int move = getNextMoveCalculation(sourceColX, step, whiteTurn);
-    // int edge = isEdge(move);
-    // int pawnGoToHome = game->isPawnsHome && (game->removeFurthestPawn == 1 || edge) ? 1 : 0;
-
-    // if (pawnGoToHome)
-    // {
-    //     game->board.pawnMoveToCourt = 1;
-
-    //     *currentActiveColumn = move;
-
-    //     int validMv = makeMove(b_list, action);
-
-    //     return 0;
-    // }
-    // else
-    // {
-    //     game->board.pawnMoveToCourt = 0;
-    // }
-
-    // int validNext = isValidNextMove(move);
-    // if (!validNext)
-    //     return 0;
-
-    // int isValidCol = validPawnToColumnMove(game, move);
-
-    // if (!isValidCol)
-    // {
-    //     int validMv = makeMove(b_list, action);
-    //     *skippedColumns = *skippedColumns + 1;
-    //     int res = findNextLegalMove(game, action, b_list, currentActiveColumn, skippedColumns);
-    //     return res;
-    // }
-    // else
-    // {
-    //     *skippedColumns = 0;
-    // }
 
     makeMove(b_list, action);
     *currentActiveColumn = move;

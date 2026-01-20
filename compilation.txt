@@ -4,7 +4,6 @@ sudo dnf install make
 
 sudo dnf install ncurses-devel
 
-
 g++ --version
 should be 15
 

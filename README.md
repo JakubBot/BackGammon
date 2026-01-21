@@ -6,6 +6,10 @@ A classic Backgammon board game implemented in C with a terminal-based UI using 
 ![ncurses](https://img.shields.io/badge/ncurses-6.5-green)
 ![Platform](https://img.shields.io/badge/Platform-macOS%20|%20Linux-lightgrey)
 
+## Gameplay Demo
+
+![Gameplay Demo](assets/gameplay.gif)
+
 ## Features
 
 - **Two-player gameplay** - Local multiplayer on the same machine

@@ -1,3 +1,12 @@
-Jakub 1
-Adam 10
-Franek 0
+specter 12
+rogue 7
+mystic 15
+ironclad 3
+shade 10
+stone 0
+frost 14
+flux 5
+storm 9
+spark 16
+void 6
+rune 11
